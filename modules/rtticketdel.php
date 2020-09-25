@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -25,22 +25,24 @@
  */
 
 $ticket = intval($_GET['id']);
-$queue = $DB->GetOne('SELECT queueid FROM rttickets WHERE id = ?', array($ticket));
-$right = $LMS->GetUserRightsRT($AUTH->id, $queue);
+$taction = ($_GET['taction']);
 
-if(($right & 4) != 4)
-{
-	$SMARTY->display('noaccess.html');
-        $SESSION->close();
-	die;
+if (!($LMS->CheckTicketAccess($ticket) & RT_RIGHT_DELETE)) {
+    access_denied();
 }
 
-$DB->Execute('DELETE FROM rttickets WHERE id = ?', array($ticket));
-//HINT: We delete messages connected with deleted ticket in database (ON DELETE CASCADE mechanism)
+if ($taction == 'delete') {
+    $del = 1;
+    $nodel = 0;
+    $deltime = time();
+    // We use incomplete cascade delete. This means that we delete only messages tah weren't deleted before ticket delete operation.
+    $DB->BeginTrans();
+    $DB->Execute('UPDATE rttickets SET deleted=?, deltime=?, deluserid=? WHERE id = ?', array($del, $deltime, Auth::GetCurrentUser(), $ticket));
+    $DB->Execute('UPDATE rtmessages SET deleted=?, deluserid=? WHERE deleted=? and ticketid = ?', array($del, Auth::GetCurrentUser(), $nodel, $ticket));
+    $DB->CommitTrans();
+} elseif ($taction == 'delperm') {
+    $DB->Execute('DELETE FROM rttickets WHERE id = ?', array($ticket));
+}
 
-if (isset($CONFIG['rt']['mail_dir']))
-	rrmdir($CONFIG['rt']['mail_dir'].sprintf('/%06d', $ticket));
-
-header('Location: ?m=rtqueueview&id='.$queue);
-
-?>
+$SESSION->redirect('?m=rtqueueview'
+    . ($SESSION->is_set('backid') ? '#' . $SESSION->get('backid') : ''));

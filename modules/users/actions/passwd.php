@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,38 +24,37 @@
  *  $Id$
  */
 
-$id = (isset($_GET['id'])) ? $_GET['id'] : $AUTH->id;
+$id = (isset($_GET['id'])) ? $_GET['id'] : Auth::GetCurrentUser();
 
-if($LMS->UserExists($id))
-{
-	$error = FALSE;
+if ($LMS->UserExists($id)) {
+    $error = false;
 
-	if(isset($_POST['passwd']))
-	{
-		$passwd = $_POST['passwd'];
-		
-		if($passwd['passwd'] == '' || $passwd['confirm'] == '')
-			$error['password'] = trans('Empty passwords are not allowed!').'<BR>';
-		
-		if($passwd['passwd'] != $passwd['confirm'])
-			$error['password'] = trans('Passwords does not match!');
-		
-		if(!$error)
-		{
-			$LMS->SetUserPassword($id, $passwd['passwd']);
-			$SESSION->redirect('?'.$SESSION->get('backto'));
-		}
-	}
+    if (isset($_POST['passwd'])) {
+        $passwd = $_POST['passwd'];
+        
+        if ($passwd['passwd'] == '' || $passwd['confirm'] == '') {
+            $error['password'] = trans('Empty passwords are not allowed!').'<BR>';
+        }
+        
+        if ($passwd['passwd'] != $passwd['confirm']) {
+            $error['password'] = trans('Passwords does not match!');
+        }
+        
+        if ($LMS->PasswdExistsInHistory($id, $passwd['passwd'])) {
+            $error['password'] = trans('You already used this password!');
+        }
+        
+        if (!$error) {
+            $LMS->SetUserPassword($id, $passwd['passwd']);
+            $SESSION->redirect('?'.$SESSION->get('backto'));
+        }
+    }
 
-	$passwd['realname'] = $LMS->GetUserName($id);
-	$passwd['id'] = $id;
-	$layout['pagetitle'] = trans('Password Change for User $a',$passwd['realname']);
-	$SMARTY->assign('error', $error);
-	$SMARTY->assign('passwd', $passwd);
+    $passwd['realname'] = $LMS->GetUserName($id);
+    $passwd['id'] = $id;
+    $layout['pagetitle'] = trans('Password Change for User $a', $passwd['realname']);
+    $SMARTY->assign('error', $error);
+    $SMARTY->assign('passwd', $passwd);
+} else {
+    $SESSION->redirect('?m='. $SESSION->get('lasturl'));
 }
-else
-{
-	$SESSION->redirect('?m='. $SESSION->get('lasturl'));
-}
-
-?>

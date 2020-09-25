@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,52 +24,31 @@
  *  $Id$
  */
 
-function GetEvents($date=NULL, $userid=0, $customerid=0)
-{
-	global $DB, $AUTH;
-
-	$list = $DB->GetAll(
-	        'SELECT events.id AS id, title, description, begintime, endtime, closed, note, '
-		.$DB->Concat('UPPER(customers.lastname)',"' '",'customers.name'). ' AS customername, 
-		 customers.address AS customeraddr, customers.city AS customercity,
-		 (SELECT phone FROM customercontacts WHERE customerid = customers.id ORDER BY id LIMIT 1) AS customerphone 
-		 FROM events LEFT JOIN customers ON (customerid = customers.id)
-		 WHERE date = ? AND (private = 0 OR (private = 1 AND userid = ?)) '
-		 .($customerid ? 'AND customerid = '.intval($customerid) : '')
-		 .' ORDER BY begintime',
-		 array($date, $AUTH->id));
-
-	if($list)
-		foreach($list as $idx => $row)
-		{
-			$list[$idx]['userlist'] = $DB->GetAll('SELECT userid AS id, users.name
-								    FROM eventassignments, users
-								    WHERE userid = users.id AND eventid = ? ',
-								    array($row['id']));
-
-			if($userid && sizeof($list[$idx]['userlist']))
-				foreach($list[$idx]['userlist'] as $user)
-					if($user['id'] == $userid)
-					{
-						$list2[] = $list[$idx];
-						break;
-					}
-		}
-
-	if($userid)
-		return $list2;
-	else
-		return $list;
-}
-
 $date = $_GET['day'];
 
-if(!$date)
-{
-	$SESSION->redirect('?m=eventlist');
+if (empty($date)) {
+    $date = time();
 }
 
-$eventlist = GetEvents($date, $_GET['a'], $_GET['u']);
+list ($year, $month, $day) = explode('/', date('Y/m/d', $date));
+
+$eventlist = $LMS->GetEventList(
+    array(
+        'year' => $year,
+        'month' => $month,
+        'day' => $day,
+        'forward' => 1,
+        'userid' => $_GET['a'],
+        'type' => $_GET['t'],
+        'customerid' => $_GET['u'],
+        'privacy' => $_GET['privacy'],
+        'closed' => $_GET['closed'],
+        'singleday' => true,
+        'count' => false,
+    )
+);
+
+//$eventlist = GetEvents($date, $_GET['a'], $_GET['t'], $_GET['u'], intval($_GET['privacy']), $_GET['closed']);
 
 $layout['pagetitle'] = trans('Timetable');
 
@@ -77,6 +56,4 @@ $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('eventlist', $eventlist);
 $SMARTY->assign('date', $date);
-$SMARTY->display('eventprint.html');
-
-?>
+$SMARTY->display('event/eventprint.html');

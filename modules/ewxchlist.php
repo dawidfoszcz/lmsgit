@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,36 +24,36 @@
  *  $Id$
  */
 
-function GetChannelsList($order='name,asc')
+function GetChannelsList($order = 'name,asc')
 {
-	global $DB, $LMS;
+    global $DB, $LMS;
 
-	if($order=='')
+    if ($order=='') {
         $order='name,asc';
+    }
 
-	list($order,$direction) = sscanf($order, '%[^,],%s');
+    list($order,$direction) = sscanf($order, '%[^,],%s');
 
-	($direction=='desc') ? $direction = 'desc' : $direction = 'asc';
+    ($direction=='desc') ? $direction = 'desc' : $direction = 'asc';
 
-	switch($order)
-	{
-		case 'id':
-		case 'devcnt':
-		case 'nodecnt':
-		case 'downceil':
-		case 'upceil':
-		case 'downceil_n':
-		case 'upceil_n':
-		case 'cid':
-	        $sqlord = ' ORDER BY '.$order;
-		break;
-		default:
+    switch ($order) {
+        case 'id':
+        case 'devcnt':
+        case 'nodecnt':
+        case 'downceil':
+        case 'upceil':
+        case 'downceil_n':
+        case 'upceil_n':
+        case 'cid':
+            $sqlord = ' ORDER BY '.$order;
+            break;
+        default:
             $sqlord = ' ORDER BY name';
-		break;
-	}
+            break;
+    }
 
-	$channels = $DB->GetAll('('
-	    .'SELECT c.id, c.name, c.upceil, c.downceil,
+    $channels = $DB->GetAll('('
+        .'SELECT c.id, c.name, c.upceil, c.downceil,
 	    c.upceil_n, c.downceil_n, c.halfduplex, c2.id AS cid,
 		(SELECT COUNT(*) FROM netdevices WHERE channelid = c.id) AS devcnt,
 		(SELECT COUNT(*) FROM ewx_stm_nodes n
@@ -66,29 +66,31 @@ function GetChannelsList($order='name,asc')
 		(
 		SELECT 0 AS id, \''.trans('default').'\' AS name,
 		    ch.upceil, ch.downceil, 0 AS upceil_n, 0 AS downceil_n, 0, ch.id AS cid,
-		    (SELECT COUNT(DISTINCT netdev) FROM nodes WHERE netdev > 0 AND id IN (
+		    (SELECT COUNT(DISTINCT netdev) FROM vnodes WHERE netdev IS NOT NULL AND id IN (
 		        SELECT nodeid FROM ewx_stm_nodes WHERE channelid = ch.id)) AS devcnt,
 		    (SELECT COUNT(*) FROM ewx_stm_nodes WHERE channelid = ch.id) AS nodecnt
 		    FROM ewx_stm_channels ch
 		    WHERE ch.cid = 0
 		)'
-		.($sqlord != '' ? $sqlord.' '.$direction : ''));
+        .($sqlord != '' ? $sqlord.' '.$direction : ''));
 
-	$channels['total'] = sizeof($channels);
-	$channels['order'] = $order;
-	$channels['direction'] = $direction;
+    $channels['total'] = empty($channels) ? 0 : count($channels);
+    $channels['order'] = $order;
+    $channels['direction'] = $direction;
 
-	return $channels;
+    return $channels;
 }
 
-if(!isset($_GET['o']))
+if (!isset($_GET['o'])) {
         $SESSION->restore('eclo', $o);
-else
-        $o = $_GET['o'];
+} else {
+    $o = $_GET['o'];
+}
 $SESSION->save('eclo', $o);
 
-if ($SESSION->is_set('eclp') && !isset($_GET['page']))
+if ($SESSION->is_set('eclp') && !isset($_GET['page'])) {
         $SESSION->restore('eclp', $_GET['page']);
+}
 
 $channels = GetChannelsList($o);
 
@@ -101,7 +103,7 @@ unset($channels['order']);
 unset($channels['direction']);
 
 $page = (empty($_GET['page']) ? 1 : $_GET['page']);
-$pagelimit = (empty($CONFIG['phpui']['channellist_pagelimit']) ? $listdata['total'] : $CONFIG['phpui']['channellist_pagelimit']);
+$pagelimit = ConfigHelper::getConfig('phpui.channellist_pagelimit', $listdata['total']);
 $start = ($page - 1) * $pagelimit;
 
 $SESSION->save('eclp', $page);
@@ -115,6 +117,4 @@ $SMARTY->assign('page', $page);
 $SMARTY->assign('start', $start);
 $SMARTY->assign('channels', $channels);
 $SMARTY->assign('listdata', $listdata);
-$SMARTY->display('ewxchlist.html');
-
-?>
+$SMARTY->display('ewxch/ewxchlist.html');

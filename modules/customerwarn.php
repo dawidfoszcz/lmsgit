@@ -24,14 +24,15 @@
  *  $Id$
  */
 
-function getMessageTemplate($tmplid) {
-	global $DB;
+function getMessageTemplate($tmplid)
+{
+    global $DB;
 
-	$result = new xajaxResponse();
-	$message = $DB->GetOne('SELECT message FROM templates WHERE id = ?', array($tmplid));
-	$result->call('messageTemplateReceived', $message);
+    $result = new xajaxResponse();
+    $message = $DB->GetOne('SELECT message FROM templates WHERE id = ?', array($tmplid));
+    $result->call('messageTemplateReceived', $message);
 
-	return $result;
+    return $result;
 }
 
 $LMS->InitXajax();
@@ -40,87 +41,106 @@ $SMARTY->assign('xajax', $LMS->RunXajax());
 
 $setwarnings = isset($_POST['setwarnings']) ? $_POST['setwarnings'] : array();
 
-if (isset($setwarnings['mcustomerid']))
-{
-	$warnon = isset($setwarnings['warnon']) ? $setwarnings['warnon'] : FALSE;
-	$warnoff = isset($setwarnings['warnoff']) ? $setwarnings['warnoff'] : FALSE;
-	$message = isset($setwarnings['message']) ? $setwarnings['message'] : NULL;
+if (isset($setwarnings['mcustomerid'])) {
+    $warnon = isset($setwarnings['warnon']) ? $setwarnings['warnon'] : false;
+    $warnoff = isset($setwarnings['warnoff']) ? $setwarnings['warnoff'] : false;
+    $message = isset($setwarnings['message']) ? $setwarnings['message'] : null;
 
-	$msgtmplid = intval($setwarnings['tmplid']);
-	$msgtmploper = intval($setwarnings['tmploper']);
-	$msgtmplname = $setwarnings['tmplname'];
-	if ($msgtmploper > 1)
-		switch ($msgtmploper) {
-			case 2:
-				if (empty($msgtmplid))
-					break;
-				$LMS->UpdateMessageTemplate($msgtmplid, TMPL_WARNING, null, $setwarnings['message']);
-				break;
-			case 3:
-				if (!strlen($msgtmplname))
-					break;
-				$LMS->AddMessageTemplate(TMPL_WARNING, $msgtmplname, $setwarnings['message']);
-				break;
-		}
+    $msgtmplid = intval($setwarnings['tmplid']);
+    $msgtmploper = intval($setwarnings['tmploper']);
+    $msgtmplname = $setwarnings['tmplname'];
+    if ($msgtmploper > 1) {
+        switch ($msgtmploper) {
+            case 2:
+                if (empty($msgtmplid)) {
+                    break;
+                }
+                $LMS->UpdateMessageTemplate($msgtmplid, TMPL_WARNING, null, '', $setwarnings['message']);
+                break;
+            case 3:
+                if (!strlen($msgtmplname)) {
+                    break;
+                }
+                $LMS->AddMessageTemplate(TMPL_WARNING, $msgtmplname, '', $setwarnings['message']);
+                break;
+        }
+    }
 
-	$cids = array_filter($setwarnings['mcustomerid'], 'is_natural');
-	if (!empty($cids)) {
-		$LMS->NodeSetWarnU($cids, $warnon ? 1 : 0);
-		if (isset($message)) {
-			$DB->Execute('UPDATE customers SET message = ? WHERE id IN (' . implode(',', $cids) . ')',
-				array($message));
-			if ($SYSLOG)
-				foreach ($cids as $cid) {
-					$args = array(
-						$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CUST] => $cid,
-						'message' => $message
-					);
-					$SYSLOG->AddMessage(SYSLOG_RES_CUST, SYSLOG_OPER_UPDATE, $args,
-						array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CUST]));
-				}
-		}
-	}
+    $cids = array_filter($setwarnings['mcustomerid'], 'is_natural');
+    if (!empty($cids)) {
+        $LMS->NodeSetWarnU($cids, $warnon ? 1 : 0);
+        if (isset($message)) {
+            $DB->Execute(
+                'UPDATE customers SET message = ? WHERE id IN (' . implode(',', $cids) . ')',
+                array($message)
+            );
+            if ($SYSLOG) {
+                foreach ($cids as $cid) {
+                    $args = array(
+                    SYSLOG::RES_CUST => $cid,
+                    'message' => $message
+                    );
+                    $SYSLOG->AddMessage(SYSLOG::RES_CUST, SYSLOG::OPER_UPDATE, $args);
+                }
+            }
+        }
+    }
 
-	$SESSION->save('warnmessage', $message);
-	$SESSION->save('warnon', $warnon);
-	$SESSION->save('warnoff', $warnoff);
+    $SESSION->save('warnmessage', $message);
+    $SESSION->save('warnon', $warnon);
+    $SESSION->save('warnoff', $warnoff);
 
-	$SESSION->redirect('?'.$SESSION->get('backto'));
+    $SESSION->redirect('?'.$SESSION->get('backto'));
 }
 
-if(isset($_GET['search']))
-{
-	$SESSION->restore('customersearch', $customersearch);
-	$SESSION->restore('cslo', $o);
-	$SESSION->restore('csls', $s);
-	$SESSION->restore('csln', $n);
-	$SESSION->restore('cslg', $g);
-	$SESSION->restore('cslk', $k);
+if (isset($_GET['search'])) {
+    $SESSION->restore('customersearch', $search);
+    $SESSION->restore('cslo', $order);
+    $SESSION->restore('csls', $state);
+    $SESSION->restore('cslsk', $statesqlkey);
+    $SESSION->restore('csln', $network);
+    $SESSION->restore('cslng', $nodegroup);
+    $SESSION->restore('cslg', $customergroup);
+    $SESSION->restore('cslk', $sqlskey);
+    $SESSION->restore('csld', $division);
 
-	$customerlist = $LMS->GetCustomerList($o, $s, $n, $g, $customersearch, NULL, $k);
-	
-	unset($customerlist['total']);
-	unset($customerlist['state']);
-	unset($customerlist['network']);
-	unset($customerlist['customergroup']);
-	unset($customerlist['direction']);
-	unset($customerlist['order']);
-	unset($customerlist['below']);
-	unset($customerlist['over']);
+    $customerlist = $LMS->GetCustomerList(compact(
+        'order',
+        'state',
+        'statesqlkey',
+        'network',
+        'customergroup',
+        'search',
+        'time',
+        'sqlskey',
+        'nodegroup',
+        'division'
+    ));
 
-	$selected = array();
-	if($customerlist)
-		foreach($customerlist as $row)
-			$selected[$row['id']] = $row['id'];
-	
-	$SMARTY->assign('selected', $selected);
+    unset($customerlist['total']);
+    unset($customerlist['state']);
+    unset($customerlist['network']);
+    unset($customerlist['customergroup']);
+    unset($customerlist['direction']);
+    unset($customerlist['order']);
+    unset($customerlist['below']);
+    unset($customerlist['over']);
+
+    $selected = array();
+    if ($customerlist) {
+        foreach ($customerlist as $row) {
+            $selected[$row['id']] = $row['id'];
+        }
+    }
+
+    $SMARTY->assign('selected', $selected);
 }
 
 $layout['pagetitle'] = trans('Notices');
 
 $customerlist = $DB->GetAllByKey('SELECT c.id AS id, MAX(warning) AS warning, '.
-		    $DB->Concat('UPPER(lastname)',"' '",'c.name').' AS customername 
-		    FROM customersview c 
+            $DB->Concat('UPPER(lastname)', "' '", 'c.name').' AS customername 
+		    FROM customerview c 
 		    LEFT JOIN nodes ON c.id = ownerid 
 		    WHERE deleted = 0 
 		    GROUP BY c.id, lastname, c.name 
@@ -130,7 +150,5 @@ $SMARTY->assign('messagetemplates', $LMS->GetMessageTemplates(TMPL_WARNING));
 $SMARTY->assign('warnmessage', $SESSION->get('warnmessage'));
 $SMARTY->assign('warnon', $SESSION->get('warnon'));
 $SMARTY->assign('warnoff', $SESSION->get('warnoff'));
-$SMARTY->assign('customerlist',$customerlist);
-$SMARTY->display('customerwarnings.html');
-
-?>
+$SMARTY->assign('customerlist', $customerlist);
+$SMARTY->display('customer/customerwarnings.html');

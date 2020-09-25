@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,248 +24,293 @@
  *  $Id$
  */
 
-if(isset($_GET['action']) && $_GET['action'] == 'confirm')
-{
-	if(!empty($_POST['marks']))
-	{
-	        foreach($_POST['marks'] as $id => $mark)
-			$DB->Execute('UPDATE documents SET closed=1 WHERE id=?
-				AND EXISTS (SELECT 1 FROM docrights r WHERE r.userid = ?
-					AND r.doctype = documents.type AND (r.rights & 4) = 4)',
-				array($mark, $AUTH->id));
-	}
-	else
-		$DB->Execute('UPDATE documents SET closed=1 WHERE id=?
-			AND EXISTS (SELECT 1 FROM docrights r WHERE r.userid = ?
-				AND r.doctype = documents.type AND (r.rights & 4) = 4)',
-			array($_GET['id'], $AUTH->id));
+check_file_uploads();
 
-	$SESSION->redirect('?'.$SESSION->get('backto'));
+$userid = Auth::GetCurrentUser();
+
+if (isset($_GET['action'])) {
+    if (!empty($_POST['marks'])) {
+        $ids = $_POST['marks'];
+    } else {
+        $ids = array($_GET['id']);
+    }
+
+    switch ($_GET['action']) {
+        case 'confirm':
+            $LMS->CommitDocuments($ids);
+            break;
+        case 'archive':
+            $LMS->ArchiveDocuments($ids);
+            break;
+    }
+
+    $SESSION->redirect('?'.$SESSION->get('backto'));
 }
 
-$document = $DB->GetRow('SELECT documents.id AS id, closed, type, number, template,
-	cdate, numberplanid, title, fromdate, todate, description, divisionid
+include(MODULES_DIR . DIRECTORY_SEPARATOR . 'document.inc.php');
+
+$document = $DB->GetRow(
+    'SELECT documents.id AS id, closed,
+		archived, confirmdate, adate, auserid,
+		type, number, numberplans.template,
+		cdate, sdate, cuserid, numberplanid, title, fromdate, todate, description, divisionid, documents.customerid,
+		r.rights AS docrights
 	FROM documents
+	JOIN docrights r ON (r.doctype = documents.type)
 	LEFT JOIN documentcontents ON (documents.id = docid)
 	LEFT JOIN numberplans ON (numberplanid = numberplans.id)
-	WHERE documents.id = ?', array($_GET['id']));
+	WHERE documents.id = ? AND r.userid = ? AND (r.rights & ?) > 0',
+    array($_GET['id'], $userid, DOCRIGHT_EDIT)
+);
+if (empty($document)) {
+    $SMARTY->display('noaccess.html');
+    die;
+}
 
-if(isset($_POST['document']))
-{
-	$documentedit = $_POST['document'];
-	$documentedit['id'] = $_GET['id'];
+$document['attachments'] = $DB->GetAllByKey('SELECT *, 0 AS deleted FROM documentattachments
+	WHERE docid = ? ORDER BY type DESC', 'id', array($_GET['id']));
 
-	$oldfdate = $documentedit['fromdate'];
-	$oldtdate = $documentedit['todate'];
+if (isset($_POST['document'])) {
+    $documentedit = $_POST['document'];
+    $documentedit['id'] = $_GET['id'];
 
-	if(!$documentedit['title'])
-		$error['title'] = trans('Document title is required!');
+    $oldfdate = $documentedit['fromdate'];
+    $oldtdate = $documentedit['todate'];
+    $oldconfirmdate = $documentedit['confirmdate'];
 
-	// check if selected customer can use selected numberplan
-        if($documentedit['numberplanid'] && !$DB->GetOne('SELECT 1 FROM numberplanassignments
-	        WHERE planid = ? AND divisionid = ?', array($documentedit['numberplanid'], $document['divisionid'])))
-	{
-		$error['number'] = trans('Selected numbering plan doesn\'t match customer\'s division!');
-	}
-	elseif(!$documentedit['number'])
-	{
-		if($document['numberplanid'] != $documentedit['numberplanid'])
-		{
-			$tmp = $LMS->GetNewDocumentNumber($documentedit['type'], $documentedit['numberplanid']);
-			$documentedit['number'] = $tmp ? $tmp : 1;
-		}
-		else
-			$documentedit['number'] = $document['number'];
-	}
-	elseif(!preg_match('/^[0-9]+$/', $documentedit['number']))
-    		$error['number'] = trans('Document number must be an integer!');
-	elseif($document['number'] != $documentedit['number'] || $document['numberplanid'] != $documentedit['numberplanid'])
-	{
-		if($LMS->DocumentExists($documentedit['number'], $documentedit['type'], $documentedit['numberplanid']))
-			$error['number'] = trans('Document with specified number exists!');
-	}
+    if (!$documentedit['title']) {
+        $error['title'] = trans('Document title is required!');
+    }
 
-	if($documentedit['fromdate'])
-	{
-		$date = explode('/',$documentedit['fromdate']);
-		if(checkdate($date[1],$date[2],$date[0]))
-			$documentedit['fromdate'] = mktime(0,0,0,$date[1],$date[2],$date[0]);
-		else
-			$error['fromdate'] = trans('Incorrect date format! Enter date in YYYY/MM/DD format!');
-	}
-	else 
-		$documentedit['fromdate'] = 0;
+    // check if selected customer can use selected numberplan
+    if ($documentedit['numberplanid'] && !$DB->GetOne('SELECT 1 FROM numberplanassignments
+	        WHERE planid = ? AND divisionid = ?', array($documentedit['numberplanid'], $document['divisionid']))) {
+        $error['number'] = trans('Selected numbering plan doesn\'t match customer\'s division!');
+    } elseif (!$documentedit['number']) {
+        if ($document['numberplanid'] != $documentedit['numberplanid']) {
+            $tmp = $LMS->GetNewDocumentNumber(array(
+                'doctype' => $documentedit['type'],
+                'planid' => $documentedit['numberplanid'],
+                'customerid' => $document['customerid'],
+            ));
+            $documentedit['number'] = $tmp ? $tmp : 1;
+        } else {
+            $documentedit['number'] = $document['number'];
+        }
+    } elseif (!preg_match('/^[0-9]+$/', $documentedit['number'])) {
+        $error['number'] = trans('Document number must be an integer!');
+    } elseif ($document['number'] != $documentedit['number'] || $document['numberplanid'] != $documentedit['numberplanid']) {
+        if ($LMS->DocumentExists(array(
+            'number' => $documentedit['number'],
+            'doctype' => $documentedit['type'],
+            'planid' => $documentedit['numberplanid'],
+        ))) {
+            $error['number'] = trans('Document with specified number exists!');
+        }
+    }
 
-	if($documentedit['todate'])
-	{
-		$date = explode('/',$documentedit['todate']);
-		if(checkdate($date[1],$date[2],$date[0]))
-			$documentedit['todate'] = mktime(23,59,59,$date[1],$date[2],$date[0]);
-		else
-			$error['todate'] = trans('Incorrect date format! Enter date in YYYY/MM/DD format!');
-	}
-	else
-		$documentedit['todate'] = 0;
+    if ($documentedit['fromdate']) {
+        $date = explode('/', $documentedit['fromdate']);
+        if (checkdate($date[1], $date[2], $date[0])) {
+            $documentedit['fromdate'] = mktime(0, 0, 0, $date[1], $date[2], $date[0]);
+        } else {
+            $error['fromdate'] = trans('Incorrect date format! Enter date in YYYY/MM/DD format!');
+        }
+    } else {
+        $documentedit['fromdate'] = 0;
+    }
 
-	if($documentedit['fromdate'] > $documentedit['todate'] && $documentedit['todate']!=0)
-		$error['todate'] = trans('Start date can\'t be greater than end date!');
+    if ($documentedit['todate']) {
+        $date = explode('/', $documentedit['todate']);
+        if (checkdate($date[1], $date[2], $date[0])) {
+            $documentedit['todate'] = mktime(23, 59, 59, $date[1], $date[2], $date[0]);
+        } else {
+            $error['todate'] = trans('Incorrect date format! Enter date in YYYY/MM/DD format!');
+        }
+    } else {
+        $documentedit['todate'] = 0;
+    }
 
-/*	if($filename = $_FILES['file']['name'])
-	{
-		if(is_uploaded_file($_FILES['file']['tmp_name']) && $_FILES['file']['size'])
-		{
-			$file = $_FILES['file']['tmp_name'];
-			$documentedit['md5sum'] = md5_file($file);
-			$documentedit['contenttype'] = $_FILES['file']['type'];
-			$documentedit['filename'] = $filename;
-		}
-		else // upload errors
-			switch($_FILES['file']['error'])
-			{
-				case 1:
-				case 2: $error['file'] = trans('File is too large.'); break;
-				case 3: $error['file'] = trans('File upload has finished prematurely.'); break;
-				case 4: $error['file'] = trans('Path to file was not specified.'); break;
-				default: $error['file'] = trans('Problem during file upload.'); break;
-			}
-	}
-	elseif($documentedit['template'])
-	{
-		include(DOC_DIR.'/templates/'.$documentedit['template'].'/info.php');
-		if(file_exists(DOC_DIR.'/templates/'.$engine['engine'].'/engine.php'))
-			require_once(DOC_DIR.'/templates/'.$engine['engine'].'/engine.php');
-		else
-			require_once(DOC_DIR.'/templates/default/engine.php');
+    if ($documentedit['fromdate'] > $documentedit['todate'] && $documentedit['todate']!=0) {
+        $error['todate'] = trans('Start date can\'t be greater than end date!');
+    }
 
-		if($output)
-		{
-			$file = DOC_DIR.'/tmp.file';
-			$fh = fopen($file, 'w');
-			fwrite($fh, $output);
-			fclose($fh);
+    $documentedit['closed'] = isset($documentedit['closed']) ? 1 : 0;
+    $documentedit['archived'] = isset($documentedit['archived']) ? 1 : 0;
+    if ($documentedit['archived'] && !$documentedit['closed']) {
+        $error['closed'] = trans('Cannot undo document confirmation while it is archived!');
+    }
 
-			$documentedit['md5sum'] = md5_file($file);
-			$documentedit['contenttype'] = $engine['content_type'];
-			$documentedit['filename'] = $engine['output'];
-		}
-		else
-			$error['template'] = trans('Problem during file generation!');
-	}
-	else
-		$error['file'] = trans('You must to specify file for upload or select document template!');
+    if ($documentedit['confirmdate'] && !$documentedit['closed']) {
+        $date = explode('/', $documentedit['confirmdate']);
+        if (checkdate($date[1], $date[2], $date[0])) {
+            $documentedit['confirmdate'] = mktime(0, 0, 0, $date[1], $date[2], $date[0]);
+        } else {
+            $error['confirmdate'] = trans('Incorrect date format! Enter date in YYYY/MM/DD format!');
+            $documentedit['confirmdate'] = 0;
+        }
+    } else {
+        $documentedit['confirmdate'] = 0;
+    }
 
-	if(!$error)
-	{
-		$path = DOC_DIR.'/'.substr($documentedit['md5sum'],0,2);
-		@mkdir($path, 0700);
-		$newfile = $path.'/'.$documentedit['md5sum'];
-		if(!file_exists($newfile))
-		{
-			if(!@rename($file, $newfile))
-				$error['file'] = trans('Can\'t save file in "$a" directory!', $path);
-		}
-		else
-			$error['file'] = trans('Specified file exists in database!');
-	}
-*/
-	$documentedit['closed'] = isset($documentedit['closed']) ? 1 : 0;
+    $result = handle_file_uploads('attachments', $error);
+    extract($result);
+    $SMARTY->assign('fileupload', $fileupload);
 
-	if(!$error)
-	{
-		$DB->BeginTrans();
+    $files = array();
+    if (!$error && !empty($attachments)) {
+        foreach ($attachments as $attachment) {
+            $attachment['tmpname'] = $tmppath . DIRECTORY_SEPARATOR . $attachment['name'];
+            $attachment['filename'] = $attachment['name'];
+            $attachment['md5sum'] = md5_file($attachment['tmpname']);
+            $files[] = $attachment;
+        }
+    }
 
-		$DB->Execute('UPDATE documents SET type=?, closed=?, number=?, numberplanid=?
+    if (!$error) {
+        $error = $LMS->AddDocumentFileAttachments($files);
+        if (empty($error) && !empty($tmppath)) {
+            rrmdir($tmppath);
+        }
+    }
+
+    if (!$error) {
+        $DB->BeginTrans();
+
+        $fullnumber = docnumber(array(
+            'number' => $documentedit['number'],
+            'template' => $DB->GetOne('SELECT template FROM numberplans WHERE id = ?', array($documentedit['numberplanid'])),
+            'cdate' => $document['cdate'],
+            'customerid' => $document['customerid'],
+        ));
+
+        $closed = $documentedit['closed'] ? ($document['confirmdate'] == -1 && $document['closed'] != 2 ? 2 : 1) : 0;
+
+        $DB->Execute(
+            'UPDATE documents SET type=?, closed=?, sdate=?, cuserid=?, confirmdate = ?,
+			        archived = ?, adate = ?, auserid = ?, number=?, numberplanid=?, fullnumber=?
 				WHERE id=?',
-				array(	$documentedit['type'],
-					$documentedit['closed'],
-					$documentedit['number'],
-					$documentedit['numberplanid'],
-					$documentedit['id'],
-					));
+            array(  $documentedit['type'],
+                    $closed == 1 && !$document['closed'] ? 0 : $closed,
+                    $documentedit['closed'] ? ($document['closed'] ? $document['sdate'] : time()) : 0,
+                    $documentedit['closed'] ? ($document['closed'] ? $document['cuserid'] : $userid) : null,
+                    !$document['closed'] && $documentedit['closed'] && $document['confirmdate'] == -1 ? 0 : ($documentedit['closed'] || !$documentedit['confirmdate'] ? 0 : $documentedit['confirmdate'] + 86399),
+                    $documentedit['archived'],
+                    $documentedit['archived'] ? ($document['archived'] ? $document['adate'] : time()) : 0,
+                    $documentedit['archived'] ? ($document['archived'] ? $document['auserid'] : $userid) : null,
+                    $documentedit['number'],
+                    empty($documentedit['numberplanid']) ? null : $documentedit['numberplanid'],
+                    $fullnumber,
+                    $documentedit['id'],
+                    )
+        );
 
-		$DB->Execute('UPDATE documentcontents SET title=?, fromdate=?, todate=?, description=?
+        $DB->Execute(
+            'UPDATE documentcontents SET title=?, fromdate=?, todate=?, description=?
 				WHERE docid=?',
-				array(	$documentedit['title'],
-					$documentedit['fromdate'],
-					$documentedit['todate'],
-					$documentedit['description'],
-					$documentedit['id']
-					));
+            array(  $documentedit['title'],
+                    $documentedit['fromdate'],
+                    $documentedit['todate'],
+                    $documentedit['description'],
+                    $documentedit['id']
+                    )
+        );
 
-		$DB->CommitTrans();
+        if (isset($documentedit['attachments']) && is_array($documentedit['attachments'])) {
+            foreach ($documentedit['attachments'] as $attachmentid => $attachment) {
+                if ($attachment['deleted'] && $document['attachments'][$attachmentid]['type'] < 1) {
+                    $md5sum = $document['attachments'][$attachmentid]['md5sum'];
+                    if ($DB->GetOne('SELECT COUNT(*) FROM documentattachments WHERE md5sum = ?', array($md5sum)) <= 1) {
+                        @unlink(DOC_DIR . DIRECTORY_SEPARATOR . substr($md5sum, 0, 2) . DIRECTORY_SEPARATOR . $md5sum);
+                    }
+                    $DB->Execute('DELETE FROM documentattachments WHERE id = ?', array($attachmentid));
+                }
+            }
+        }
 
-		$SESSION->redirect('?'.$SESSION->get('backto'));
-	}
-	else
-	{
-		$document['title'] = $documentedit['title'];
-		$document['type'] = $documentedit['type'];
-		$document['description'] = $documentedit['description'];
-		$document['closed'] = $documentedit['closed'];
-		$document['number'] = $documentedit['number'];
-		$document['numberplanid'] = $documentedit['numberplanid'];
-		$document['fromdate'] = $oldfdate;
-		$document['todate'] = $oldtdate;
-	}
+        $LMS->AddDocumentAttachments($documentedit['id'], $files);
+
+        $DB->CommitTrans();
+
+        if ($closed == 1 && !$document['closed']) {
+            $LMS->CommitDocuments(array($documentedit['id']));
+        }
+
+        $SESSION->redirect('?'.$SESSION->get('backto'));
+    } else {
+        $document['title'] = $documentedit['title'];
+        $document['type'] = $documentedit['type'];
+        $document['description'] = $documentedit['description'];
+        $document['closed'] = $documentedit['closed'];
+        $document['number'] = $documentedit['number'];
+        $document['numberplanid'] = $documentedit['numberplanid'];
+        $document['fromdate'] = $oldfdate;
+        $document['todate'] = $oldtdate;
+        $document['confirmdate'] = $documentedit['confirmdate'];
+        $document['confirmdatestring'] = $oldconfirmdate;
+        foreach ($document['attachments'] as $attachmentid => &$attachment) {
+            $attachment['deleted'] = $documentedit['attachments'][$attachmentid]['deleted'];
+        }
+        unset($attachment);
+    }
+} else {
+    if ($document['fromdate'] > 0) {
+        $document['fromdate'] = date('Y/m/d', $document['fromdate']);
+    }
+    if ($document['todate'] > 0) {
+        $document['todate'] = date('Y/m/d', $document['todate']);
+    }
+    if ($document['confirmdate'] > 0) {
+        $document['confirmdatestring'] = date('Y/m/d', $document['confirmdate']);
+    }
 }
-else
-{
-	if($document['fromdate']>0)
-		$document['fromdate'] = date('Y/m/d', $document['fromdate']);
-	if($document['todate']>0)
-		$document['todate'] = date('Y/m/d', $document['todate']);
-}
 
-$rights = $DB->GetCol('SELECT doctype FROM docrights
-	WHERE userid = ? AND (rights & 2) = 2', array($AUTH->id));
+$rights = $DB->GetCol(
+    'SELECT doctype FROM docrights
+	WHERE userid = ? AND (rights & ?) > 0',
+    array($userid, DOCRIGHT_CREATE)
+);
 
-if(!$rights || !$DB->GetOne('SELECT 1 FROM docrights
-	WHERE userid = ? AND doctype = ? AND (rights & 8) = 8',
-	array($AUTH->id, $document['type'])))
-{
+if (!$rights || !$DB->GetOne(
+    'SELECT 1 FROM docrights
+	WHERE userid = ? AND doctype = ? AND (rights & ?) > 0',
+    array($userid, $document['type'], DOCRIGHT_EDIT)
+)) {
         $SMARTY->display('noaccess.html');
         die;
 }
 
-$allnumberplans = array();
-$numberplans = array();
-
-if($templist = $LMS->GetNumberPlans())
-        foreach($templist as $item)
-	        if($item['doctype']<0)
-			$allnumberplans[] = $item;
-
-if(isset($document['numberplanid']))
-{
-        foreach($allnumberplans as $plan)
-                if($plan['doctype'] == $document['numberplanid'])
-                        $numberplans[] = $plan;
+$numberplans = GetDocumentNumberPlans($document['type'], $document['customerid']);
+if (empty($numberplans)) {
+    $numberplans = array();
 }
+$SMARTY->assign('numberplans', $numberplans);
 
 /*
 if($dirs = getdir(DOC_DIR.'/templates', '^[a-z0-9_-]+$'))
-	foreach($dirs as $dir)
-	{
-		$infofile = DOC_DIR.'/templates/'.$dir.'/info.php';
-		if(file_exists($infofile))
-		{
-			unset($engine);
-			include($infofile);
-			$docengines[$dir] = $engine;
-		}
-	}
+    foreach($dirs as $dir)
+    {
+        $infofile = DOC_DIR.'/templates/'.$dir.'/info.php';
+        if(file_exists($infofile))
+        {
+            unset($engine);
+            include($infofile);
+            $docengines[$dir] = $engine;
+        }
+    }
 
 if($docengines) ksort($docengines);
 */
 
-$layout['pagetitle'] = trans('Edit Document: $a', docnumber($document['number'], $document['template'], $document['cdate']));
+$layout['pagetitle'] = trans('Edit Document: $a', docnumber(array(
+    'number' => $document['number'],
+    'template' => $document['template'],
+    'cdate' => $document['cdate'],
+    'customerid' => $document['customerid'],
+)));
 
 //$SMARTY->assign('docengines', $docengines);
-$SMARTY->assign('numberplans', $numberplans);
 $SMARTY->assign('docrights', $rights);
-$SMARTY->assign('allnumberplans', $allnumberplans);
 $SMARTY->assign('error', $error);
 $SMARTY->assign('document', $document);
-$SMARTY->display('documentedit.html');
-
-?>
+$SMARTY->display('document/documentedit.html');

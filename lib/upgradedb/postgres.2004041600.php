@@ -23,7 +23,7 @@
  *
  *  $Id$
  */
-$DB->Execute("
+$this->Execute("
     BEGIN;
     CREATE SEQUENCE usergroups_id_seq;
     CREATE TABLE usergroups (
@@ -44,5 +44,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004041600' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

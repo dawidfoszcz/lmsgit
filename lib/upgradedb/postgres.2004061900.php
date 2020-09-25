@@ -23,7 +23,7 @@
  *
  *  $Id$
  */
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE tariffs ADD upceil integer;
     ALTER TABLE tariffs ALTER upceil SET DEFAULT 0;
@@ -50,5 +50,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004061900' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

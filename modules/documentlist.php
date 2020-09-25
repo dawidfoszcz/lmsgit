@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,154 +24,188 @@
  *  $Id$
  */
 
-function GetDocumentList($order='cdate,asc', $type=NULL, $customer=NULL, $from=0, $to=0)
-{
-	global $DB, $AUTH;
+if (!isset($_GET['init'])) {
+    if (isset($_GET['o'])) {
+        $filter['order'] = $_GET['o'];
+    }
 
-	if($order=='')
-		$order='cdate,asc';
+    if (isset($_GET['t'])) {
+        if (is_array($_GET['t'])) {
+            $filter['type'] = Utils::filterIntegers($_GET['t']);
+            if (count($filter['type']) == 1) {
+                $first = reset($filter['type']);
+                if ($first == 0) {
+                    $filter['type'] = 0;
+                }
+            }
+        } else {
+            $filter['type'] = intval($_GET['t']);
+        }
+    }
 
-	list($order,$direction) = sscanf($order, '%[^,],%s');
-	($direction=='desc') ? $direction = 'desc' : $direction = 'asc';
+    if (isset($_GET['service'])) {
+        if (is_array($_GET['service'])) {
+            $filter['service'] = Utils::filterIntegers($_GET['service']);
+            if (count($filter['service']) == 1) {
+                $first = reset($filter['service']);
+                if ($first == 0) {
+                    $filter['service'] = 0;
+                }
+            }
+        } else {
+            $filter['service'] = intval($_GET['service']);
+        }
+    }
 
-	switch($order)
-	{
-		case 'type':
-			$sqlord = ' ORDER BY d.type '.$direction.', d.name';
-		break;
-		case 'title':
-			$sqlord = ' ORDER BY title '.$direction.', d.name';
-		break;
-		case 'customer':
-			$sqlord = ' ORDER BY d.name '.$direction.', title';
-		break;
-		default:
-			$sqlord = ' ORDER BY d.cdate '.$direction.', d.name';
-		break;
-	}
+    if (isset($_GET['c'])) {
+        $filter['customer'] = $_GET['c'];
+    }
 
-	$list = $DB->GetAll('SELECT docid, d.number, d.type, title, d.cdate, fromdate, todate, description, 
-				filename, md5sum, contenttype, template, d.closed, d.name, d.customerid
-                	FROM documentcontents
-			JOIN documents d ON (d.id = documentcontents.docid)
-			JOIN docrights r ON (d.type = r.doctype AND r.userid = ? AND (r.rights & 1) = 1)
-		        LEFT JOIN numberplans ON (d.numberplanid = numberplans.id)
-			LEFT JOIN (
-			        SELECT DISTINCT a.customerid FROM customerassignments a
-				JOIN excludedgroups e ON (a.customergroupid = e.customergroupid)
-				WHERE e.userid = lms_current_user()
-			) e ON (e.customerid = d.customerid)
-			WHERE e.customerid IS NULL '
-			.($customer ? 'AND d.customerid = '.intval($customer) : '')
-			.($type ? ' AND d.type = '.intval($type) : '')
-			.($from ? ' AND d.cdate >= '.intval($from) : '')
-			.($to ? ' AND d.cdate <= '.intval($to) : '')
-			.$sqlord, array($AUTH->id));
+    if (isset($_GET['p'])) {
+        $filter['numberplan'] = $_GET['p'];
+    }
 
-	$list['total'] = sizeof($list);
-	$list['direction'] = $direction;
-	$list['order'] = $order;
+    if (isset($_GET['usertype'])) {
+        $filter['usertype'] = $_GET['usertype'];
+    }
+    if (!isset($filter['usertype']) || empty($filter['usertype'])) {
+        $filter['usertype'] = 'creator';
+    }
 
-	return $list;
+    if (isset($_GET['u'])) {
+        if (is_array($_GET['u'])) {
+            $filter['userid'] = Utils::filterIntegers($_GET['u']);
+            if (count($filter['userid']) == 1) {
+                $first = reset($filter['userid']);
+                if ($first == 0) {
+                    $filter['userid'] = 0;
+                }
+            }
+        } else {
+            $filter['userid'] = intval($_GET['u']);
+        }
+    }
+
+    if (isset($_GET['periodtype'])) {
+        $filter['periodtype'] = $_GET['periodtype'];
+    }
+    if (!isset($filter['periodtype']) || empty($filter['periodtype'])) {
+        $filter['periodtype'] = 'creationdate';
+    }
+
+    if (isset($_GET['from'])) {
+        if ($_GET['from'] != '') {
+            list ($year, $month, $day) = explode('/', $_GET['from']);
+            $filter['from'] = mktime(0, 0, 0, $month, $day, $year);
+        } else {
+            $filter['from'] = 0;
+        }
+    } elseif (!isset($filter['from'])) {
+        $filter['from'] = 0;
+    }
+
+    if (isset($_GET['to'])) {
+        if ($_GET['to'] != '') {
+            list ($year, $month, $day) = explode('/', $_GET['to']);
+            $filter['to'] = mktime(23, 59, 59, $month, $day, $year);
+        } else {
+            $filter['to'] = 0;
+        }
+    } elseif (!isset($filter['to'])) {
+        $filter['to'] = 0;
+    }
+
+    if (isset($_GET['s'])) {
+        $filter['status'] = $_GET['s'];
+    } elseif (!isset($filter['status'])) {
+        $filter['status'] = -1;
+    }
+
+    if (isset($_GET['archived'])) {
+        $filter['archived'] = $_GET['archived'];
+    } elseif (!isset($filter['archived'])) {
+        $filter['archived'] = -1;
+    }
+} else {
+    $filter = array(
+        'status' => -1,
+        'archived' => -1,
+    );
+    $SMARTY->clearAssign('persistent_filter');
+    $SESSION->saveFilter($filter);
 }
 
-if (empty($_GET['init']))
-{
-    if(!isset($_GET['o']))
-	    $SESSION->restore('doclo', $o);
-    else
-	    $o = $_GET['o'];
-    $SESSION->save('doclo', $o);
-
-    if(!isset($_GET['t']))
-	    $SESSION->restore('doclt', $t);
-    else
-	    $t = $_GET['t'];
-    $SESSION->save('doclt', $t);
-
-    if(!isset($_GET['c']))
-	    $SESSION->restore('doclc', $c);
-    else
-	    $c = $_GET['c'];
-    $SESSION->save('doclc', $c);
-
-    if(isset($_GET['from']))
-    {
-        if($_GET['from'] != '')
-        {
-            list($year, $month, $day) = explode('/', $_GET['from']);
-            $from = mktime(0,0,0, $month, $day, $year);
+if (isset($_GET['init'])) {
+    $default_current_period = ConfigHelper::getConfig('phpui.documentlist_default_current_period', '', true);
+    if (preg_match('/^(day|month)$/', $default_current_period)) {
+        list ($year, $month, $day) = explode('/', date('Y/m/d'));
+        if ($default_current_period == 'day') {
+            $filter['from'] = mktime(0, 0, 0, $month, $day, $year);
+        } else {
+            $filter['from'] = mktime(0, 0, 0, $month, 1, $year);
         }
-        else
-		    $from = 0;
     }
-    elseif($SESSION->is_set('doclfrom'))
-	    $SESSION->restore('doclfrom', $from);
-    else
-        $from = 0;
-    $SESSION->save('doclfrom', $from);
-
-    if(isset($_GET['to']))
-    {
-        if($_GET['to'] != '')
-        {
-            list($year, $month, $day) = explode('/', $_GET['to']);
-            $to = mktime(23,59,59, $month, $day, $year);
-        }
-        else
-		    $to = 0;
-    }
-    elseif($SESSION->is_set('doclto'))
-	    $SESSION->restore('doclto', $to);
-    else
-        $to = 0;
-    $SESSION->save('doclto', $to);
 }
 
-$documentlist = GetDocumentList($o, $t, $c, $from, $to);
+$filter['count'] = true;
+$filter['total'] = intval($LMS->GetDocumentList($filter));
 
-$listdata['total'] = $documentlist['total'];
-$listdata['order'] = $documentlist['order'];
-$listdata['direction'] = $documentlist['direction'];
-$listdata['type'] = $t;
-$listdata['customer'] = $c;
-$listdata['from'] = $from;
-$listdata['to'] = $to;
+$filter['limit'] = intval(ConfigHelper::getConfig('phpui.documentlist_pagelimit', 100));
+$filter['page'] = intval(isset($_GET['page']) ? $_GET['page'] : ceil($filter['total'] / $filter['limit']));
+if (empty($filter['page'])) {
+    $filter['page'] = 1;
+}
+$filter['offset'] = ($filter['page'] - 1) * $filter['limit'];
+
+$filter['count'] = false;
+$documentlist = $LMS->GetDocumentList($filter);
+
+//if (isset($_GET['init']) && isset($filter['from'])) {
+//    $from = $filter['from'];
+//    unset($filter['from']);
+//    $SESSION->saveFilter($filter);
+//    $filter['from'] = $from;
+//} else {
+    $SESSION->saveFilter($filter);
+//}
+
+$pagination = LMSPaginationFactory::getPagination(
+    $filter['page'],
+    $filter['total'],
+    $filter['limit'],
+    ConfigHelper::checkConfig('phpui.short_pagescroller')
+);
+
+$filter['order'] = $documentlist['order'];
+$filter['direction'] = $documentlist['direction'];
 
 unset($documentlist['total']);
 unset($documentlist['order']);
 unset($documentlist['direction']);
 
-$pagelimit = $CONFIG['phpui']['documentlist_pagelimit'];
-$page = !isset($_GET['page']) ? ceil($listdata['total']/$pagelimit) : intval($_GET['page']);
-$start = ($page - 1) * $pagelimit;
-
 $layout['pagetitle'] = trans('Documents List');
 
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
-if($docid = $SESSION->get('documentprint'))
-{
-	$SMARTY->assign('docid', $docid);
-	$SESSION->remove('documentprint');
+if ($docid = $SESSION->get('documentprint')) {
+    $SMARTY->assign('docid', $docid);
+    $SESSION->remove('documentprint');
 }
 
-if($listdata['total'])
-{
-	$SMARTY->assign('docrights', $DB->GetAllByKey('SELECT doctype, rights
-			FROM docrights WHERE userid = ? AND rights > 1', 'doctype', array($AUTH->id)));
+if ($filter['total']) {
+    $SMARTY->assign('docrights', $DB->GetAllByKey('SELECT doctype, rights
+			FROM docrights WHERE userid = ? AND rights > 1', 'doctype', array(Auth::GetCurrentUser())));
 }
 
-if(!isset($CONFIG['phpui']['big_networks']) || !chkconfig($CONFIG['phpui']['big_networks']))
-{
+if (!ConfigHelper::checkConfig('phpui.big_networks')) {
     $SMARTY->assign('customers', $LMS->GetCustomerNames());
 }
 
+$SMARTY->assign('users', $LMS->GetUserNames());
+$SMARTY->assign('numberplans', $LMS->GetNumberPlans(array(
+    'doctype' => array(DOC_CONTRACT, DOC_ANNEX, DOC_PROTOCOL, DOC_ORDER, DOC_SHEET, -6, -7, -8, -9, -99, DOC_PRICELIST, DOC_PROMOTION, DOC_WARRANTY, DOC_REGULATIONS, DOC_OTHER),
+)));
 $SMARTY->assign('documentlist', $documentlist);
-$SMARTY->assign('pagelimit', $pagelimit);
-$SMARTY->assign('page', $page);
-$SMARTY->assign('start', $start);
-$SMARTY->assign('listdata', $listdata);
-$SMARTY->display('documentlist.html');
-
-?>
+$SMARTY->assign('pagination', $pagination);
+$SMARTY->assign('filter', $filter);
+$SMARTY->display('document/documentlist.html');

@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("CREATE TABLE divisions (
+$this->Execute("CREATE TABLE divisions (
     	id int(11) NOT NULL auto_increment,
 	shortname       varchar(255) NOT NULL DEFAULT '',
         name        	text    NOT NULL DEFAULT '',
@@ -42,14 +42,14 @@ $DB->Execute("CREATE TABLE divisions (
 	UNIQUE KEY shortname (shortname)
 ) ENGINE=MyISAM");
 
-$DB->Execute("ALTER TABLE documents ADD divisionid int(11) NOT NULL DEFAULT '0'");
-$DB->Execute("UPDATE documents SET divisionid = 1");
+$this->Execute("ALTER TABLE documents ADD divisionid int(11) NOT NULL DEFAULT '0'");
+$this->Execute("UPDATE documents SET divisionid = 1");
 
-$DB->Execute("ALTER TABLE customers ADD divisionid int(11) NOT NULL DEFAULT '0'");
-$DB->Execute("UPDATE customers SET divisionid = 1");
+$this->Execute("ALTER TABLE customers ADD divisionid int(11) NOT NULL DEFAULT '0'");
+$this->Execute("UPDATE customers SET divisionid = 1");
 
-$DB->Execute("DROP VIEW customersview");
-$DB->Execute("CREATE VIEW customersview AS
+$this->Execute("DROP VIEW customersview");
+$this->Execute("CREATE VIEW customersview AS
         SELECT c.* FROM customers c
 	        WHERE NOT EXISTS (
 	        SELECT 1 FROM customerassignments a
@@ -57,24 +57,30 @@ $DB->Execute("CREATE VIEW customersview AS
 	        WHERE e.userid = lms_current_user() AND a.customerid = c.id);
 ");
 
-if($list = $DB->GetAll("SELECT * FROM uiconfig WHERE section = 'finances' OR section = 'invoices'"))
-        foreach($list as $opt)
-	        $CONFIG[$opt['section']][$opt['var']] = $opt['value'];
-
-$DB->Execute("INSERT INTO divisions (shortname, inv_header, inv_footer, inv_author, inv_cplace, name, 
+$shortname = ConfigHelper::getConfig('finances.shortname');
+$header = ConfigHelper::getConfig('invoices.header');
+$footer = ConfigHelper::getConfig('invoices.footer');
+$default_author = ConfigHelper::getConfig('invoices.default_author');
+$cplace = ConfigHelper::getConfig('invoices.cplace');
+$name = ConfigHelper::getConfig('finances.name');
+$address = ConfigHelper::getConfig('finances.address');
+$city = ConfigHelper::getConfig('finances.city');
+$zip = ConfigHelper::getConfig('finances.zip');
+$account = ConfigHelper::getConfig('finances.account');
+$this->Execute(
+    "INSERT INTO divisions (shortname, inv_header, inv_footer, inv_author, inv_cplace, name, 
 	address, city, zip, account) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-	array(!empty($CONFIG['finances']['shortname']) && $CONFIG['finances']['shortname'] != 'finances/shortname' ? $CONFIG['finances']['shortname'] : 'default',
-	        !empty($CONFIG['invoices']['header']) ? str_replace("\\n", "\n", $CONFIG['invoices']['header']) : '',
-	        !empty($CONFIG['invoices']['footer']) ? str_replace("\\n", "\n", $CONFIG['invoices']['footer']) : '',
-	        !empty($CONFIG['invoices']['default_author']) ? $CONFIG['invoices']['default_author'] : '',
-	        !empty($CONFIG['invoices']['cplace']) ? $CONFIG['invoices']['cplace'] : '',
-	        !empty($CONFIG['finances']['name']) && $CONFIG['finances']['name'] != 'finances/name' ? $CONFIG['finances']['name'] : 'default',
-	        !empty($CONFIG['finances']['address']) && $CONFIG['finances']['address'] != 'finances/address'  ? $CONFIG['finances']['address'] : '',
-	        !empty($CONFIG['finances']['city']) && $CONFIG['finances']['city'] != 'finances/city'  ? $CONFIG['finances']['city'] : '',
-	        !empty($CONFIG['finances']['zip']) && $CONFIG['finances']['zip'] != 'finances/zip'  ? $CONFIG['finances']['zip'] : '',
-	        !empty($CONFIG['finances']['account']) ? $CONFIG['finances']['account'] : '',
-	));
+    array(!empty($shortname) && $shortname != 'finances/shortname' ? $shortname : 'default',
+            !empty($header) ? str_replace("\\n", "\n", $header) : '',
+            !empty($footer) ? str_replace("\\n", "\n", $footer) : '',
+            !empty($default_author) ? $default_author : '',
+            !empty($cplace) ? $cplace : '',
+            !empty($name) && $name != 'finances/name' ? $name : 'default',
+            !empty($address) && $address != 'finances/address'  ? $address : '',
+            !empty($city) && $city != 'finances/city'  ? $city : '',
+            !empty($zip) && $zip != 'finances/zip'  ? $zip : '',
+            !empty($account) ? $account : '',
+    )
+);
 
-$DB->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?", array('2008102000', 'dbversion'));
-
-?>
+$this->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?", array('2008102000', 'dbversion'));

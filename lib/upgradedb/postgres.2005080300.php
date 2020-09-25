@@ -24,26 +24,9 @@
  *  $Id$
  */
 
-if($temp = $DB->GetOne('SELECT value FROM uiconfig WHERE section=? AND var=? AND disabled=0', 
-		array('invoices', 'number_template')))
-	$CONFIG['invoices']['number_template'] = $temp;
-	
-if($temp = $DB->GetOne('SELECT value FROM uiconfig WHERE section=? AND var=? AND disabled=0', 
-		array('receipts', 'number_template')))
-	$CONFIG['receipts']['number_template'] = $temp;
+$this->BeginTrans();
 
-if($temp = $DB->GetOne('SELECT value FROM uiconfig WHERE section=? AND var=? AND disabled=0', 
-		array('invoices', 'monthly_numbering')))
-	$CONFIG['invoices']['monthly_numbering'] = $temp;
-
-if($temp = $DB->GetOne('SELECT value FROM uiconfig WHERE section=? AND var=? AND disabled=0', 
-		array('receipts', 'monthly_numbering')))
-	$CONFIG['receipts']['monthly_numbering'] = $temp;
-
-
-$DB->BeginTrans();
-
-$DB->Execute("
+$this->Execute("
     CREATE SEQUENCE numberplans_id_seq;
     CREATE TABLE numberplans (
 	id integer DEFAULT nextval('numberplans_id_seq'::text) NOT NULL,
@@ -54,12 +37,16 @@ $DB->Execute("
 	PRIMARY KEY (id))
 ");
 
-$DB->Execute("INSERT INTO numberplans (template, period, doctype, isdefault) VALUES(?,?,1,1)", 
-		array(str_replace('%M','%m',$CONFIG['invoices']['number_template']), $CONFIG['invoices']['monthly_numbering'] ? 3 : 5));
-$DB->Execute("INSERT INTO numberplans (template, period, doctype, isdefault) VALUES(?,?,2,1)", 
-		array(str_replace('%M','%m',$CONFIG['receipts']['number_template']), $CONFIG['receipts']['monthly_numbering'] ? 3 : 5));
+$this->Execute(
+    "INSERT INTO numberplans (template, period, doctype, isdefault) VALUES(?,?,1,1)",
+    array(str_replace('%M', '%m', ConfigHelper::getConfig('invoices.number_template')), ConfigHelper::getConfig('invoices.monthly_numbering') ? 3 : 5)
+);
+$this->Execute(
+    "INSERT INTO numberplans (template, period, doctype, isdefault) VALUES(?,?,2,1)",
+    array(str_replace('%M', '%m', ConfigHelper::getConfig('receipts.number_template')), ConfigHelper::getConfig('receipts.monthly_numbering') ? 3 : 5)
+);
 
-$DB->Execute("
+$this->Execute("
     ALTER TABLE documents ADD numberplanid integer;
     UPDATE documents SET numberplanid = 0;
     ALTER TABLE documents ALTER numberplanid SET NOT NULL;
@@ -70,8 +57,6 @@ $DB->Execute("
     CREATE INDEX documents_numberplanid_idx ON documents(numberplanid);
 ");
 
-$DB->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?",array('2005080300', 'dbversion'));
+$this->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?", array('2005080300', 'dbversion'));
 
-$DB->CommitTrans();
-
-?>
+$this->CommitTrans();

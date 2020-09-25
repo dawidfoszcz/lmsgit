@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2020 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,67 +24,92 @@
  *  $Id$
  */
 
-$SESSION->save('backto', $_SERVER['QUERY_STRING']);
+if ($api) {
+    $count = false;
+    $customerlist = $LMS->GetCustomerList(compact("count"));
+    if (empty($customerlist)) {
+        $customerlist = array();
+    } else {
+        unset($customerlist['total']);
+        unset($customerlist['state']);
+        unset($customerlist['order']);
+        unset($customerlist['below']);
+        unset($customerlist['over']);
+        unset($customerlist['direction']);
+    }
+    header('Content-Type: application/json');
+    echo json_encode(array_values($customerlist));
+    die;
+} else {
+    $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
-$layout['pagetitle'] = trans('Customers List');
+    $divisionContext = $SESSION->get('division_context', true);
+    if (!isset($divisionContext)) {
+        $divisionContext = $SESSION->get_persistent_setting('division_context');
+        $SESSION->save('division_context', $divisionContext, true);
+    }
+    $SMARTY->assign('division_context', $divisionContext);
+    $layout['division'] = $divisionContext;
 
-if(!isset($_GET['o']))
-	$SESSION->restore('clo', $o);
-else
-	$o = $_GET['o'];
-$SESSION->save('clo', $o);
+    $layout['pagetitle'] = trans('Customers List');
 
-if(!isset($_GET['s']))
-	$SESSION->restore('cls', $s);
-else
-	$s = $_GET['s'];
-$SESSION->save('cls', $s);
+    if (isset($_GET['o'])) {
+        $filter['order'] = $_GET['o'];
+    }
 
-if(!isset($_GET['n']))
-	$SESSION->restore('cln', $n);
-else
-	$n = $_GET['n'];
-$SESSION->save('cln', $n);
+    if (isset($_GET['s'])) {
+        $filter['state'] = $_GET['s'];
+    }
 
-if(!isset($_GET['g']))
-	$SESSION->restore('clg', $g);
-else
-	$g = $_GET['g'];
-$SESSION->save('clg', $g);
+    if (isset($_GET['n'])) {
+        $filter['network'] = $_GET['n'];
+    }
 
-if(!isset($_GET['ng']))
-        $SESSION->restore('clng', $ng);
-else
-        $ng = $_GET['ng'];
-$SESSION->save('clng', $ng);
+    if (isset($_GET['g'])) {
+        $filter['customergroup'] = Utils::filterIntegers($_GET['g']);
+    }
 
-if(!isset($_GET['d']))
-        $SESSION->restore('cld', $d);
-else
-        $d = $_GET['d'];
-$SESSION->save('cld', $d);
-		
-if (! isset($_GET['page']))
-	$SESSION->restore('clp', $_GET['page']);
-	    
-$customerlist = $LMS->GetCustomerList($o, $s, $n, $g, NULL, NULL, 'AND', $ng, $d);
+    if (isset($_GET['ng'])) {
+        $filter['nodegroup'] = $_GET['ng'];
+    }
 
-$listdata['total'] = $customerlist['total'];
-$listdata['order'] = $customerlist['order'];
-$listdata['below'] = $customerlist['below'];
-$listdata['over'] = $customerlist['over'];
-$listdata['direction'] = $customerlist['direction'];
-$listdata['network'] = $n;
-$listdata['nodegroup'] = $ng;
-$listdata['customergroup'] = $g;
-$listdata['division'] = $d;
-$listdata['state'] = $s;
+    if (isset($_GET['d'])) {
+        $filter['division'] = $_GET['d'];
+    }
 
-$page = (! $_GET['page'] ? 1 : $_GET['page']); 
-$pagelimit = (!$CONFIG['phpui']['customerlist_pagelimit'] ? $listdata['total'] : $CONFIG['phpui']['customerlist_pagelimit']);
-$start = ($page - 1) * $pagelimit;
+    if (isset($_GET['assignments'])) {
+        $filter['assignments'] = $_GET['assignments'];
+    }
 
-$SESSION->save('clp', $page);
+    if (isset($_GET['page'])) {
+        $filter['page'] = intval($_GET['page']);
+    } elseif (!isset($filter['page']) || empty($filter['page'])) {
+        $filter['page'] = 1;
+    }
+
+    $SESSION->saveFilter($filter);
+
+    $filter['search'] = array();
+    $filter['sqlskey'] = 'AND';
+    $filter['count'] = true;
+    $summary = $LMS->GetCustomerList($filter);
+
+    $filter['total'] = intval($summary['total']);
+    $filter['limit'] = intval(ConfigHelper::getConfig('phpui.customerlist_pagelimit', 100));
+    $filter['offset'] = ($filter['page'] - 1) * $filter['limit'];
+    if ($filter['total'] && $filter['total'] < $filter['offset']) {
+        $filter['page'] = 1;
+        $filter['offset'] = 0;
+    }
+    $filter['count'] = false;
+    $customerlist = $LMS->GetCustomerList($filter);
+}
+$pagination = LMSPaginationFactory::getPagination($filter['page'], $filter['total'], $filter['limit'], ConfigHelper::checkConfig('phpui.short_pagescroller'));
+
+$filter['below'] = $summary['below'];
+$filter['over'] = $summary['over'];
+$filter['order'] = $customerlist['order'];
+$filter['direction'] = $customerlist['direction'];
 
 unset($customerlist['total']);
 unset($customerlist['state']);
@@ -93,16 +118,10 @@ unset($customerlist['below']);
 unset($customerlist['over']);
 unset($customerlist['direction']);
 
-$SMARTY->assign('customerlist',$customerlist);
-$SMARTY->assign('listdata',$listdata);
+$SMARTY->assign('customerlist', $customerlist);
 $SMARTY->assign('networks', $LMS->GetNetworks());
 $SMARTY->assign('customergroups', $LMS->CustomergroupGetAll());
 $SMARTY->assign('nodegroups', $LMS->GetNodeGroupNames());
-$SMARTY->assign('divisions', $DB->GetAll('SELECT id, shortname FROM divisions ORDER BY shortname'));
-$SMARTY->assign('pagelimit',$pagelimit);
-$SMARTY->assign('page',$page);
-$SMARTY->assign('start',$start);
+$SMARTY->assign('pagination', $pagination);
 
-$SMARTY->display('customerlist.html');
-
-?>
+$SMARTY->display('customer/customerlist.html');

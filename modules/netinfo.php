@@ -24,25 +24,23 @@
  *  $Id$
  */
 
-if(!$LMS->NetworkExists($_GET['id']))
-{
-	$SESSION->redirect('?m=netlist');
+if (!$LMS->NetworkExists($_GET['id'])) {
+    $SESSION->redirect('?m=netlist');
 }
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 
-if($SESSION->is_set('ntlp.'.$_GET['id']) && !isset($_GET['page']))
-	$SESSION->restore('ntlp.'.$_GET['id'], $page);
+if ($SESSION->is_set('ntlp.'.$_GET['id']) && !isset($_GET['page'])) {
+    $SESSION->restore('ntlp.'.$_GET['id'], $page);
+}
 
 $SESSION->save('ntlp.'.$_GET['id'], $page);
 
-$network = $LMS->GetNetworkRecord($_GET['id'], $page, $CONFIG['phpui']['networkhosts_pagelimit']);
+$network = $LMS->GetNetworkRecord($_GET['id'], $page, ConfigHelper::getConfig('phpui.networkhosts_pagelimit'));
 
 $layout['pagetitle'] = trans('Info Network: $a', $network['name']);
 
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('network', $network);
-$SMARTY->display('netinfo.html');
-
-?>
+$SMARTY->display('net/netinfo.html');

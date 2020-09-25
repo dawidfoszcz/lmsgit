@@ -18,7 +18,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  *  USA.
  *
  *  $Id$
@@ -26,36 +26,30 @@
 
 // Include required files (including sequence is important)
 
-require_once(LIB_DIR.'/unstrip.php');
+$_SERVER['REMOTE_ADDR'] = str_replace("::ffff:", "", $_SERVER['REMOTE_ADDR']);
+
 require_once(LIB_DIR.'/definitions.php');
 require_once(LIB_DIR.'/checkip.php');
 require_once(LIB_DIR.'/common.php');
 require_once(LIB_DIR.'/Session.class.php');
 require_once(LIB_DIR.'/Auth.class.php');
-require_once(LIB_DIR.'/definitions.php');
 require_once(LIB_DIR.'/LMS.class.php');
 
 // Initialize main classes
 
-$SESSION = new Session($DB, $CONFIG['phpui']['timeout']);
+$SESSION = new Session($DB, ConfigHelper::getConfig('phpui.timeout'));
 $AUTH = new Auth($DB, $SESSION);
-$LMS = new LMS($DB, $AUTH, $CONFIG);
-$LMS->ui_lang = $_ui_language;
-$LMS->lang = $_language;
+$LMS = new LMS($DB, $AUTH);
 
-$SMARTY->assignByRef('_LANG', $_LANG);
-$SMARTY->assignByRef('LANGDEFS', $LANGDEFS);
-$SMARTY->assignByRef('_ui_language', $LMS->ui_lang);
-$SMARTY->assignByRef('_language', $LMS->lang);
-$SMARTY->assign('_dochref', is_dir('doc/html/'.$LMS->ui_lang) ? 'doc/html/'.$LMS->ui_lang.'/' : 'doc/html/en/');
-$SMARTY->assign('_config',$CONFIG);
+$SMARTY->assign('_dochref', is_dir('doc/html/' . Localisation::getCurrentUiLanguage())
+    ? 'doc/html/' . Localisation::getCurrentUiLanguage() . DIRECTORY_SEPARATOR : 'doc/html/en/');
 
 $layout['logname'] = $AUTH->logname;
 $layout['lmsdbv'] = $DB->GetVersion();
 $layout['smarty_version'] = $SMARTY->_version;
 $layout['hostname'] = hostname();
-$layout['lmsv'] = '1.11-git';
-$layout['lmsvr'] = $LMS->_revision;
+$layout['lmsv'] = LMS::SOFTWARE_VERSION;
+$layout['lmsvr'] = LMS::getSoftwareRevision();
 $layout['dberrors'] =& $DB->GetErrors();
 $layout['popup'] = isset($_GET['popup']) ? true : false;
 
@@ -65,16 +59,13 @@ $SMARTY->assign('_action', $ExecStack->action);
 
 header('X-Powered-By: LMS/'.$layout['lmsv']);
 
-$error = NULL; // initialize error variable needed for (almost) all modules
+$error = null; // initialize error variable needed for (almost) all modules
 
-if($AUTH->islogged !== TRUE)
-{
-	$SMARTY->assign('error', $AUTH->error);
-	$SMARTY->display('../modules/core/templates/login.html');
-	die;
+if ($AUTH->islogged !== true) {
+    $SMARTY->assign('error', $AUTH->error);
+    $SMARTY->display('../modules/core/templates/login.html');
+    die;
 }
 
 // core plugins
 register_plugin('menu-menuend', '../modules/core/templates/logout.html');
-
-?>

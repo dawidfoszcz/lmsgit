@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,18 +24,15 @@
  *  $Id$
  */
 
-if(! $LMS->QueueExists($_GET['id']))
-{
-	$SESSION->redirect('?m=rtqueuelist');
+if (! $LMS->QueueExists($_GET['id'])) {
+    $SESSION->redirect('?m=rtqueuelist');
 }
 
 $queue = $LMS->GetQueue($_GET['id']);
 
-$layout['pagetitle'] = trans('Queue Info: $a',$queue['name']);
+$layout['pagetitle'] = trans('Queue Info: $a', $queue['name']);
 
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('queue', $queue);
-$SMARTY->display('rtqueueinfo.html');
-
-?>
+$SMARTY->display('rt/rtqueueinfo.html');

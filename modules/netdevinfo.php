@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2020 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,51 +24,151 @@
  *  $Id$
  */
 
-if (!$LMS->NetDevExists($_GET['id'])) {
-	$SESSION->redirect('?m=netdevlist');
+$id = intval($_GET['id']);
+
+if (!$LMS->NetDevExists($id)) {
+    $SESSION->redirect('?m=netdevlist');
 }
 
-$netdevinfo = $LMS->GetNetDev($_GET['id']);
-$netdevconnected = $LMS->GetNetDevConnectedNames($_GET['id']);
-$netcomplist = $LMS->GetNetdevLinkedNodes($_GET['id']);
-$netdevlist = $LMS->GetNotConnectedDevices($_GET['id']);
-$replacelist = $LMS->GetNetDevList();
+$LMS->InitXajax();
+include(MODULES_DIR . DIRECTORY_SEPARATOR . 'netdevxajax.inc.php');
+$SMARTY->assign('xajax', $LMS->RunXajax());
 
-$replacelisttotal = $replacelist['total'];
-unset($replacelist['order']);
-unset($replacelist['total']);
-unset($replacelist['direction']);
+if (!isset($_POST['xjxfun'])) {                  // xajax was called and handled by netdevxajax.inc.php
+    $netdev = $LMS->GetNetDev($id);
+    if (!empty($netdev['ownerid'])) {
+        $assignments = $LMS->GetCustomerAssignments($netdev['ownerid'], true, false);
+        $assignments = $LMS->GetNetDevCustomerAssignments($id, $assignments);
+        $SMARTY->assign(array(
+            'assignments' => $assignments,
+            'customerinfo' => array(
+                'id' => $netdev['ownerid'],
+            )
+        ));
+    }
+    $attachmenttype = 'netdevid';
+    $attachmentresourceid = $id;
+    $SMARTY->assign('attachmenttype', $attachmenttype);
+    $SMARTY->assign('attachmentresourceid', $attachmentresourceid);
 
-$nodelist = $LMS->GetUnlinkedNodes();
-$netdevips = $LMS->GetNetDevIPs($_GET['id']);
+    $filecontainers = array(
+        'netdevid' => array(
+            'id' => $id,
+            'prefix' => trans('Device attachments'),
+            'containers' => $LMS->GetFileContainers('netdevid', $id),
+        ),
+        'netdevmodelid' => array(
+            'id' => intval($netdev['modelid']),
+            'prefix' => trans('Model attachments'),
+            'containers' => $LMS->GetFileContainers('netdevmodelid', intval($netdev['modelid'])),
+        ),
+    );
+    $SMARTY->assign('filecontainers', $filecontainers);
 
-$SESSION->save('backto', $_SERVER['QUERY_STRING']);
+    include(MODULES_DIR . DIRECTORY_SEPARATOR . 'attachments.php');
 
-$layout['pagetitle'] = trans('Device Info: $a $b $c', $netdevinfo['name'], $netdevinfo['producer'], $netdevinfo['model']);
+    $netdevconnected = $LMS->GetNetDevConnectedNames($id);
+    $netcomplist = $LMS->GetNetdevLinkedNodes($id);
+    $netdevlist = $LMS->GetNotConnectedDevices($id);
 
-$netdevinfo['id'] = $_GET['id'];
+    if ($netdev['ports'] > $netdev['takenports']) {
+        $nodelist = $LMS->GetUnlinkedNodes();
+    }
+    $netdevips = $LMS->GetNetDevIPs($id);
 
-$SMARTY->assign('netdevinfo', $netdevinfo);
-$SMARTY->assign('netdevlist', $netdevconnected);
-$SMARTY->assign('netcomplist', $netcomplist);
-$SMARTY->assign('restnetdevlist', $netdevlist);
-$SMARTY->assign('netdevips', $netdevips);
-$SMARTY->assign('nodelist', $nodelist);
-$SMARTY->assign('replacelist', $replacelist);
-$SMARTY->assign('replacelisttotal', $replacelisttotal);
-$SMARTY->assign('devlinktype', $SESSION->get('devlinktype'));
-$SMARTY->assign('devlinktechnology', $SESSION->get('devlinktechnology'));
-$SMARTY->assign('devlinkspeed', $SESSION->get('devlinkspeed'));
-$SMARTY->assign('nodelinktype', $SESSION->get('nodelinktype'));
-$SMARTY->assign('nodelinktechnology', $SESSION->get('nodelinktechnology'));
-$SMARTY->assign('nodelinkspeed', $SESSION->get('nodelinkspeed'));
+    $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
-include(MODULES_DIR . '/netdevxajax.inc.php');
+    $layout['pagetitle'] = trans('Device Info: $a $b $c', $netdev['name'], $netdev['producer'], $netdev['model']);
 
-if (isset($_GET['ip'])) {
-	$SMARTY->assign('nodeipdata', $LMS->GetNode($_GET['ip']));
-	$SMARTY->display('netdevipinfo.html');
-} else {
-	$SMARTY->display('netdevinfo.html');
+    $netdev['id'] = $id;
+
+    if ($netdev['netnodeid']) {
+        $netdev['netnode'] = $LMS->GetNetNode($netdev['netnodeid']);
+    }
+
+    $netdev['projectname'] = trans('none');
+    if ($netdev['invprojectid']) {
+        if ($LMS->GetProjectType($netdev['invprojectid']) == INV_PROJECT_SYSTEM) {
+            /* inherited */
+            if ($netdev['netnodeid']) {
+                $netdev['projectname'] = trans('$a (from network node $b)', $netdev['netnode']['name'], $netdev['netnode']['name']);
+            }
+        } else {
+            $prj = $LMS->GetProject($netdev['invprojectid']);
+            if ($prj) {
+                $netdev['projectname'] = $prj['name'];
+            }
+        }
+    }
+
+    $queue = $LMS->GetQueueContents(array('netdevids' => $id));
+    unset($queue['total']);
+    unset($queue['state']);
+    unset($queue['order']);
+    unset($queue['direction']);
+    unset($queue['owner']);
+    unset($queue['removed']);
+    unset($queue['priority']);
+    unset($queue['deadline']);
+    unset($queue['service']);
+    unset($queue['type']);
+    unset($queue['unread']);
+    unset($queue['rights']);
+
+    $start = 0;
+    $pagelimit = ConfigHelper::getConfig('phpui.ticketlist_pagelimit', $queue['total']);
+
+    $SMARTY->assign('netdev', $netdev);
+    $SMARTY->assign('start', $start);
+    $SMARTY->assign('pagelimit', $pagelimit);
+    $SMARTY->assign('queue', $queue);
+    $SMARTY->assign('queue_count', $queue_count);
+    $SMARTY->assign('queue_netdevid', $id);
+    $SMARTY->assign('objectid', $netdev['id']);
+    $SMARTY->assign('restnetdevlist', $netdevlist);
+    $SMARTY->assign('netdevips', $netdevips);
+    $SMARTY->assign('nodelist', $nodelist);
+    $SMARTY->assign('mgmurls', $LMS->GetManagementUrls(LMSNetDevManager::NETDEV_URL, $id));
+    $SMARTY->assign('radiosectors', $LMS->GetRadioSectors($id));
+    $SMARTY->assign('devlinktype', $SESSION->get('devlinktype'));
+    $SMARTY->assign('devlinktechnology', $SESSION->get('devlinktechnology'));
+    $SMARTY->assign('devlinkspeed', $SESSION->get('devlinkspeed'));
+    $SMARTY->assign('nodelinktype', $SESSION->get('nodelinktype'));
+    $SMARTY->assign('nodelinktechnology', $SESSION->get('nodelinktechnology'));
+    $SMARTY->assign('nodelinkspeed', $SESSION->get('nodelinkspeed'));
+
+    $hook_data = $LMS->executeHook(
+        'netdevinfo_before_display',
+        array(
+            'netdevconnected' => $netdevconnected,
+            'netcomplist' => $netcomplist,
+            'smarty' => $SMARTY,
+        )
+    );
+    $netdevconnected = $hook_data['netdevconnected'];
+    $netcomplist = $hook_data['netcomplist'];
+    $SMARTY->assign('netdevlist', $netdevconnected);
+    $SMARTY->assign('netcomplist', $netcomplist);
+
+    if (isset($_GET['ip'])) {
+        $nodeipdata = $LMS->GetNodeConnType($_GET['ip']);
+        $netdevauthtype = array();
+        $authtype = $nodeipdata;
+        if ($authtype != 0) {
+            $netdevauthtype['dhcp'] = ($authtype & 2);
+            $netdevauthtype['eap'] = ($authtype & 4);
+        }
+        $SMARTY->assign('nodeipdata', $LMS->GetNode($_GET['ip']));
+        $SMARTY->assign('nodesessions', $LMS->GetNodeSessions($_GET['ip']));
+        $SMARTY->assign('netdevauthtype', $netdevauthtype);
+
+        $SMARTY->assign('routednetworks', $LMS->getNodeRoutedNetworks($_GET['ip']));
+        $SMARTY->assign('notroutednetworks', $LMS->getNodeNotRoutedNetworks($_GET['ip']));
+        $SMARTY->assign('nodeid', $_GET['ip']);
+
+        $SMARTY->display('netdev/netdevipinfo.html');
+    } else {
+        $SMARTY->assign('netdevinfo_sortable_order', $SESSION->get_persistent_setting('netdevinfo-sortable-order'));
+        $SMARTY->display('netdev/netdevinfo.html');
+    }
 }
-?>

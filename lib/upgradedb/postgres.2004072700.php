@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE rttickets ADD resolvetime integer;
     ALTER TABLE rttickets ALTER resolvetime SET DEFAULT 0;
@@ -35,5 +35,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004072700' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

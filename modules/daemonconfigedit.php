@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2016 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -28,67 +28,63 @@ $id = intval($_GET['id']);
 $config = $DB->GetRow('SELECT hostid, c.id, var, value, c.description, c.disabled, instanceid FROM daemonconfig c
 			JOIN daemoninstances i ON i.id = c.instanceid WHERE c.id=?', array($id));
 
-if(isset($_POST['config'])) 
-{
-	$configedit = $_POST['config'];
+if (isset($_POST['config'])) {
+    $configedit = $_POST['config'];
 
-	foreach($configedit as $idx => $key)
-		$configedit[$idx] = trim($key);
-	
-	if($configedit['var'] == '')
-		$error['var'] = trans('Option name is required!');
-	elseif($config['var']!=$configedit['var'])
-		if($DB->GetOne('SELECT id FROM daemonconfig WHERE var=? AND instanceid=?', array($configedit['var'], $config['instanceid'])))
-			$error['var'] = trans('Option with specified name exists in that instance!');
-	
-	if(!isset($configedit['disabled']))
-		$configedit['disabled'] = 0;
+    foreach ($configedit as $idx => $key) {
+        $configedit[$idx] = trim($key);
+    }
+    
+    if ($configedit['var'] == '') {
+        $error['var'] = trans('Option name is required!');
+    } elseif ($config['var']!=$configedit['var']) {
+        if ($DB->GetOne('SELECT id FROM daemonconfig WHERE var=? AND instanceid=?', array($configedit['var'], $config['instanceid']))) {
+            $error['var'] = trans('Option with specified name exists in that instance!');
+        }
+    }
+    
+    if (!isset($configedit['disabled'])) {
+        $configedit['disabled'] = 0;
+    }
 
-	if (!$error) {
-		$configedit['value'] = str_replace("\r\n","\n", $configedit['value']);
+    if (!$error) {
+        $configedit['value'] = str_replace("\r\n", "\n", $configedit['value']);
 
-		$args = array(
-			'var' => $configedit['var'], 
-			'description' => $configedit['description'],
-			'value' => $configedit['value'],
-			'disabled' => $configedit['disabled'],
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONCONF] => $_GET['id']
-		);
-		$DB->Execute('UPDATE daemonconfig SET var=?, description=?, value=?, disabled=? WHERE id=?', array_values($args));
+        $args = array(
+            'var' => $configedit['var'],
+            'description' => $configedit['description'],
+            'value' => $configedit['value'],
+            'disabled' => $configedit['disabled'],
+            SYSLOG::RES_DAEMONCONF => $_GET['id']
+        );
+        $DB->Execute('UPDATE daemonconfig SET var=?, description=?, value=?, disabled=? WHERE id=?', array_values($args));
 
-		if ($SYSLOG) {
-			$args[$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONINST]] = $config['instanceid'];
-			$args[$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST]] = $config['hostid'];
-			$SYSLOG->AddMessage(SYSLOG_RES_DAEMONCONF, SYSLOG_OPER_UPDATE, $args,
-				array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONCONF],
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONINST],
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST]));
-		}
+        if ($SYSLOG) {
+            $args[SYSLOG::RES_DAEMONINST] = $config['instanceid'];
+            $args[SYSLOG::RES_HOST] = $config['hostid'];
+            $SYSLOG->AddMessage(SYSLOG::RES_DAEMONCONF, SYSLOG::OPER_UPDATE, $args);
+        }
 
-		$SESSION->redirect('?m=daemoninstanceview&id='.$config['instanceid']);
-	}
-}
-elseif(isset($_GET['statuschange']))
-{
-	if ($SYSLOG) {
-		$args = array(
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST] => $config['hostid'],
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONINST] => $config['instanceid'],
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONCONF] => $config['id'],
-			'disabled' => $config['disabled'] ? 0 : 1
-		);
-		$SYSLOG->AddMessage(SYSLOG_RES_DAEMONCONF, SYSLOG_OPER_UPDATE, $args,
-			array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST],
-				$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONINST],
-				$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_DAEMONCONF]));
-	}
+        $SESSION->redirect('?m=daemoninstanceview&id='.$config['instanceid']);
+    }
+} elseif (isset($_GET['statuschange'])) {
+    if ($SYSLOG) {
+        $args = array(
+            SYSLOG::RES_HOST => $config['hostid'],
+            SYSLOG::RES_DAEMONINST => $config['instanceid'],
+            SYSLOG::RES_DAEMONCONF => $config['id'],
+            'disabled' => $config['disabled'] ? 0 : 1
+        );
+        $SYSLOG->AddMessage(SYSLOG::RES_DAEMONCONF, SYSLOG::OPER_UPDATE, $args);
+    }
 
-	if ($config['disabled'])
-		$DB->Execute('UPDATE daemonconfig SET disabled=0 WHERE id=?', array($config['id']));
-	else
-		$DB->Execute('UPDATE daemonconfig SET disabled=1 WHERE id=?', array($config['id']));
+    if ($config['disabled']) {
+        $DB->Execute('UPDATE daemonconfig SET disabled=0 WHERE id=?', array($config['id']));
+    } else {
+        $DB->Execute('UPDATE daemonconfig SET disabled=1 WHERE id=?', array($config['id']));
+    }
 
-	$SESSION->redirect('?m=daemoninstanceview&id='.$config['instanceid']);
+    $SESSION->redirect('?m=daemoninstanceview&id='.$config['instanceid']);
 }
 
 $instance = $DB->GetRow('SELECT daemoninstances.name AS name, hosts.name AS hostname FROM daemoninstances, hosts WHERE hosts.id=hostid AND daemoninstances.id=?', array($config['instanceid']));
@@ -99,6 +95,4 @@ $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('error', $error);
 $SMARTY->assign('config', $config);
-$SMARTY->display('daemonconfigedit.html');
-
-?>
+$SMARTY->display('daemon/daemonconfigedit.html');

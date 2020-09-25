@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -31,5 +31,4 @@ $categories = $LMS->GetCategoryList();
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('categories', $categories);
-$SMARTY->display('rtcategorylist.html');
-?>
+$SMARTY->display('rt/rtcategorylist.html');

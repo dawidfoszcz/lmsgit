@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE assignments ADD suspended smallint;
     ALTER TABLE assignments ALTER suspended SET DEFAULT 0;
@@ -34,5 +34,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004081800' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

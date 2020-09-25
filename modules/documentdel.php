@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2020 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,62 +24,20 @@
  *  $Id$
  */
 
-if($_GET['is_sure']=='1')
-{
-        if(isset($_POST['marks']))
-	{
-	        foreach($_POST['marks'] as $id => $mark)
-		{
-			$md5sum = $DB->GetOne('SELECT c.md5sum FROM documentcontents c
-				JOIN documents d ON (d.id = c.docid)
-				JOIN docrights r ON (r.doctype = d.type)
-				WHERE c.docid = ? AND r.userid = ? AND (r.rights & 16) = 16',
-				array($id, $AUTH->id));
+if (isset($_POST['marks'])) {
+    $docids = Utils::filterIntegers(array_keys($_POST['marks']));
+} elseif (isset($_GET['id'])) {
+    if (preg_match('/^[0-9]+$/', $_GET['id'])) {
+        $docids = array($_GET['id']);
+    }
+}
 
-			if (!$md5sum)
-				continue;
-
-			if($DB->GetOne('SELECT COUNT(*) FROM documentcontents WHERE md5sum = ?',array((string)$md5sum))==1)
-			{
-				@unlink(DOC_DIR.'/'.substr($md5sum,0,2).'/'.$md5sum);
-			}
-	
-			$DB->BeginTrans();
-			
-			$DB->Execute('DELETE FROM documentcontents WHERE docid = ?',array($id));
-			$DB->Execute('DELETE FROM documents WHERE id = ?',array($id));
-	
-			$DB->CommitTrans();
-		}
-	}
-	elseif(isset($_GET['id']))
-	{			
-		$md5sum = $DB->GetOne('SELECT c.md5sum FROM documentcontents c
-			JOIN documents d ON (d.id = c.docid)
-			JOIN docrights r ON (r.doctype = d.type)
-			WHERE c.docid = ? AND r.userid = ? AND (r.rights & 16) = 16',
-			array($_GET['id'], $AUTH->id));
-
-		if (!$md5sum)
-		{
-			$SMARTY->display('noaccess.html');
-		        die;
-		}
-		
-		if($DB->GetOne('SELECT COUNT(*) FROM documentcontents WHERE md5sum = ?',array((string)$md5sum))==1)
-		{
-			@unlink(DOC_DIR.'/'.substr($md5sum,0,2).'/'.$md5sum);
-		}
-	
-		$DB->BeginTrans();
-		
-		$DB->Execute('DELETE FROM documentcontents WHERE docid = ?',array($_GET['id']));
-		$DB->Execute('DELETE FROM documents WHERE id = ?',array($_GET['id']));
-	
-		$DB->CommitTrans();
-	}
+if (!empty($docids)) {
+    foreach ($docids as $id) {
+        if (!$LMS->DeleteDocument($id)) {
+            access_denied();
+        }
+    }
 }
 
 $SESSION->redirect('?'.$SESSION->get('backto'));
-	
-?>

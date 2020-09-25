@@ -24,20 +24,17 @@
  *  $Id$
  */
 
-if(!preg_match('/^[0-9]+$/', $_GET['id']))
-{
-	$SESSION->redirect('?m=voipaccountlist');
+if (!preg_match('/^[0-9]+$/', $_GET['id'])) {
+    $SESSION->redirect('?m=voipaccountlist');
 }
 
-if(!$LMS->VoipAccountExists($_GET['id']))
-	if(isset($_GET['ownerid']))
-	{
-		$SESSION->redirect('?m=customerinfo&id='.$_GET['ownerid']);
-	}
-	else
-	{
-		$SESSION->redirect('?m=voipaccountlist');
-	}
+if (!$LMS->VoipAccountExists($_GET['id'])) {
+    if (isset($_GET['ownerid'])) {
+        $SESSION->redirect('?m=customerinfo&id='.$_GET['ownerid']);
+    } else {
+        $SESSION->redirect('?m=voipaccountlist');
+    }
+}
 
 $voipaccountid = $_GET['id'];
 $voipaccountinfo = $LMS->GetVoipAccount($voipaccountid);
@@ -47,12 +44,24 @@ include(MODULES_DIR.'/customer.inc.php');
 
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
-if(!isset($_GET['ownerid']))
-	$SESSION->save('backto', $SESSION->get('backto').'&ownerid='.$customerid);
+if (!isset($_GET['ownerid'])) {
+    $SESSION->save('backto', $SESSION->get('backto').'&ownerid='.$customerid);
+}
 
 $layout['pagetitle'] = trans('Voip Account Info: $a', $voipaccountinfo['login']);
 
-$SMARTY->assign('voipaccountinfo',$voipaccountinfo);
-$SMARTY->display('voipaccountinfo.html');
+$hook_data = $plugin_manager->executeHook(
+    'voipaccountinfo_before_display',
+    array(
+        'voipaccountinfo' => $voipaccountinfo,
+        'smarty' => $SMARTY,
+    )
+);
 
-?>
+$voipaccountinfo = $hook_data['voipaccountinfo'];
+
+$LMS->InitXajax();
+$SMARTY->assign('xajax', $LMS->RunXajax());
+
+$SMARTY->assign('voipaccountinfo', $voipaccountinfo);
+$SMARTY->display('voipaccount/voipaccountinfo.html');

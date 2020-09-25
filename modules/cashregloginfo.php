@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,19 +24,19 @@
  *  $Id$
  */
 
-$reglog = $DB->GetRow('SELECT l.*, users.name AS username
-			FROM cashreglog l 
-			LEFT JOIN users ON (l.userid = users.id)
-			WHERE l.id = ?', 
-			array(intval($_GET['id'])));
+$reglog = $DB->GetRow(
+    'SELECT l.*, vusers.name AS username
+			FROM cashreglog l
+			LEFT JOIN vusers ON (l.userid = vusers.id)
+			WHERE l.id = ?',
+    array(intval($_GET['id']))
+);
 
-if(!$reglog)
-{
+if (!$reglog) {
         $SESSION->redirect('?m=cashreglist');
 }
 
-if(!$DB->GetOne('SELECT rights FROM cashrights WHERE userid=? AND regid=?', array($AUTH->id, $reglog['regid'])))
-{
+if (!$DB->GetOne('SELECT rights FROM cashrights WHERE userid=? AND regid=?', array(Auth::GetCurrentUser(), $reglog['regid']))) {
         $SMARTY->display('noaccess.html');
         $SESSION->close();
         die;
@@ -47,6 +47,4 @@ $reglog['time'] = strftime('%Y/%m/%d %H:%M', $reglog['time']);
 $layout['pagetitle'] = trans('Cash History Entry Info');
 
 $SMARTY->assign('reglog', $reglog);
-$SMARTY->display('cashregloginfo.html');
-
-?>
+$SMARTY->display('cash/cashregloginfo.html');

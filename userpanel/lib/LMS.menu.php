@@ -25,64 +25,67 @@
  */
 
 // variables
-define('USERPANEL_DIR', $LMS->CONFIG['directories']['userpanel_dir']);
-define('USERPANEL_MODULES_DIR', USERPANEL_DIR.'/modules/');
-define('USERPANEL_LIB_DIR', USERPANEL_DIR.'/lib/');
+$CONFIG['directories']['userpanel_dir'] = (!isset($CONFIG['directories']['userpanel_dir']) ? getcwd() . DIRECTORY_SEPARATOR . 'userpanel' : $CONFIG['directories']['userpanel_dir']);
 
-@include(USERPANEL_DIR.'/lib/locale/'.$_ui_language.'/strings.php');
+define('USERPANEL_DIR', $CONFIG['directories']['userpanel_dir']);
+define('USERPANEL_LIB_DIR', USERPANEL_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR);
+define('USERPANEL_MODULES_DIR', USERPANEL_DIR . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR);
+
+Localisation::appendUiLanguage(USERPANEL_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'locale');
 
 // Clear submenu array
-$submenu = NULL;
+$submenu = null;
 
 // Add Configutation submenu
-$submenu[] = 
-	array(
-		'name' => trans('Configuration'),
-		'link' => '?m=userpanel',
-		'tip' => trans('Userpanel configuration'),
-		'prio' => 10,
-	);
 $submenu[] =
-	array(
-		'name' => trans('Rights'),
-		'link' => '?m=userpanel&f=rights',
-		'tip' => trans('Customers\' rights'),
-		'prio' => 20,
-	);
+    array(
+        'name' => trans('Configuration'),
+        'link' => '?m=userpanel',
+        'tip' => trans('Userpanel Configuration'),
+        'prio' => 10,
+    );
+$submenu[] =
+    array(
+        'name' => trans('Rights'),
+        'link' => '?m=userpanel&f=rights',
+        'tip' => trans('Customers\' rights'),
+        'prio' => 20,
+    );
 
 // *** HERE ADD YOUR OWN SUBMENU ***
 
 
 // Include userpanel.class
 require_once(USERPANEL_DIR.'/lib/Userpanel.class.php');
-$USERPANEL = new USERPANEL($DB, $SESSION, $CONFIG);
+$USERPANEL = new USERPANEL($DB, $SESSION);
 
 // Initialize modules
 $dh  = opendir(USERPANEL_MODULES_DIR);
-while (false !== ($filename = readdir($dh)))
-	if ((preg_match('/^[a-zA-Z0-9]/',$filename)) && (is_dir(USERPANEL_MODULES_DIR.$filename)) && file_exists(USERPANEL_MODULES_DIR.$filename."/configuration.php"))
-	{
-        	@include(USERPANEL_MODULES_DIR.$filename.'/locale/'.$_ui_language.'/strings.php');
-	        include(USERPANEL_MODULES_DIR.$filename.'/configuration.php');
-	}
+while (false !== ($filename = readdir($dh))) {
+    if ((preg_match('/^[a-zA-Z0-9]/', $filename)) && (is_dir(USERPANEL_MODULES_DIR.$filename)) && file_exists(USERPANEL_MODULES_DIR.$filename."/configuration.php")) {
+        Localisation::appendUiLanguage(USERPANEL_MODULES_DIR . $filename . DIRECTORY_SEPARATOR . 'locale');
+        include(USERPANEL_MODULES_DIR.$filename . DIRECTORY_SEPARATOR . 'configuration.php');
+    }
+}
 
-foreach($USERPANEL->MODULES as $menupos)
-	if(isset($menupos['submenu']))
-		foreach($menupos['submenu'] as $modulemenu)
-			$submenu[] = $modulemenu;
+foreach ($USERPANEL->MODULES as $menupos) {
+    if (!empty($menupos['submenu'])) {
+        foreach ($menupos['submenu'] as $modulemenu) {
+            $submenu[] = $modulemenu;
+        }
+    }
+}
 
 // *** HERE ADD YOUR OWN SUBMENU ***
 
 
 
 // Add Userpanel menu to LMS main menu
-$menu[] = array(
-	'name' => trans('Userpanel'),
-	'img' => 'cms.gif',
-	'link' => '?m=userpanel',
-	'tip' => trans('Userpanel'),
-	'prio' => '80',
-	'submenu' => $submenu,
+$menu['userpanel'] = array(
+    'name' => trans('Userpanel'),
+    'css' => 'lms-ui-menu-item-icon lms-ui-icon-userpanel',
+    'link' => '?m=userpanel',
+    'tip' => trans('Userpanel'),
+    'prio' => '80',
+    'submenu' => $submenu,
 );
-
-?>

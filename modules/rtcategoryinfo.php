@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,18 +24,15 @@
  *  $Id$
  */
 
-if(! $LMS->CategoryExists($_GET['id']))
-{
-	$SESSION->redirect('?m=rtcategorylist');
+if (! $LMS->CategoryExists($_GET['id'])) {
+    $SESSION->redirect('?m=rtcategorylist');
 }
 
 $category = $LMS->GetCategory($_GET['id']);
 
-$layout['pagetitle'] = trans('Category Info: $a',$category['name']);
+$layout['pagetitle'] = trans('Category Info: $a', $category['name']);
 
 $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('category', $category);
-$SMARTY->display('rtcategoryinfo.html');
-
-?>
+$SMARTY->display('rt/rtcategoryinfo.html');

@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2016 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -18,20 +18,26 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  *  USA.
  *
  *  $Id$
  */
 
-// REPLACE THIS WITH PATH TO YOUR CONFIG FILE
+$CONFIG_FILE = DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'lms' . DIRECTORY_SEPARATOR . 'lms.ini';
+
 // find alternative config files:
-if (is_readable('lms.ini'))
-	$CONFIG_FILE = 'lms.ini';
-elseif (is_readable('/etc/lms/lms-' . $_SERVER['HTTP_HOST'] . '.ini'))
-	$CONFIG_FILE = '/etc/lms/lms-' . $_SERVER['HTTP_HOST'] . '.ini';
-elseif (!is_readable($CONFIG_FILE))
-	die('Unable to read configuration file [' . $CONFIG_FILE . ']!');
+if (is_readable('lms.ini')) {
+    $CONFIG_FILE = 'lms.ini';
+} elseif (is_readable(DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'lms' . DIRECTORY_SEPARATOR . 'lms-' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . '.ini')) {
+    $CONFIG_FILE = DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'lms' . DIRECTORY_SEPARATOR . 'lms-' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . '.ini';
+} elseif (is_readable(DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'lms' . DIRECTORY_SEPARATOR . 'lms-' . $_SERVER['HTTP_HOST'] . '.ini')) {
+    $CONFIG_FILE = DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'lms' . DIRECTORY_SEPARATOR . 'lms-' . $_SERVER['HTTP_HOST'] . '.ini';
+} elseif (!is_readable($CONFIG_FILE)) {
+    die('Unable to read configuration file [' . $CONFIG_FILE . ']!');
+}
+
+define('CONFIG_FILE', $CONFIG_FILE);
 
 $CONFIG = (array) parse_ini_file($CONFIG_FILE, true);
 
@@ -53,102 +59,88 @@ define('MODULES_DIR', $CONFIG['directories']['modules_dir']);
 define('SMARTY_COMPILE_DIR', $CONFIG['directories']['smarty_compile_dir']);
 define('SMARTY_TEMPLATES_DIR', $CONFIG['directories']['smarty_templates_dir']);
 
-// Load autloader
-require_once(LIB_DIR.'/autoloader.php');
+// Load autoloader
+$composer_autoload_path = SYS_DIR . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+if (file_exists($composer_autoload_path)) {
+    require_once $composer_autoload_path;
+} else {
+    die("Composer autoload not found. Run 'composer install' command from LMS directory and try again. More informations at https://getcomposer.org/");
+}
 
 // Do some checks and load config defaults
+require_once(LIB_DIR . DIRECTORY_SEPARATOR . 'checkdirs.php');
 
-require_once(LIB_DIR . '/checkdirs.php');
-require_once(LIB_DIR . '/config.php');
-
-// Init database 
-
-$_DBTYPE = $CONFIG['database']['type'];
-$_DBHOST = $CONFIG['database']['host'];
-$_DBUSER = $CONFIG['database']['user'];
-$_DBPASS = $CONFIG['database']['password'];
-$_DBNAME = $CONFIG['database']['database'];
+// Init database
 
 $DB = null;
 
 try {
-
-    $DB = LMSDB::getDB($_DBTYPE, $_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME);
-
+    $DB = LMSDB::getInstance();
 } catch (Exception $ex) {
-    
     trigger_error($ex->getMessage(), E_USER_WARNING);
-    
     // can't working without database
-    die("Fatal error: cannot connect to database!\n");
-    
+    die("Fatal error: cannot connect to database!" . PHP_EOL);
 }
 
 // Call any of upgrade process before anything else
 
-require_once(LIB_DIR . '/upgradedb.php');
+$DB->UpgradeDb();
 
 // test for proper version of Smarty
 
-if (defined('Smarty::SMARTY_VERSION'))
-	$ver_chunks = preg_split('/[- ]/', Smarty::SMARTY_VERSION);
-else
-	$ver_chunks = NULL;
-if (count($ver_chunks) != 2 || version_compare('3.0', $ver_chunks[1]) > 0)
-	die('<B>Wrong version of Smarty engine! We support only Smarty-3.x greater than 3.0.</B>');
+if (defined('Smarty::SMARTY_VERSION')) {
+    $ver_chunks = preg_split('/[- ]/', Smarty::SMARTY_VERSION);
+} else {
+    $ver_chunks = null;
+}
+if (count($ver_chunks) != 2 || version_compare('3.0', $ver_chunks[1]) > 0) {
+    die('<B>Wrong version of Smarty engine! We support only Smarty-3.x greater than 3.0.</B>');
+}
 
 define('SMARTY_VERSION', $ver_chunks[1]);
 
 // system localization
 
-require_once(LIB_DIR . '/language.php');
-
-// Read configuration of LMS-UI from database
-
-if ($cfg = $DB->GetAll('SELECT section, var, value FROM uiconfig WHERE disabled=0'))
-	foreach ($cfg as $row)
-		$CONFIG[$row['section']][$row['var']] = $row['value'];
+require_once(LIB_DIR . DIRECTORY_SEPARATOR . 'language.php');
 
 // Redirect to SSL
-
-$_FORCE_SSL = (isset($CONFIG['phpui']['force_ssl']) ? chkconfig($CONFIG['phpui']['force_ssl']) : FALSE);
+$_FORCE_SSL = ConfigHelper::checkConfig('phpui.force_ssl');
 
 if ($_FORCE_SSL && $_SERVER['HTTPS'] != 'on') {
-	header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-	exit(0);
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit(0);
 }
 
 // EXPERIMENTAL CODE! USE WITH CAUTION ;-)
 
 $_LMSDIR = dirname(__FILE__);
 
-require_once(LIB_DIR . '/ExecStack.class.php');
-
-$ExecStack = new ExecStack($_LMSDIR . '/modules/', (isset($_GET['m']) ? $_GET['m'] : NULL), (isset($_GET['a']) ? $_GET['a'] : NULL));
+$ExecStack = new ExecStack((isset($_GET['m']) ? $_GET['m'] : null), (isset($_GET['a']) ? $_GET['a'] : null), $_LMSDIR . '/modules/');
 
 // don't use foreach() below, because privileges checking action
 // will probably need to remove some actions from stack
 // Note: that action should be executed first
 
 while (list(, $execute) = each($ExecStack->_EXECSTACK['actions'])) {
-	// do include once, because testing that language for executed module has been already loaded
-	// will take some time, so let's PHP decide if we already loaded it or what...
+    // do include once, because testing that language for executed module has been already loaded
+    // will take some time, so let's PHP decide if we already loaded it or what...
 
-	@include_once($_LMSDIR . '/modules/' . $execute['module'] . '/lang/' . $_language . '.php');
-	@include_once($_LMSDIR . '/modules/' . $execute['module'] . '/modinit.php');
+    @include_once($_LMSDIR . '/modules/' . $execute['module'] . '/lang/' . $_language . '.php');
+    @include_once($_LMSDIR . '/modules/' . $execute['module'] . '/modinit.php');
 
-	// execute action
+    // execute action
 
-	if ($ExecStack->needExec($execute['module'], $execute['action']))
-		include($_LMSDIR . '/modules/' . $execute['module'] . '/actions/' . $execute['action'] . '.php');
+    if ($ExecStack->needExec($execute['module'], $execute['action'])) {
+        include($_LMSDIR . '/modules/' . $execute['module'] . '/actions/' . $execute['action'] . '.php');
+    }
 }
 
-foreach ($ExecStack->_EXECSTACK['templates'] as $step => $execute)
-	$SMARTY->display($_LMSDIR . '/modules/' . $execute['module'] . '/templates/' . $execute['template'] . '.html');
+foreach ($ExecStack->_EXECSTACK['templates'] as $step => $execute) {
+    $SMARTY->display($_LMSDIR . '/modules/' . $execute['module'] . '/templates/' . $execute['template'] . '.html');
+}
 
 $DB->Destroy();
 
 
 echo '<PRE>';
 print_r($ExecStack);
-?>

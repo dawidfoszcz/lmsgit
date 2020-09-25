@@ -24,22 +24,23 @@
  *  $Id$
  */
 
-$DB->BeginTrans();
+$this->BeginTrans();
 
-$DB->Execute("ALTER TABLE nodegroups ADD prio int(11) NOT NULL DEFAULT '0'");
+$this->Execute("ALTER TABLE nodegroups ADD prio int(11) NOT NULL DEFAULT '0'");
 
-$list = $DB->GetAll('SELECT id FROM nodegroups');
+$list = $this->GetAll('SELECT id FROM nodegroups');
 
 $prio = 1;
-if($list) foreach($list as $row)
-{    
-	$DB->Execute('UPDATE nodegroups SET prio = ? WHERE id = ?',  
-			array($prio ,$row['id']));
-	$prio++;
+if ($list) {
+    foreach ($list as $row) {
+        $this->Execute(
+            'UPDATE nodegroups SET prio = ? WHERE id = ?',
+            array($prio ,$row['id'])
+        );
+        $prio++;
+    }
 }
 
-$DB->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?",array('2008010700', 'dbversion'));
+$this->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?", array('2008010700', 'dbversion'));
 
-$DB->CommitTrans();
-
-?>
+$this->CommitTrans();

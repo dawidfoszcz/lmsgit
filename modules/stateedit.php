@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2016 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -28,33 +28,33 @@ $state = $DB->GetRow('SELECT * FROM states WHERE id=?', array($_GET['id']));
 
 $name = $state['name'];
 
-$stateedit = isset($_POST['stateedit']) ? $_POST['stateedit'] : NULL;
+$stateedit = isset($_POST['stateedit']) ? $_POST['stateedit'] : null;
 
-if(sizeof($stateedit)) 
-{
-	$stateedit['name'] = trim($stateedit['name']);
-	$stateedit['description'] = trim($stateedit['description']);
-	$stateedit['id'] = $state['id'];
+if (count($stateedit)) {
+    $stateedit['name'] = trim($stateedit['name']);
+    $stateedit['description'] = trim($stateedit['description']);
+    $stateedit['id'] = $state['id'];
 
-	if($stateedit['name'] == '')
-		$error['name'] = trans('State name is required!');
+    if ($stateedit['name'] == '') {
+        $error['name'] = trans('State name is required!');
+    }
 
-	if (!$error) {
-		$args = array(
-			'name' => $stateedit['name'],
-			'description' => $stateedit['description'],
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_STATE] => $stateedit['id']
-		);
-		$DB->Execute('UPDATE states SET name=?, description=? WHERE id=?', array_values($args));
+    if (!$error) {
+        $args = array(
+            'name' => $stateedit['name'],
+            'description' => $stateedit['description'],
+            SYSLOG::RES_STATE => $stateedit['id']
+        );
+        $DB->Execute('UPDATE states SET name=?, description=? WHERE id=?', array_values($args));
 
-		if ($SYSLOG)
-			$SYSLOG->AddMessage(SYSLOG_RES_STATE, SYSLOG_OPER_UPDATE, $args,
-				array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_STATE]));
+        if ($SYSLOG) {
+            $SYSLOG->AddMessage(SYSLOG::RES_STATE, SYSLOG::OPER_UPDATE, $args);
+        }
 
-		$SESSION->redirect('?m=statelist');
-	}
+        $SESSION->redirect('?m=statelist');
+    }
 
-	$state = $stateedit;
+    $state = $stateedit;
 }
 
 $layout['pagetitle'] = trans('State Edit: $a', $name);
@@ -63,6 +63,4 @@ $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('stateedit', $state);
 $SMARTY->assign('error', $error);
-$SMARTY->display('stateedit.html');
-
-?>
+$SMARTY->display('state/stateedit.html');

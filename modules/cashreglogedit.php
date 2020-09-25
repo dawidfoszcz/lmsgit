@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -29,81 +29,61 @@ $reglog = $DB->GetRow('SELECT * FROM cashreglog WHERE id = ?', array(intval($_GE
 $regid = $reglog['regid'];
 $reglog['time'] = strftime('%Y/%m/%d %H:%M', $reglog['time']);
 
-if(!$regid)
-{
+if (!$regid) {
         $SESSION->redirect('?m=cashreglist');
 }
-	
-if($DB->GetOne('SELECT rights FROM cashrights WHERE userid=? AND regid=?', array($AUTH->id, $regid))<256)
-{
+    
+if ($DB->GetOne('SELECT rights FROM cashrights WHERE userid=? AND regid=?', array(Auth::GetCurrentUser(), $regid))<256) {
         $SMARTY->display('noaccess.html');
         $SESSION->close();
         die;
 }
 
-if(isset($_POST['reglog']))
-{
-	$reglog = $_POST['reglog'];
-	
-	foreach($reglog as $key => $value)
-	        $reglog[$key] = trim($value);
+if (isset($_POST['reglog'])) {
+    $reglog = $_POST['reglog'];
+    
+    foreach ($reglog as $key => $value) {
+            $reglog[$key] = trim($value);
+    }
 
-	$reglog['value'] = str_replace(',','.', $reglog['value']);
+    $reglog['value'] = str_replace(',', '.', $reglog['value']);
 
-	if($reglog['value'] == '')
-		$error['value'] = trans('Cash state value is required!');
-	elseif(!preg_match('/^[-]?[0-9.,]+$/', $reglog['value']))
-	        $error['value'] = trans('Incorrect value!');
+    if ($reglog['value'] == '') {
+        $error['value'] = trans('Cash state value is required!');
+    } elseif (!preg_match('/^[-]?[0-9.,]+$/', $reglog['value'])) {
+            $error['value'] = trans('Incorrect value!');
+    }
 
-	if($reglog['time'])
-	{
-		if(preg_match('/^([0-9]{4}\/[0-9]{2}\/[0-9]{2})\s+([0-9]{2}:[0-9]{2})$/', $reglog['time'], $matches))
-		{
-	    		// date format 'yyyy/mm/dd hh:mm'
-			$date = explode('/', $matches[1]);
-			$time = explode(':', $matches[2]);
+    if (!empty($reglog['time'])) {
+            $time = datetime_to_timestamp($reglog['time']);
+        if (empty($time)) {
+            $error['time'] = trans('Wrong datetime format!');
+        }
+    } else {
+        $time = time();
+    }
 
-			if(checkdate($date[1],$date[2],(int)$date[0]))
-			{
-		    		if (!strlen($time[0]) || !strlen($time[1]))
-		    			$time[0] = $time[1] = 0;
-				$time = mktime($time[0],$time[1],0,$date[1],$date[2],$date[0]);
-			}
-			else
-				$error['time'] = trans('Wrong datetime format!');
-		}
-		else
-			$error['time'] = trans('Wrong datetime format!');    
-	}
-	else
-		$time = time();
-
-	if (!$error) {
-		$args = array(
-			'time' => $time,
-			'description' => $reglog['description'],
-			'value' => $reglog['value'],
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_USER] => $AUTH->id,
-			$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CASHREGHIST] => intval($_GET['id'])
-		);
-		$DB->Execute('UPDATE cashreglog SET time=?, description=?, value=?, userid=?
+    if (!$error) {
+        $args = array(
+            'time' => $time,
+            'description' => $reglog['description'],
+            'value' => $reglog['value'],
+            SYSLOG::RES_USER => Auth::GetCurrentUser(),
+            SYSLOG::RES_CASHREGHIST => intval($_GET['id'])
+        );
+        $DB->Execute('UPDATE cashreglog SET time=?, description=?, value=?, userid=?
 				WHERE id=?', array_values($args));
-		if ($SYSLOG) {
-			$args[$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CASHREG]] = $regid;
-			$SYSLOG->AddMessage(SYSLOG_RES_CASHREGHIST, SYSLOG_OPER_UPDATE, $args,
-				array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CASHREGHIST],
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CASHREG],
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_USER]));
-		}
+        if ($SYSLOG) {
+            $args[SYSLOG::RES_CASHREG] = $regid;
+            $SYSLOG->AddMessage(SYSLOG::RES_CASHREGHIST, SYSLOG::OPER_UPDATE, $args);
+        }
 
-		$SESSION->redirect('?'.$SESSION->get('backto'));
-	}
+        $SESSION->redirect('?'.$SESSION->get('backto'));
+    }
 }
 
 $layout['pagetitle'] = trans('Cash History Entry Edit');
 
 $SMARTY->assign('reglog', $reglog);
 $SMARTY->assign('error', $error);
-$SMARTY->display('cashreglogedit.html');
-
-?>
+$SMARTY->display('cash/cashreglogedit.html');

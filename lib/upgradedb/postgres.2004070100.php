@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     CREATE SEQUENCE rtrights_id_seq;
     CREATE TABLE rtrights (
@@ -43,5 +43,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004070100' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

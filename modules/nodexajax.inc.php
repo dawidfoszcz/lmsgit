@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2018 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -21,130 +21,177 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  *  USA.
  *
- *  $Id: nodelocks.php,v 1.1 2012/04/07 23:12:01 chilek Exp $
+ *  $Id$
  */
 
-function NodeStats($id, $dt) {
-	global $DB;
-	if ($stats = $DB->GetRow('SELECT SUM(download) AS download, SUM(upload) AS upload 
+function NodeStats($id, $dt)
+{
+    global $DB;
+    if ($stats = $DB->GetRow('SELECT SUM(download) AS download, SUM(upload) AS upload 
 		FROM stats WHERE nodeid=? AND dt>?', array($id, time() - $dt))) {
-			list($result['download']['data'], $result['download']['units']) = setunits($stats['download']);
-			list($result['upload']['data'], $result['upload']['units']) = setunits($stats['upload']);
-			$result['downavg'] = $stats['download'] * 8 / 1000 / $dt;
-			$result['upavg'] = $stats['upload'] * 8 / 1000 / $dt;
-		}
-	return $result;
+            list($result['download']['data'], $result['download']['units']) = setunits($stats['download']);
+            list($result['upload']['data'], $result['upload']['units']) = setunits($stats['upload']);
+            $result['downavg'] = $stats['download'] * 8 / 1000 / $dt;
+            $result['upavg'] = $stats['upload'] * 8 / 1000 / $dt;
+    }
+    return $result;
 }
 
-function getNodeLocks($nodeid) {
-	global $SMARTY, $DB;
+function getNodeLocks()
+{
+    global $SMARTY;
 
-	$result = new xajaxResponse();
-	$nodelocks = NULL;
-	$locks = $DB->GetAll('SELECT id, days, fromsec, tosec FROM nodelocks WHERE nodeid = ? ORDER BY id', array($nodeid));
-	if ($locks)
-		foreach ($locks as $lock) {
-			$fromsec = intval($lock['fromsec']);
-			$tosec = intval($lock['tosec']);
-			$days = intval($lock['days']);
-			$lockdays = array();
-			for ($i = 0; $i < 7; $i++)
-				if ($days & (1 << $i))
-					$lockdays[$i] = 1;
-			$nodelocks[] = array('id' => $lock['id'], 'days' => $lockdays, 'fhour' => intval($fromsec / 3600), 'fminute' => intval(($fromsec % 3600) / 60),
-					'thour' => intval($tosec / 3600), 'tminute' => intval(($tosec % 3600) / 60));
-		}
-	$SMARTY->assign('nodelocks', $nodelocks);
-	$nodelocklist = $SMARTY->fetch('nodelocklist.html');
+    $result = new xajaxResponse();
 
-	$result->assign('nodelocktable', 'innerHTML', $nodelocklist);
+    $nodelocks = null;
+    $nodeid = intval($_GET['id']);
+    $DB = LMSDB::getInstance();
+    $locks = $DB->GetAll(
+        'SELECT id, days, fromsec, tosec, disabled FROM nodelocks WHERE nodeid = ? ORDER BY id',
+        array($nodeid)
+    );
+    if ($locks) {
+        foreach ($locks as $lock) {
+            $fromsec = intval($lock['fromsec']);
+            $tosec = intval($lock['tosec']);
+            $days = intval($lock['days']);
+            $lockdays = array();
+            for ($i = 0; $i < 7; $i++) {
+                if ($days & (1 << $i)) {
+                    $lockdays[$i] = 1;
+                }
+            }
+            $disabled = intval($lock['disabled']);
+            $nodelocks[] = array('id' => $lock['id'], 'days' => $lockdays, 'fhour' => intval($fromsec / 3600), 'fminute' => intval(($fromsec % 3600) / 60),
+                'thour' => intval($tosec / 3600), 'tminute' => intval(($tosec % 3600) / 60), 'disabled' => $disabled);
+        }
+    }
+    $SMARTY->assign('nodelocks', $nodelocks);
+    $nodelocklist = $SMARTY->fetch('node/nodelocklist.html');
 
-	return $result;
+    $result->assign('nodelocktable', 'innerHTML', $nodelocklist);
+    $result->assign('nodelockaddlink', 'disabled', false);
+
+    return $result;
 }
 
-function addNodeLock($nodeid, $params) {
-	global $DB;
+function addNodeLock($params)
+{
+    $result = new xajaxResponse();
 
-	$result = new xajaxResponse();
+    if (empty($params)) {
+        $result->assign('nodelockaddlink', 'disabled', false);
+        return $result;
+    }
 
-	if (empty($params['days']))
-		return $result;
-	$days = 0;
-	foreach ($params['days'] as $key => $value)
-		$days += (1 << $key);
-	$fromsec = $params['fhour'] * 3600 + $params['fminute'] * 60;
-	$tosec = $params['thour'] * 3600 + $params['tminute'] * 60;
-	if ($fromsec >= $tosec || !$days)
-		return $result;
+    $formdata = array();
+    parse_str($params, $formdata);
 
-	$DB->Execute('INSERT INTO nodelocks (nodeid, days, fromsec, tosec) VALUES (?, ?, ?, ?)', array($nodeid, $days, $fromsec, $tosec));
-	$result->call('xajax_getNodeLocks', $nodeid);
-	$result->assign('nodelockaddlink', 'disabled', false);
+    $days = 0;
+    foreach ($formdata['days'] as $key => $value) {
+        $days += (1 << $key);
+    }
+    $fromsec = $formdata['fhour'] * 3600 + $formdata['fminute'] * 60;
+    $tosec = $formdata['thour'] * 3600 + $formdata['tminute'] * 60;
+    if ($fromsec >= $tosec || !$days) {
+        $result->assign('nodelockaddlink', 'disabled', false);
+        return $result;
+    }
 
-	return $result;
+    $nodeid = intval($_GET['id']);
+
+    $DB = LMSDB::getInstance();
+    $DB->Execute(
+        'INSERT INTO nodelocks (nodeid, days, fromsec, tosec) VALUES (?, ?, ?, ?)',
+        array($nodeid, $days, $fromsec, $tosec)
+    );
+
+    $result->call('getNodeLocks');
+
+    return $result;
 }
 
-function delNodeLock($nodeid, $id) {
-	global $DB;
+function delNodeLock($id)
+{
+    $result = new xajaxResponse();
 
-	$result = new xajaxResponse();
-	$DB->Execute('DELETE FROM nodelocks WHERE id = ?', array($id));
-	$result->call('xajax_getNodeLocks', $nodeid);
-	$result->assign('nodelocktable', 'disabled', false);
+    $nodeid = intval($_GET['id']);
 
-	return $result;
+    $DB = LMSDB::getInstance();
+    $DB->Execute('DELETE FROM nodelocks WHERE id = ?', array($id));
+
+    $result->call('getNodeLocks');
+
+    return $result;
 }
 
-function getThroughput($ip) {
-	global $CONFIG;
+function toggleNodeLock($id)
+{
+    $result = new xajaxResponse();
 
-	$result = new xajaxResponse();
-	$cmd = get_conf('phpui.live_traffic_helper');
-	if (empty($cmd))
-		return $result;
+    $nodeid = intval($_GET['id']);
 
-	$cmd = str_replace('%i', $ip, $cmd);
-	exec($cmd, $output);
-	if (!is_array($output) && count($output) != 1)
-		return $result;
+    $DB = LMSDB::getInstance();
+    $DB->Execute('UPDATE nodelocks SET disabled = (CASE WHEN disabled = 0 THEN 1 ELSE 0 END) WHERE id = ?', array($id));
 
-	$stats = explode(' ', $output[0]);
-	if (count($stats) != 4)
-		return $result;
+    $result->call('getNodeLocks');
 
-	array_walk($stats, intval);
-	foreach (array(0, 2) as $idx)
-		if ($stats[$idx] > 1000000)
-			$stats[$idx] = (round(floatval($stats[$idx]) / 1000000.0, 2)) . ' Mbit/s';
-		elseif ($stats[$idx] > 1000)
-			$stats[$idx] = (round(floatval($stats[$idx]) / 1000.0, 2)) . ' Kbit/s';
-		else
-			$stats[$idx] = $stats[$idx] . ' bit/s';
-	$result->assign('livetraffic', 'innerHTML', $stats[0] . ' / ' . $stats[2]);
-	$result->call('live_traffic_finished');
-
-	return $result;
+    return $result;
 }
 
-function getNodeStats($nodeid) {
-	global $SMARTY, $DB;
+function getThroughput($ip)
+{
 
-	$nodeid = intval($nodeid);
-	$result = new xajaxResponse();
+    $result = new xajaxResponse();
+    $cmd = ConfigHelper::getConfig('phpui.live_traffic_helper');
+    if (empty($cmd)) {
+        return $result;
+    }
 
-	$nodestats['hour'] = NodeStats($nodeid, 60 * 60);
-	$nodestats['day'] = NodeStats($nodeid, 60 * 60 * 24);
-	$nodestats['month'] = NodeStats($nodeid, 60 * 60 * 24 * 30);
+    $cmd = str_replace('%i', $ip, $cmd);
+    exec($cmd, $output);
+    if (!is_array($output) && count($output) != 1) {
+        return $result;
+    }
 
-	$SMARTY->assign('nodeid', $nodeid);
-	$nodeip = $DB->GetOne('SELECT INET_NTOA(ipaddr) FROM nodes WHERE id = ?', array($nodeid));
-	$SMARTY->assign('nodeip', $nodeip);
-	$SMARTY->assign('nodestats', $nodestats);
-	$contents = $SMARTY->fetch('nodestats.html');
-	$result->append('nodeinfo', 'innerHTML', $contents);
+    $stats = explode(' ', $output[0]);
+    if (count($stats) != 4) {
+        return $result;
+    }
 
-	if (get_conf('phpui.live_traffic_helper')) {
-		$script = '
+    $speed_unit_type = ConfigHelper::getConfig('phpui.speed_unit_type', 1000);
+    $speed_unit_aggregation_threshold = ConfigHelper::getConfig('phpui.speed_unit_aggregation_threshold', 5);
+
+    array_walk($stats, 'intval');
+    foreach (array(0, 2) as $idx) {
+        $stats[$idx] = convert_to_units($stats[$idx], $speed_unit_aggregation_threshold, $speed_unit_type) . '/s';
+    }
+    $result->assign('livetraffic', 'innerHTML', $stats[0] . ' / ' . $stats[2] . ' (' . $stats[1] . ' pps / ' . $stats[3] . ' pps)');
+    $result->call('live_traffic_finished');
+
+    return $result;
+}
+
+function getNodeStats($nodeid)
+{
+    global $SMARTY, $DB;
+
+    $nodeid = intval($nodeid);
+    $result = new xajaxResponse();
+
+    $nodestats['hour'] = NodeStats($nodeid, 60 * 60);
+    $nodestats['day'] = NodeStats($nodeid, 60 * 60 * 24);
+    $nodestats['month'] = NodeStats($nodeid, 60 * 60 * 24 * 30);
+
+    $SMARTY->assign('nodeid', $nodeid);
+    $nodeip = $DB->GetOne('SELECT INET_NTOA(ipaddr) FROM vnodes WHERE id = ?', array($nodeid));
+    $SMARTY->assign('nodeip', $nodeip);
+    $SMARTY->assign('nodestats', $nodestats);
+    $contents = $SMARTY->fetch('node/nodestats.html');
+    $result->append('nodeinfo', 'innerHTML', $contents);
+
+    if (ConfigHelper::getConfig('phpui.live_traffic_helper')) {
+        $script = '
 			live_traffic_start = function() {
 				xajax.config.waitCursor = false;
 				xajax_getThroughput(\'' . $nodeip . '\');
@@ -156,14 +203,65 @@ function getNodeStats($nodeid) {
 			}
 		';
 
-		$result->script($script);
-		$result->script("live_traffic_start()");
-	}
+        $result->script($script);
+        $result->script("live_traffic_start()");
+    }
 
-	return $result;
+    return $result;
 }
 
-$LMS->InitXajax();
-$LMS->RegisterXajaxFunction(array('getNodeLocks', 'addNodeLock', 'delNodeLock', 'getThroughput', 'getNodeStats'));
+include(MODULES_DIR . DIRECTORY_SEPARATOR . 'managementurls.inc.php');
 
-?>
+function getManagementUrls()
+{
+    $result = new xajaxResponse();
+
+    _getManagementUrls(LMSNetDevManager::NODE_URL, $result);
+
+    return $result;
+}
+
+function addManagementUrl($params)
+{
+    return _addManagementUrl(LMSNetDevManager::NODE_URL, $params);
+}
+
+function delManagementUrl($id)
+{
+    return _delManagementUrl(LMSNetDevManager::NODE_URL, $id);
+}
+
+function updateManagementUrl($id, $params)
+{
+    return _updateManagementUrl(LMSNetDevManager::NODE_URL, $id, $params);
+}
+
+function getRadioSectors($netdev, $technology = 0)
+{
+    $result = new xajaxResponse();
+
+    $lms = LMS::getInstance();
+    $radiosectors = $lms->GetRadioSectors($netdev, $technology);
+
+    $result->call('radio_sectors_received', $radiosectors);
+
+    return $result;
+}
+
+function getFirstFreeAddress($netid, $elemid)
+{
+    global $LMS;
+
+    $result = new xajaxResponse();
+
+    $ip = $LMS->GetFirstFreeAddress($netid);
+    if ($ip != false) {
+        $result->assign($elemid, 'value', $ip);
+    }
+
+    return $result;
+}
+
+$LMS->RegisterXajaxFunction(array('getNodeLocks', 'addNodeLock', 'delNodeLock', 'toggleNodeLock', 'getThroughput', 'getNodeStats',
+    'getManagementUrls', 'addManagementUrl', 'delManagementUrl', 'updateManagementUrl', 'getRadioSectors',
+    'getFirstFreeAddress'));

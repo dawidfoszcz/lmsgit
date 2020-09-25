@@ -1,4 +1,4 @@
-{if $part eq "titlebar"}
+{if $part == "titlebar"}
 <div class="lmsPopupTitleBar" style="width: auto !important; width: 452px">
 	<div class="lmsPopupTitle">{t a=$ipaddr}Ping to $a{/t}</div>
 	<div id="{$popupid}_popupCloseBox" class="olPopupCloseBox lmsPopupCloseBox">&nbsp;</div>
@@ -6,7 +6,7 @@
 <div class="lmsPingContentsFrame">
 	<iframe id="autoiframe_{$popupid}" width="450px" height="300px" frameborder="0" framespacing="0" scrolling="no" src="?m=ping&ip={$ipaddr}&type={$type}"></iframe>
 </div>
-{elseif $part eq "ipform"}
+{elseif $part == "ipform"}
 <div class="lmsPopupTitleBar">
 	<div class="lmsPopupTitle">&nbsp;</div>
 	<div id="{$popupid}_popupCloseBox" class="olPopupCloseBox lmsPopupCloseBox">&nbsp;</div>
@@ -23,15 +23,14 @@
 	</div>
 </div>
 {else}
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html>
 <!--// $Id$ //-->
 <html><head>
 <meta name="GENERATOR" content="LMS {$layout.lmsv}">
-<meta http-equiv="Content-Language" content="{$LANGDEFS.$_ui_language.html}">
-<meta http-equiv="Content-Type" content="text/html; charset={$LANGDEFS.$_ui_language.charset}">
-<title>::: LMS :{if $layout.pagetitle neq ""} {$layout.pagetitle} :{/if}::</title>
-<link href="img/style.css" rel="stylesheet" type="text/css">
-<link href="img/map.css" rel="stylesheet" type="text/css">
+{include file="language.html"}
+<title>::: LMS :{if $layout.pagetitle != ""} {$layout.pagetitle} :{/if}::</title>
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<link href="css/map.css" rel="stylesheet" type="text/css">
 {$xajax}
 </head>
 {if !$part}
@@ -39,12 +38,9 @@
 	<frame scrolling="always" frameborder="0" marginheight="0" marginwidth="0" name="m" noresize src="?m=ping&p=main&ip={$ipaddr}&type={$type}">
 </frameset>
 {else}
-<!--[if IE]>
-<script type="text/javascript" src="img/json2.js"></script>
-<![endif]-->
-<script type="text/javascript" src="img/common.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
 <body style="overflow: auto">
-	<div id="data" class="lmsPingContents" style="height: 250px; width: 450px; overflow: auto"></div>
+	<div id="data" class="lmsPingContents"></div>
 	<form id="params">
 	<table cellpadding="2" style="bottom: 0; position: absolute" width="100%">
 		<tr class="light">
@@ -97,7 +93,7 @@
 		if (elem && document.getElementById('autoscroll').checked)
 			elem.scrollTop = elem.scrollHeight;
 		try {
-			var times = JSON.parse(document.getElementById('times').value);
+			var times = JSON.parse(decodeURIComponent(document.getElementById('times').value));
 			if (times.length) {
 				for (var i in times) {
 					var chunks = times[i].split(' ');

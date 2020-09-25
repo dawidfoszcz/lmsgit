@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE stats ADD down bigint;
     ALTER TABLE stats ADD up bigint;
@@ -40,5 +40,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004071400' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

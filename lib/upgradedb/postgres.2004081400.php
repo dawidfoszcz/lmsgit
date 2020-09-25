@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE nodes ADD lastonline integer;
     ALTER TABLE nodes ALTER lastonline SET DEFAULT 0;
@@ -32,5 +32,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004081400' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

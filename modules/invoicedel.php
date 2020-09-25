@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,13 +24,38 @@
  *  $Id$
  */
 
-$id = intval($_GET['id']);
-
-if($id && $_GET['is_sure'] == '1')
-{
-	$LMS->InvoiceDelete($id);
+if (isset($_POST['marks'])) {
+    $ids = $_POST['marks'];
+} else {
+    $ids = array($_GET['id']);
+}
+$ids = Utils::filterIntegers($ids);
+if (empty($ids)) {
+    return;
 }
 
-$SESSION->redirect('?m=invoicelist');
+foreach ($ids as $id) {
+    if ($LMS->isDocumentPublished($id) && !ConfigHelper::checkPrivilege('published_document_modification')) {
+        continue;
+    }
 
-?>
+    if ($LMS->isDocumentReferenced($id)) {
+        continue;
+    }
+
+    if ($LMS->isArchiveDocument($id)) {
+        continue;
+    }
+
+    $hook_data = $LMS->executeHook('invoicedel_before_delete', array(
+        'id' => $id,
+    ));
+    if (isset($hook_data['continue']) && empty($hook_data['continue'])) {
+        continue;
+    }
+    $DB->BeginTrans();
+    $LMS->InvoiceDelete($id);
+    $DB->CommitTrans();
+}
+
+$SESSION->redirect($_SERVER['HTTP_REFERER']);

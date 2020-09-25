@@ -23,11 +23,9 @@
  *
  *  $Id$
  */
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE nodes DROP CONSTRAINT nodes_mac_key;
     UPDATE dbinfo SET keyvalue = '2004042000' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

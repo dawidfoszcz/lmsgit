@@ -334,6 +334,18 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
     for (i=0; i<hc; i++)
     {
         if (hosts[i].status == UNKNOWN) {
+		unsigned long inet = hosts[i].ipaddr;
+
+		// Networks test
+		if (nc && inet)
+		{
+			for (j=0; j<nc; j++)
+		        if (nets[j].address == (inet & nets[j].mask))
+		            break;
+			if (j == nc)
+				continue;
+		}
+
             del_node(g, ewx, sh, &hosts[i]);
             savetables = 1;
         }
@@ -449,7 +461,10 @@ int del_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, struct 
 		for (vars = response->variables; vars; vars = vars->next_variable)
 			print_variable(vars->name, vars->name_length, vars);
 #endif
-		g->db->pexec(g->db->conn, "DELETE FROM ewx_pt_config WHERE nodeid = ?", itoa(h.id));
+		if (h.id)
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_pt_config WHERE nodeid = ?", itoa(h.id));
+		else
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_pt_config WHERE nodeid IS NULL");
 #ifdef DEBUG1
 		syslog(LOG_INFO, "DEBUG: [%s/ewx-pt] Deleted node %s (%05d)", ewx->base.instance, h.name, h.id);
 #endif
@@ -623,7 +638,7 @@ int update_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, stru
     }
 	if (strcmp(h.mac, o.mac) != 0) {
 		snmp_add_var(pdu, UserAllowedMacAddr, PT_OID_LEN, 's', h.mac);
-		(*old).mac = h.mac;
+		memcpy((*old).mac, h.mac, strlen(h.mac));
     }
 	snmp_add_var(pdu, UserStatus, PT_OID_LEN, 'i', ACTIVE);
 

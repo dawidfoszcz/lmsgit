@@ -26,20 +26,15 @@
 
 $id = $_GET['id'];
 
-if($id && $_GET['is_sure']=='1')
-{
-	if (!$DB->GetOne('SELECT 1 FROM cash WHERE sourceid = ?', array($id))
-		&& !$DB->GetOne('SELECT 1 FROM cashimport WHERE sourceid = ?', array($id)))
-	{
-		$DB->Execute('DELETE FROM cashsources WHERE id = ?', array($id));
-		if ($SYSLOG) {
-			$args = array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_CASHSOURCE] => $id);
-			$SYSLOG->AddMessage(SYSLOG_RES_CASHSOURCE, SYSLOG_OPER_DELETE,
-				$args, array_keys($args));
-		}
-	}
+if ($id) {
+    if (!$DB->GetOne('SELECT 1 FROM cash WHERE sourceid = ?', array($id))
+        && !$DB->GetOne('SELECT 1 FROM cashimport WHERE sourceid = ?', array($id))) {
+        $DB->Execute('DELETE FROM cashsources WHERE id = ?', array($id));
+        if ($SYSLOG) {
+            $args = array(SYSLOG::RES_CASHSOURCE => $id);
+            $SYSLOG->AddMessage(SYSLOG::RES_CASHSOURCE, SYSLOG::OPER_DELETE, $args);
+        }
+    }
 }
 
 header('Location: ?m=cashsourcelist');
-
-?>

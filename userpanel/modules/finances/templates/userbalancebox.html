@@ -1,6 +1,6 @@
 <!--// $Id$ //-->
 {box title="Your balance"}
-{$disable_invoices = check_conf('userpanel.disable_invoices')}
+{$disable_invoices = ConfigHelper::checkConfig('userpanel.disable_invoices')}
 <form name="invoices" action="?m=finances&f=invoice" method="POST" target="_blank">
 <table style="width: 100%;" cellpadding="3">
 	<tr class="darkest">
@@ -13,28 +13,41 @@
 		<td width="1%" align="right"></td>
 		{/if}
 	</tr>
-	{section name=balancelist loop=$balancelist.id step=-1}
-	<tr class="dark">
-		<td width="1%" class="nobr">{$balancelist.date[balancelist]}</td>
-		<td width="1%" align="right" class="nobr">{if $balancelist.value[balancelist] > 0 && $balancelist.type[balancelist] != 4}+{/if}{if $balancelist.type[balancelist] == 4}-{/if}{$balancelist.value[balancelist]|money_format}</td>
+	{$ldate = ConfigHelper::getConfig('userpanel.limit_balance_list_to_last_years', 5)}
+	{if $ldate}
+		{$ldate = ($smarty.now - $ldate * 366 * 86400)}
+	{else}
+		{$ldate = 0}
+	{/if}
+	{section name=balancelist loop=$balancelist.list step=-1}
+	{$item=$balancelist.list[balancelist]}
+	{if $item.time >= $ldate}
+		<tr class="dark">
+		<td width="1%" class="nobr">{$item.date}</td>
+		<td width="1%" align="right" class="nobr">{if $item.value > 0 && $item.type != 4}+{/if}{if $item.type == 4}-{/if}{moneyf($item.value, $item.currency)}</td>
 		<td width="1%" align="center">&raquo;</td>
-		<td width="1%" align="right" class="nobr">{if $balancelist.after[balancelist] < 0}<font color="red">{/if}{$balancelist.after[balancelist]|money_format}{if $balancelist.after[balancelist] < 0}</font>{/if}</td>
-		<td width="95%">{$balancelist.comment[balancelist]}</td>
+		<td width="1%" align="right" class="nobr">{if $item.after < 0}<span style="color: red;">{/if}{moneyf($item.after)}{if $item.after < 0}</span>{/if}</td>
+		<td width="95%">{$item.comment}</td>
 		{if !$disable_invoices}
 		<td width="1%" class="nobr">
-			{if $balancelist.doctype[balancelist]==1 || $balancelist.doctype[balancelist]==3}
-			<a href="?m=finances&amp;f=invoice&amp;id={$balancelist.docid[balancelist]}" target="_blank">{img src="print.gif" alt="[ Print ]" text=$balancelist.number[balancelist]}</a><input style="vertical-align: middle" type="checkbox" name="inv[{$balancelist.docid[balancelist]}]" value="1" />
+			{foreach $item.customlinks as $link}
+			<a {if isset($link.url)}href="{$link.url}"{/if} target="_blank" {if isset($link.onclick)}onclick="{$link.onclick}"{/if}>{if isset($link.icon)}{img src="`$link.icon`" alt="`$link.label`" text=$link.tip}{else}{$link.label}{/if}</a>
+			{if isset($link.extra)}{$link.extra}{/if}
+			{/foreach}
+			{if $item.doctype == 1 || $item.doctype == 3}
+			<a href="?m=finances&amp;f=invoice&amp;id={$item.docid}" onclick="reset_login_timeout();" target="_blank">{img src="print.gif" alt="Print" text=$item.number}</a><input style="vertical-align: middle" type="checkbox" name="inv[{$item.docid}]" value="1" />
 			{else}
 			&nbsp;
 			{/if}
 		</td>
 		{/if}
 	</tr>
+	{/if}
 	{sectionelse}
 	<tr>
 		<td align="center" width="100%" colspan="6">
 			<p>&nbsp;</p>
-			<p><b>{trans("No such transactions on your account.")}</b></p>
+			<p><strong>{trans("No such transactions on your account.")}</strong></p>
 			<p>&nbsp;</p>
 		</td>
 	</tr>
@@ -45,7 +58,10 @@
 			<table width="100%" cellpadding="0" cellspacing="0">
 			    <tr>
 				<td width="50%">
-				{img src="print.gif" alt="[ Print ]"} <a href="javascript:document.invoices.submit()">{trans("Print selected")}</a>
+					{img src="print.gif" alt="Print"} <a onclick="reset_login_timeout();" href="javascript:document.invoices.submit();">{trans("Print selected")}</a>
+					{img src="group.gif" alt="Aggregate documents"} <a href="?m=finances&aggregate_documents={if $aggregate_documents}0{else}1{/if}">
+						{if $aggregate_documents}{trans("Don't aggregate documents")}{else}{trans("Aggregate documents")}{/if}
+					</a>
 				</td>
 				<td width="50%" align="right">
 				<label for="allbox">{trans("Check all")}</label><input style="vertical-align: middle" type="checkbox" name="allbox" id="allbox" onchange="CheckAll('invoices', this)" value="1" />

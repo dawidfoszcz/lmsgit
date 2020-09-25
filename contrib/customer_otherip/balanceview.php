@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -38,19 +38,19 @@ $pin = (trim($loginform['pwd']) ? trim($loginform['pwd']) : 0);
 //$id = GetCustomerIDByContractAndPIN($login, $pin);
 $id = GetCustomerIDByIDAndPIN($login, $pin);
 
-if($id)
-{
-	session_start();
-	$_SESSION['uid'] = $id;
+if ($id) {
+    session_start();
+    $_SESSION['uid'] = $id;
 
-	$SMARTY->assign('customerinfo',$LMS->GetCustomer($id));
-	$SMARTY->assign('balancelist',$LMS->GetCustomerBalanceList($id));
-	$SMARTY->assign('limit',15);
-	$SMARTY->assign('account_no',$CONFIG['finances']['account']);
-	$SMARTY->assign('bank_name',$CONFIG['finances']['bank']);
-	$SMARTY->display('balanceview.html');
+    $LMS->executeHook('customer_otherip_before_display', array('smarty' => $SMARTY, 'customerid' => $id));
+
+    $customerinfo = $LMS->GetCustomer($id);
+    $SMARTY->assign('customerinfo', $customerinfo);
+    $SMARTY->assign('balancelist', $LMS->GetCustomerBalanceList($id));
+    $SMARTY->assign('limit', 15);
+    $SMARTY->assign('account_no', ConfigHelper::getConfig('finances.account'));
+    $SMARTY->assign('bank_name', ConfigHelper::getConfig('finances.bank'));
+    $SMARTY->display('balanceview.html');
+} else {
+    header('Location: index.php?error=1');
 }
-else
-	header('Location: index.php?error=1');
-
-?>

@@ -421,8 +421,8 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 				"SUM(t.downrate) AS downrate, SUM(t.downceil) AS downceil "
 			"FROM assignments a "
 			"LEFT JOIN tariffs t ON (a.tariffid = t.id) "
-			"WHERE (datefrom <= %NOW% OR datefrom = 0) AND (dateto >= %NOW% OR dateto = 0) "
-				"AND EXISTS (SELECT 1 FROM nodeassignments JOIN nodes n ON (n.id = nodeid) " 
+			"WHERE a.datefrom <= %NOW% AND (a.dateto >= %NOW% OR a.dateto = 0) "
+				"AND EXISTS (SELECT 1 FROM nodeassignments JOIN vnodes n ON (n.id = nodeid) " 
 					"WHERE a.id = assignmentid"
 					"%disabled%enets) "
 			"GROUP BY a.customerid"
@@ -482,14 +482,14 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 		"JOIN ( "
 			"SELECT count(*) AS cnt, assignmentid "
 			"FROM nodeassignments "
-			"LEFT JOIN nodes n ON (nodeid = n.id) "
+			"LEFT JOIN vnodes n ON (nodeid = n.id) "
 			"WHERE 1=1"
 			"%disabled "
 //			"%enets "
 			"GROUP BY assignmentid"
 			") cn ON (cn.assignmentid = na.assignmentid) "
 		"WHERE "
-			"(a.datefrom <= %NOW% OR a.datefrom = 0) AND (a.dateto >= %NOW% OR a.dateto = 0)"
+			"a.datefrom <= %NOW% AND (a.dateto >= %NOW% OR a.dateto = 0)"
 			"%disabled"
 			"%enets"
 	);
@@ -798,7 +798,7 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 						{
 							if( // komputer nalezy do innego kanalu
 							    ((x && channels[x].customerid != channels[j].customerid) || 
-								    channels[j].customerid == 0)
+								    !channels[j].customerid)
 							    || // zmiana ID
 							    (c.hosts[n].id != channels[j].hosts[k].id)
 							)
@@ -883,7 +883,7 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 								    ) 
 								{
 									// komputer byl w kanale
-									if( (channels[j].customerid != 0) 
+									if( (channels[j].customerid)
 									    || // lub zmiana ID
 									    (c.hosts[k].id != channels[j].hosts[n].id))
 									{
@@ -893,7 +893,7 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 									}
 							
 									// jesli komputer nie byl w kanale, mozemy go zaktualizowac bez usuwania
-									if( (channels[j].customerid == 0 &&
+									if( (!channels[j].customerid &&
 									    (c.hosts[k].uprate != channels[j].hosts[n].uprate ||
 									    c.hosts[k].upceil != channels[j].hosts[n].upceil ||
 									    c.hosts[k].downrate != channels[j].hosts[n].downrate ||
@@ -938,7 +938,7 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 					deleted++;
 				}
 
-			if(deleted == channels[i].no && channels[i].customerid != 0)
+			if(deleted == channels[i].no && channels[i].customerid)
 				del_channel(g, ewx, sh, &channels[i]);
 		}
 	
@@ -1498,7 +1498,10 @@ int del_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, struct 
 //    		for(vars = response->variables; vars; vars = vars->next_variable)
 //    			print_variable(vars->name, vars->name_length, vars);
 
-		g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid = ?", itoa(h.id));
+		if (h.id)
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid = ?", itoa(h.id));
+		else
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid IS NULL");
 #ifdef DEBUG1
 		syslog(LOG_INFO, "DEBUG: [%s/ewx-stm] Deleted node %s (%05d)", ewx->base.instance, h.ip, h.id);
 #endif
@@ -1583,7 +1586,7 @@ int add_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, struct 
 
 		g->db->pexec(g->db->conn, "INSERT INTO ewx_stm_nodes (nodeid, mac, ipaddr, channelid, uprate, upceil, downrate, downceil, halfduplex) "
 				    "VALUES (?, '?', INET_ATON('?'), ?, ?, ?, ?, ?, ?)", 
-				    itoa(h.id), h.mac, h.ip, channelid, uprate, upceil, downrate, downceil, halfduplex);
+				    itoa(h.id), h.mac, h.ip, chid ? channelid : "NULL", uprate, upceil, downrate, downceil, halfduplex);
 
 		free(uprate);
 		free(upceil);

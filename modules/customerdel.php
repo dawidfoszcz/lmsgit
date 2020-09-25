@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -24,27 +24,37 @@
  *  $Id$
  */
 
-$layout['pagetitle'] = trans('Customer Remove: $a',sprintf("%04d",$_GET['id']));
-$SMARTY->assign('customerid',$_GET['id']);
+$permanent = ConfigHelper::checkPrivilege('permanent_customer_removal') && isset($_GET['type']) && $_GET['type'] == 'permanent';
 
-if (!$LMS->CustomerExists($_GET['id']))
-{
-	$body = '<P>'.trans('Incorrect Customer ID.').'</P>';
-}else{
+if (!$LMS->CustomerExists($_GET['id'])) {
+    $layout['pagetitle'] = trans($permanent ? 'Permanent Customer Remove: $a' : 'Customer Remove: $a', sprintf("%04d", $_GET['id']));
+    $SMARTY->assign('customerid', $_GET['id']);
+    $body = '<P>' . trans('Incorrect Customer ID.') . '</P>';
+    $body .= '<A HREF="?' . $SESSION->get('backto') . '">' . trans('Back') . '</A></P>';
+    $SMARTY->assign('body', $body);
+    $SMARTY->display('dialog.html');
+} else {
+    $LMS->executeHook(
+        'customerdel_before_submit',
+        array(
+            'id' => $_GET['id'],
+            'permanent' => $permanent,
+        )
+    );
 
-	if($_GET['is_sure']!=1)
-	{
-		$body = '<P>'.trans('Do you want to remove $a customer?',$LMS->GetCustomerName($_GET['id'])).'</P>'; 
-		$body .= '<P>'.trans('All customer data and computers bound to this customer will be lost!').'</P>';
-		$body .= '<P><A HREF="?m=customerdel&id='.$_GET['id'].'&is_sure=1">'.trans('Yes, I do.').'</A></P>';
-	}else{
-		header("Location: ?".$SESSION->get('backto'));
-		$body = '<P>'.trans('Customer $a has been removed.',$LMS->GetCustomerName($_GET['id'])).'</P>';
-		$LMS->DeleteCustomer($_GET['id']);
-	}
+    if ($permanent) {
+        $LMS->DeleteCustomerPermanent($_GET['id']);
+    } else {
+        $LMS->DeleteCustomer($_GET['id']);
+    }
+
+    $LMS->executeHook(
+        'customerdel_after_submit',
+        array(
+            'id' => $_GET['id'],
+            'permanent' => $permanent,
+        )
+    );
+
+    $SESSION->redirect('?'.$SESSION->get('backto'));
 }
-
-$SMARTY->assign('body',$body);
-$SMARTY->display('dialog.html');
-
-?>

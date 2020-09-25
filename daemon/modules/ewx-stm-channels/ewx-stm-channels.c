@@ -1,7 +1,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -481,7 +481,7 @@ void reload(GLOBAL *g, struct ewx_module *ewx)
 		"JOIN nodes n ON (na.nodeid = n.id) "
 		"LEFT JOIN netdevices d ON (n.netdev = d.id) "
 		"WHERE "
-			"(a.datefrom <= %NOW% OR a.datefrom = 0) AND (a.dateto >= %NOW% OR a.dateto = 0)"
+			"a.datefrom <= %NOW% AND (a.dateto >= %NOW% OR a.dateto = 0)"
 			"%disabled"
 			"%enets"
 	);
@@ -1630,7 +1630,10 @@ int del_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, struct 
    		for(vars = response->variables; vars; vars = vars->next_variable)
    			print_variable(vars->name, vars->name_length, vars);
 #endif
-		g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid = ?", itoa(h.id));
+		if (h.id)
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid = ?", itoa(h.id));
+		else
+			g->db->pexec(g->db->conn, "DELETE FROM ewx_stm_nodes WHERE nodeid IS NULL");
 #ifdef DEBUG1
 		syslog(LOG_INFO, "DEBUG: [%s/ewx-stm-channels] Deleted node %s/%s (%05d)",
 		    ewx->base.instance, h.ip, h.mac, h.id);
@@ -1721,7 +1724,7 @@ int add_node(GLOBAL *g, struct ewx_module *ewx, struct snmp_session *sh, struct 
 		g->db->pexec(g->db->conn, "INSERT INTO ewx_stm_nodes (nodeid, mac, ipaddr, "
 		        "channelid, uprate, upceil, downrate, downceil, halfduplex) "
 				"VALUES (?, '?', INET_ATON('?'), ?, ?, ?, ?, ?, ?)", 
-				itoa(h.id), h.mac, h.ip, channelid, uprate, upceil, downrate, downceil, halfduplex);
+				itoa(h.id), h.mac, h.ip, chid ? channelid : "NULL", uprate, upceil, downrate, downceil, halfduplex);
 
 		free(uprate);
 		free(upceil);

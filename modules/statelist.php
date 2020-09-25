@@ -25,13 +25,14 @@
  */
 
 $statelist = $DB->GetAll('SELECT * FROM states ORDER BY name');
-$listdata['total'] = sizeof($statelist);
+$listdata['total'] = empty($statelist) ? 0 : count($statelist);
 
-if ($SESSION->is_set('cslp') && !isset($_GET['page']))
-	$SESSION->restore('cslp', $_GET['page']);
+if ($SESSION->is_set('cslp') && !isset($_GET['page'])) {
+    $SESSION->restore('cslp', $_GET['page']);
+}
 
-$page = (!isset($_GET['page']) ? 1 : $_GET['page']); 
-$pagelimit = (!isset($CONFIG['phpui']['statelist_pagelimit']) ? $listdata['total'] : $CONFIG['phpui']['statelist_pagelimit']);
+$page = (!isset($_GET['page']) ? 1 : $_GET['page']);
+$pagelimit = ConfigHelper::getConfig('phpui.statelist_pagelimit', $listdata['total']);
 $start = ($page - 1) * $pagelimit;
 
 $SESSION->save('cslp', $page);
@@ -45,6 +46,4 @@ $SMARTY->assign('page', $page);
 $SMARTY->assign('start', $start);
 $SMARTY->assign('statelist', $statelist);
 $SMARTY->assign('listdata', $listdata);
-$SMARTY->display('statelist.html');
-
-?>
+$SMARTY->display('state/statelist.html');

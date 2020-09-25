@@ -24,11 +24,11 @@
  *  $Id$
  */
 
-$DB->BeginTrans();
+$this->BeginTrans();
 
-$create_reg = $DB->GetOne('SELECT docid FROM receiptcontents LIMIT 1');
+$create_reg = $this->GetOne('SELECT docid FROM receiptcontents LIMIT 1');
 
-$DB->Execute("
+$this->Execute("
 
     ALTER TABLE receiptcontents ADD COLUMN regid integer;
     UPDATE receiptcontents SET regid = ?;
@@ -59,11 +59,10 @@ $DB->Execute("
     )
 ", array($create_reg ? 1 : 0));
 
-if($create_reg)
-	$DB->Execute("INSERT INTO cashregs (name) VALUES ('default')");
+if ($create_reg) {
+    $this->Execute("INSERT INTO cashregs (name) VALUES ('default')");
+}
 
-$DB->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?",array('2005122800', 'dbversion'));
+$this->Execute("UPDATE dbinfo SET keyvalue = ? WHERE keytype = ?", array('2005122800', 'dbversion'));
 
-$DB->CommitTrans();
-
-?>
+$this->CommitTrans();

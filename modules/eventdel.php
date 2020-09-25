@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2019 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -26,14 +26,20 @@
 
 $id = $_GET['id'];
 
-if($id && $_GET['is_sure']=='1')
-{
-	if($DB->Execute('DELETE FROM events WHERE id = ?', array($id)))
-	{	
-		$DB->Execute('DELETE FROM eventassignments WHERE eventid = ?', array($id));
-	}
+if ($id) {
+    $LMS->executeHook(
+        'eventdel_before_submit',
+        array(
+            'id' => $id
+        )
+    );
+    $LMS->EventDelete($id);
 }
 
-header('Location: ?m=eventlist');
+$backto = $SESSION->get('backto');
+if (!empty($backto) && preg_match('/^m=rtticketview/', $backto)) {
+    $SESSION->redirect('?' . $backto);
+}
 
-?>
+header('Location: ?m=eventlist'
+    . ($SESSION->is_set('backid') ? '#' . $SESSION->get('backid') : ''));

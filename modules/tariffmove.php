@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2016 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -27,35 +27,32 @@
 $from = intval($_GET['from']);
 $to = intval($_GET['to']);
 
-if($LMS->TariffExists($from) && $LMS->TariffExists($to) && $_GET['is_sure'] == 1)
-{
-	$network = ((isset($_GET['netid']) && $LMS->NetworkExists($_GET['netid'])) ? $_GET['netid'] : NULL);
+if ($LMS->TariffExists($from) && $LMS->TariffExists($to) && $_GET['is_sure'] == 1) {
+    $network = ((isset($_GET['netid']) && $LMS->NetworkExists($_GET['netid'])) ? $_GET['netid'] : null);
 
-	if($network)
-	        $net = $LMS->GetNetworkParams($network);
-	
-	if($ids = $DB->GetCol('SELECT assignments.id AS id FROM assignments, customersview c '
-			.($network ? 'LEFT JOIN nodes ON c.id = nodes.ownerid ' : '')
-			.'WHERE customerid = c.id AND deleted = 0 AND tariffid = '.$from
-			.($network ? ' AND ((ipaddr > '.$net['address'].' AND ipaddr < '.$net['broadcast'].') OR (ipaddr_pub > '
-			.$net['address'].' AND ipaddr_pub < '.$net['broadcast'].')) ' : '')
-			)) {
-		foreach ($ids as $id) {
-			$DB->Execute('UPDATE assignments SET tariffid=?
+    if ($network) {
+            $net = $LMS->GetNetworkParams($network);
+    }
+    
+    if ($ids = $DB->GetCol('SELECT assignments.id AS id FROM assignments, customerview c '
+            .($network ? 'LEFT JOIN nodes ON c.id = nodes.ownerid ' : '')
+            .'WHERE customerid = c.id AND deleted = 0 AND tariffid = '.$from
+            .($network ? ' AND ((ipaddr > '.$net['address'].' AND ipaddr < '.$net['broadcast'].') OR (ipaddr_pub > '
+            .$net['address'].' AND ipaddr_pub < '.$net['broadcast'].')) ' : ''))) {
+        foreach ($ids as $id) {
+            $DB->Execute('UPDATE assignments SET tariffid=?
 					WHERE id=? AND tariffid=?', array($to, $id, $from));
-			if ($SYSLOG) {
-				$args = array(
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_ASSIGN] => $id,
-					$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_TARIFF] => $to
-				);
-				$SYSLOG->AddMessage(SYSLOG_RES_ASSIGN, SYSLOG_OPER_UPDATE, $args, array_keys($args));
-			}
-		}
-	}
+            if ($SYSLOG) {
+                $args = array(
+                    SYSLOG::RES_ASSIGN => $id,
+                    SYSLOG::RES_TARIFF => $to
+                );
+                $SYSLOG->AddMessage(SYSLOG::RES_ASSIGN, SYSLOG::OPER_UPDATE, $args);
+            }
+        }
+    }
 
-	$SESSION->redirect('?m=tariffinfo&id='.$to.($network ? '&netid='.$network : ''));
+    $SESSION->redirect('?m=tariffinfo&id='.$to.($network ? '&netid='.$network : ''));
+} else {
+    header("Location: ?".$SESSION->get('backto'));
 }
-else
-	header("Location: ?".$SESSION->get('backto'));
-
-?>

@@ -1,8 +1,1472 @@
 $Id$
 
-version ?.??.?? (????-??-??):
+version 26-git (????-??-??):
 
-  - host owner selection for networks [red/chilan]
+  - enhancement: 'invoices.proforma_conversion_comment_format' allows to define comment format
+    in invoice created from pro forma invoice [chilan]
+  - improvement: pro forma invoices which were transformed to regular invoice present description
+    with line-though [chilan]
+  - improvement: big performance boost in invoice report and jpk generation - LMS::GetInvoiceContent()
+    gets detail level parameter support which allows to restrict returned data [chilan]
+  - improvement: 'phpui.location_autosuggest_max_length' specified maximum matched location items
+    visible in suggestion popup [chilan]
+  - improvement: customer balance box: in aggregate document mode show document comment for invoice
+    transformed from pro forma [chilan]
+  - improvement: allow to manipulate ticket categories during new note add [chilan]
+  - improvement: 'phpui.delete_related_customer_resources' configuration variable allows to specify
+    which customer related resources are removed during not-permanent customer delete process
+    ('assignments,customergroups,nodegroups,nodes,userpanel' by default) [chilan]
+  - improvement: show all receipt positions on receipt list [chilan]
+  - improvement: max download and max upload in customer traffic reports [chilan]
+  - improvement: allow to enable/disable speed column presentation on traffic report [chilan]
+  - enhancement: userpanel SSN/TEN and PIN authenication method support added [chilan]
+  - improvement: minor visual improvements of panel/tab/card interface - larger vertical distances
+    and different background color [chilan]
+  - improvement: use native color selector input element for helpdesk ticket category look
+    definition [chilan]
+  - improvement: voip account password generation link near password form field [chilan]
+  - enhancement: implemented visibility toggle of customer/node panels/tabs/boxes [chilan]
+  - improvement: allow to use ticket filter owner option 'no owner' together with
+    selected user in helpdesk [interduo]
+  - improvement: enable/disable related ticket list selector based on parent ticket
+    definition [chilan]
+  - improvement: don't allow to edit used tariffs unless user has appropriate privilege
+    ('used_tariff_edit' permission introduced) [chilan]
+  - improvement: added dedicated looked up property customisation button inside quick search
+    input fields [chilan]
+  - improvement: lms-cashimport.php script generates import report on output [chilan]
+  - enhancement: userpanel startup module can be defined from user interface [interduo]
+  - improvement: new customer can get first free identifier when 'phpui.reuse_customer_id'
+    is set to 'true' [chilan]
+  - improvement: added phpui.timetable_hide_disabled_users setting
+    in eventmodify/eventlistfilter [interduo]
+  - enhancement: allow to disable state changes new->open when adding note to ticket - now
+    it depends on variable rt.change_ticket_state_to_open_after_note_add_interval
+    (default: 0, which keeps current behaviour) [interduo]
+  - improvement: allow to quickly resend existing message [chilan]
+  - enhancement: implemeneted main menu item visibility toggle basing on user permissions [chilan]
+  - improvement: allow to hide createtime in ticket row (variable:
+    rt.hide_ticket_row_create_time, default: 0) [interduo]
+  - enhancement: hosting: added support for ALIAS and ANAME record types - they are used
+    by github pages [chilan]
+  - enhancement: allow to quickly clone existing invoice [chilan]
+  - enhancement: implemented true responsive menu popups [chilan]
+  - enhancement: implemented bulk operations on customer contact flags in customer search
+    result [chilan]
+  - enhancement: implemented true responsive lms-ui-multiselect control [chilan]
+  - enhancement: 'payments.prefer_netto' allows to enable netto value usage produced by plugins
+    ('false' by default) [televoice]
+  - enhancement: separate the Tcpdf transfer form into a separate class [ravvar]
+  - enhancement: responsive version of layout implemented [chilan]
+  - improvement: 'phpui.promotion_activation_at_next_day' configuration variable support new 'business'
+    value which causes next business day usage for activation [chilan]
+  - enhancement: 'phpui.promotion_use_discounts' configuration variable allows to force
+    value discounts usage in assignments created basing on promotion schemas [chilan]
+  - improvement: replace the transfer form from HTML to Tcpdf [ravvar]
+  - enhancement: allow to show the transfer form on the invoice for selected customers [ravvar]
+  - devel/improvement: localisation support moved to separate class - symultaneous multi-localisation
+    support [chilan]
+  - devel/refactoring: moved currency configuration to Localisation class [chilan]
+  - improvement: separate smarty function for paytype selection - items are sorted by name
+    in accordance with current ui locale [chilan]
+  - improvement: customer identifiers are validated with billing address country in mind [chilan]
+  - enhancement: 'phpui.uploaded_image_max_size' allows to resize images uploaded to server on web
+    browser side to specified size (default '0' value means disabled) [chilan]
+  - bugfix: postgresql: connect through IP instead of socket when localhost is set
+    in lms.ini [interduo]
+  - enhancement: if uploaded image scaling is enable allow to disable scaling using optional
+    checkbox [chilan]
+  - improvement: don't show quick search fields when current user has no permissions to related
+    part of system [chilan]
+  - improvement: added 'phpui.send_message_confirm_threshold' configuration variable which control
+    how many potential message recipients trigger confirmation dialog ('50' by default) [milek]
+  - enhancement: configuration variable 'rt.allow_modify_resolved_tickets_newer_than' allows
+    to prevent old ticket re-open (default '86400') [interduo]
+  - enhancement: allow to select different lms.ini file using its name containing http
+    server port [chilan]
+  - enhancement: additional selection level in assignment and promotion tariff definition - service
+    type [chilan]
+  - improvement: implemented clear button in lms-ui-multiselect ui controls [chilan]
+  - enhancement: customer group selection support added in lms-notify.php [chilan]
+  - enhancement: implemented user permissions for companies and global division context selection.
+    Configuration variable 'phpui.force_global_division_context' ('false' by default)
+    allows to force division contex [ravvar]
+  - improvement: converted customer group selection in customer search form to multiple
+    selection [chilan]
+  - enhancement: added the ability to copy user divisions between users [ravvar]
+  - enhancement: customer notes support in dedicated tab [chilan]
+  - enhancement: divided mailing notice consent to separate mail and sms delivery consents [chilan]
+  - enhancement: sms and mailing notice consent support for lms-notify.php backend script
+    ('ignore_customer_consents' script configuration variable set to 'true' allows to imitate previous
+    behavior) [chilan]
+  - improvement: transaction log tab content is loaded in background and on-demand [chilan]
+  - enhancement: lms-notify.php supports customer 'birthday' type notifications [chilan]
+  - improvement: 'phpui.default_node_check_mac' allows to enable mac checking automatically
+    during new node creation ('false' by default) [chilan]
+  - improvement: new customer group input parameter parser allows for much more group
+    assignment combination tests [chilan]
+  - improvement: implemented user group assignment management from user forms [chilan]
+  - improvement: 'phpui.touch_device_tooltips' configuration variable allows to disable globally
+    tooltips/hints on touch devices (default 'false' value means disabled) [chilan]
+  - enhancement: added transaction tab/box into netdevinfo/netdevedit views [chilan]
+  - improvement: allow to use assignments with backward period accounting - 'payments.backward_comment'
+    and 'payments.settlement_backward_comment' configuration variables control format of generated cash
+    operation content [chilan]
+  - enhancement: added the ability to hide fortunes on the Welcome page by setting configuration
+    variable 'phpui.hide_fortunes' ('false' by default) [awbnet]
+  - enhancement: variable phpui.allow_modify_closed_events_newer_than allows to prevent modify
+    old events (default '604800') [interduo]
+  - enhancement: added support for many persistent filters in single module [chilan]
+  - improvement: allow to force quick search by resource id prepending numeric value with hash
+    character [chilan]
+  - improvement: allow to click in auto suggestion description to open resource
+    in new window/tab [chilan]
+  - improvement: don't require territ flag for addresses which have selected province
+    from outside territ database province list [chilan]
+  - enhancement: 'phpui.node_to_network_device_connection_required' (default: 'false') configuration
+    variable controls if network device connection is required for added/edit node [chilan]
+  - enhancement: 'phpui.teryt_required' support for voip account localisations [chilan]
+  - improvement: allow to include cash source file name in cash import record cash
+    calculation [chilan]
+  - improvement: changed default value for 'phpui.datables_max_records' from '300' to '0' [chilan]
+  - enhancement: introduce configuration per division (UI) [ravvar, chilan]
+  - enhancement: implemented 'customer-group' action in lms-notify.php [chilan]
+  - enhancement: new user permission 'financial_operations' disallows access to financial
+    record lists [chilan]
+  - enhancement: new configuration variable 'sms.message_template' allows to reformat
+    message before sending it [chilan]
+  - improvement: lms-rtparser.php backend script is able to scale down image according
+    to 'phpui.uploaded_image_max_size' [chilan]
+  - enhancement: added separate receipt/bill sale flag for invoices [chilan]
+  - enhancement: resolve ticket by new action button in queueview list [interduo]
+  - improvement: changed TCPDF/HTML debit note to use correspondence address as
+    shipping address (if 'invoices.post_address' is set to true) [awbnet]
+  - improvement: added issuer's signature field to debit note (TCPDF/HTML)
+    (visible if 'notes.issuer_signature' is set to true, default: 'false') [awbnet]
+  - improvement: made TCPDF debit note version look like TCPDF invoice [awbnet]
+  - improvement: new default values for 'phpui.multiselect_popup_on_bottom' (change from 'false'
+    to 'true') and 'phpui.multiselect_max_visible' (change from '0' to '5') [chilan]
+  - enhancement: added routed network support [chilan]
+  - improvement: 'invoices.show_tax_category' configuration variable ('false' by default) controls
+    tax category column visibility on invoices [chilan]
+  - enhancement: added territ city type property support [chilan]
+  - enhancement: implemented JPK new 'EE' flag support for invoices [chilan]
+  - improvement: added 'with discount' customer state filter [chilan]
+  - enhancement: add support for multilevel cloning of the configuration variables [ravvar]
+  - improvement: added 'with receipt' filter on invoice list [chilan]
+  - improvement: added service type property in tariffless liabilities [chilan]
+  - improvement: 'phpui.default_liability_type' ('-1' by default) controls liability type
+    property for newly created tariffless assignments [chilan]
+  - improvement: 'phpui.default_tariff_type' ('-1' by default) controls type property
+    for newly created tariffs [chilan]
+  - improvement: added split payment and telecommunication service filter on invoice list [chilan]
+
+version 25.0 (2020-05-15):
+
+  - improvement: introduced invoices.hide_ssn configuration variable which allows to hide SSN
+    on invoices [chilan]
+  - improvement: show icon correspondent to netdevnode online status in netdevinfo [ravvar]
+  - devel: bumped required php version to 5.6 [chilan]
+  - devel: bumped required phpmailer version to 6.x [chilan]
+  - improvement: show online status for network devices ip addresses [chilan]
+  - improvement: show device online status on network device list [chilan]
+  - enhancement: online status filter on network device list [chilan]
+  - improvement: added shortcut to print customer balance from customer balance box [chilan]
+  - enhancement: userpanel: callback mechanism introduced which allows to generate html content
+    from hidden module [chilan]
+  - enhancement: userpanel: urgent notices are shown independently of active tab/module [chilan]
+  - enhancement: userpanel: special icon on notices tab inform if there are any unread
+    notices [chilan]
+  - enhancement: allow to prefer generation of settlements only - when
+    payments.prefer_settlement_only set to 'true' [chilan]
+  - improvement: phpui.speed_unit_type and phpui.speed_unit_aggregation_threshold control
+    bandwith unit presentation [chilan]
+  - improvement: add date category to filter in messages list [ravvar]
+  - improvement: data-target-url attribute support has been improved and is far
+    easier to use [chilan]
+  - enhancement: icon near customer addresses which redirect to google maps places [chilan]
+  - improvement: allow to change owner and queue during group message reply [chilan]
+  - enhancement: invoices.hide_discount configuration variable ('false' by default) controls
+    if discount column is presented on invoices [chilan]
+  - improvement: added copy to clipboard buttons/icons for events, tickets, ticket message
+    and notes [chilan]
+  - improvement: show customers with all inactive assignments for given tariff as blend [chilan]
+  - devel: change confirmation message appearance throughout change type from ConfirmLink
+    to ConfirmDialog [ravvar]
+  - devel: change warning message appearance throughout change type from alert
+    to alertDialog [ravvar]
+  - devel: change confirmation message appearance throughout change type from 'confirm'
+    to 'ConfirmDialog' [ravvar]
+  - enhancement: customer group node list network filters take network devices ip addresses
+    into consideration [chilan]
+  - enhancement: add per user settings to ui configuration [ravvar]
+  - enhancement: added credit note reason template support [chilan]
+  - improvement: allow to quick search nodes by location address [chilan]
+  - improvement: allow to jump immediately to ticket assigned event day in timetable [chilan]
+  - improvement: phpui.default_divisionid specifies pre-selected division of added
+    customer [chilan]
+  - improvement: make login form mobile device friendly [chilan]
+  - enhancement: invoice and debit note language depends on division country and customer
+    country [chilan]
+  - enhancement: script automating the installation of LMS + PostgreSQL for the Debian 10/Buster
+    system has been added to the "sample" catalog [interduo]
+  - improvement: make customer and node forms responsive [chilan, ravvar]
+  - improvement: phpui.open_calendar_on_input_click set to 'true' ('false' by default) enables
+    old-style date picker behavior on input control click [chilan]
+  - enhancement: session expiration time to left presented on right-top corner [chilan]
+  - enhancement: phpui.session_expiration_warning_interval controls if session expiration
+    warning popup is displayed if given seconds left to auto-logout (default value '0'
+    means function is disabled) [chilan]
+  - enhancement: separate session timeout for userpanel [chilan]
+  - enhancement: implemented count for assignments [chilan]
+  - enhancement: phpui.node_multi_tariff_restriction variable controls how multi tariffs
+    to single node assignments are handled (default empty value means current
+    behavior) [chilan]
+  - enhancement: nodelocks can be enabled/disabled [chilan]
+  - improvement: phpui.datatables_max_records can have 0 value which means
+    no record limit [chilan]
+  - enhancement: added optional bandwidth link distribution for uke income report [chilan]
+  - improvement: allow to search customers with balance calculated on given day [chilan]
+  - enhancement: google authenticator support added [chilan]
+  - enhancement: old password required to change current user password [chilan]
+  - enhancement: phpui.two_factor_auth_required ('false' by default) controls if two factor
+    authentication is required for all users [chilan]
+  - enhancement: two factor authentication trusted device support [chilan]
+  - enhancement: admin can set force password change flag fo users [chilan]
+  - enhancement: split payment support paytype supplement on invoices and credit
+    notes - configuration variable 'invoices.split_payment_threshold_value' controls value
+    threshold for 'split-payment' capability ('15000' for invoices issued after 10/31/2019
+    and '-1' for ones issued before 11/01/2019 where this last value means exclusion) [chilan]
+  - enhancement: lms-archive-documents.php backend script introduced as it allow
+    to archive many non-trade documents at once [chilan]
+  - improvement: allow to filter customers by overdue receivables [chilan]
+  - improvement: message item identifiers are set as sent sms message identifiers [chilan]
+  - enhancement: allow to define separate configuration for sms sent to customers [chilan]
+  - enhancement: added backend script lms-serwersms-callback.php script which
+    is called back by serwersms.pl and updates sent sms message status [chilan]
+  - enhancement: added backend script lms-smsapi-callback.php script which is called back
+    by smsapi.pl and updates sent sms message status [chilan]
+  - enhancement: allow to copy access rights from other existing user selected
+    from list [chilan]
+  - improvement: added support for %services replace symbol in messages [ravvar]
+  - improvement: allow display message body with wildcards for particular message [ravvar]
+  - improvement: added different content type of messages based on mime types [chilan/ravvar]
+  - enhancement: lms-notify.php supports userpanel and userpanel urgent message emitions [chilan]
+  - enhancement: message file attachement are stored in message history
+    (introduced sendinvoices.message_attachments configuration variable which enables/disables
+    attachment storage for send invoice messages; 'false' by default) [chilan/ravvar]
+  - enhancement: invoices.post_address configuration variable controls post box address
+    visibility on invoices ('true' by default) [chilan]
+  - improvement: optimalised performance of queue/ticket statistic generation [chilan]
+  - improvement: html and pdf debit note templates are in feature parity [ravvar]
+  - enhancement: invoice list: allow to delete many invoices in single operation [chilan]
+  - enhancement: multi-currency support ('phpui.default_currency' allows to override
+    default currency determined from language settings - none by default) [chilan]
+  - enhancement: added description field to voip accounts [chilan]
+  - enhancement: added bank name property to divisions [chilan]
+  - enhancement: last day of month at support for monthly assignments [chilan]
+  - enhancement: JPK-FA variant 3 support added [chilan]
+  - improvement: from date selection in customer event box and allow to quick jump
+    to timetable [chilan]
+  - enhancement: added separated split payment support for tariffs and liabilities [chilan]
+  - enhancement: add possibility to set values in credit note through discount
+    settings - configuration variable 'invoices.credit_note_relation_to_invoice' controls
+    discount calculation in relation to invoice document (first)
+    or last credit note document (last) [ravvar]
+  - enhancement: host transfers between networks preserve host map [chilan]
+  - enhancement: log timetable event changes in transaction log [chilan]
+  - enhancement: network device login radius property support [chilan]
+  - enhancement: search node owners can be assign to (or unassign from) customer group [chilan]
+  - enhancement: add hooks to event editing and deleting scripts [ravvar]
+  - enhancement: customer search by simultaneously selecting many statuses [chilan]
+  - enhancement: introduce schedule - a new timetable view with
+    configurable working day hours and interval time - configuration variable
+    phpui.timetable_working_hours (default "08:00-19:00")
+    and phpui.timetable_working_hours_interval (default: '30' [minutes])[ravvar]
+  - enhancement: allow to filter invoice list by selected division [chilan]
+  - enhancement: 'phpui.balancelist_default_current_period' and 'phpui.documentlist_default_current_period'
+    specify default current period in balance list and document list
+    (they are undefined by default) [chilan]
+  - enhancement: existing (not deleted) filter in customer list [chilan]
+  - enhancement: allow to select location without end-points in promotion schema selection window [chilan]
+  - improvement: added tariff selection filtering by valid tariffs and tariff tags [chilan]
+  - enhancement: phpui.promotion_show_period_values controls if period values are presented
+    in promotion tariff selection lists [chilan]
+  - devel/optimalisation: cache customer balance in separate table 'customerbalances' for
+    meaningfull database offload [chilan]
+  - enhancement: allow to quick search customers by additional information and notes [chilan]
+  - enhancement: count can be specified for selected promotion schema tariff components [chilan]
+  - enhancement: added plugin support allows to use external send sms handlers [chilan]
+  - enhancement: %mac% and %MAC% special symbols are supported for option value modifications
+    in lms-makedhcpconf.php backend script [chilan]
+  - enhancement: added stats and live traffic support for network device ip addresses [chilan]
+  - enhancement: userpanel/info: allow to hide archived documents [chilan]
+  - improvement: userlist: revDNS queries are launched asynchronously by ajax request [chilan]
+  - improvement: optional customer node column in customer print report [chilan]
+  - enhancement: allow convert html to pdf on-fly using external commands - now puppeteer script connecting to
+    google chrome working in headless mode is supported ('documents.html2pdf_command'
+    should point external command accessible from server) [chilan]
+  - enhancement: added experimental support for guyanian locales [chilan]
+  - enhancement: tariff tag assignment manager from within tariff forms [chilan]
+  - improvement: new 'backend' channel introduced (now supported inly for 'debtors' and 'reminder' types);
+    allows to create customer list which can be sent as mail report [chilan]
+  - enhancement: promotion schema period selections are combo-boxes [chilan]
+  - improvement: allow to check/uncheck all terminals in schema selection form;
+    phpui.promotion_schema_all_terminal_check configuration variable controls if all customer terminals
+    are checked by default in promotion schema selection form ('false' by default) [chilan]
+  - improvement: tariff tag selections are preserved between promotion schema info form submits [chilan]
+  - improvement: allow to filter customers which have unarchived documents assigned [chilan]
+  - improvement: phpui.customer_ten_existence_scope and phpui.customer_ssn_existence_scope configuration
+    variables (both 'global' by default) control scope of customer identifier existence checks [chilan]
+  - improvement: let customer pay deadlines assign specific values [chilan]
+  - enhancement: allow to enable/disable userpanel credential reminder methods [chilan]
+  - enhancement: web browser form states can be restored between submits per browser tab [chilan]
+  - improvement: preventing the lms-sendinvoices.php from sending already sent (inc. manually sent) invoices
+    via configuration variable 'sendinvoices.ignore_send_date' (default: 'false')
+    and highlight invoices already sent in invoice list and customer info [ravvar]
+  - improvement: highlight documents already sent in documents list and customer info [ravvar]
+  - enhancement: 'invoices.show_only_alternative_accounts' configuration variable ('false' by default)
+    causes presentation alternative customer bank accounts only on invoices and notes, but when
+    there are no alternative accounts defined for customer, division account is presented
+    as fallback [chilan]
+  - improvement: html contents of element with lms-ui-autolinker css class is handled
+    by Autolinker [chilan]
+  - enhancement: rt.default_queue supports queue names and it is also used in new ticket
+    form [chilan]
+  - enhancement: added the ability to place multiple attachment panels in one window [chilan/ravvar]
+  - enhancement: added the ability to add attachments to device models [chilan/ravvar]
+  - enhancement: show model files containers in models list [ravvar]
+  - enhancement: show network devices files containers in devices list [ravvar]
+  - enhancement: allow to send customer message quickly using icon near mail and phone contacts [chilan]
+  - enhancement: show network nodes files containers in nodes list [ravvar]
+  - improvement: allow to go back to location from which we initiated message add action [chilan]
+  - enhancement: filter user list in message add form by selected user group [chilan]
+  - enhancement: allow to send customer data to users via sms [chilan]
+  - enhancement: allow to include customer node data in sent messages [chilan]
+  - enhancement: allow to clone time table event with ticket identifier assigned to original
+    event [chilan]
+  - enhancement: helpdesk ticket, message and customer phone contacts can be selected during
+    new message creation [chilan]
+  - improvement: separate liability and payments columns as replacement
+    for %last_N_in_a_table symbol [chilan]
+  - enhancement: if phpui.promotion_allow_modify_values_for_privileged_user is set to 'true
+    ('false' by default), user can modify any promotion schema period values [chilan]
+  - improvement: location selection is required when there are more than one location in list [chilan]
+  - enhancement: copy other resource permissions is possible from user add and edit forms [chilan]
+  - enhancement: TransGUS report support added [chilan]
+  - enhancement: new plugins hooks 'user_modify_copy_permissions' and 'user_copy_permissions_prepare'
+    were introduced and they allow plugins to extend copy of user permissions to other resources [chilan]
+  - enhancement: implemented ticket assignment conflict detection [chilan]
+  - improvement: switched to liberation sans unicode true type font for tcpdf generated documents [chilan]
+  - enhancement: added document memo text fields defined for customers and copied to documents;
+   'phpui.default_customer_document_memo' configuration variable controls customer default document memo
+   field value (empty by default) [chilan]
+  - improvement: allow to quickly close newly created or edited time table event [chilan]
+  - enhancement: implemented tax category selection for tariffs, tariffless liabilities
+    and invoice content [chilan]
+  - enhancement: phpui.tax_category_required allows to force tax category selection requirement
+    ('false' by default) [chilan]
+  - enhancement: aggregate documents support for send invoices, notifies and send message customer balance
+    history lists [chilan]
+  - enhancement: if phpui.teryt_required is set to 'true' ('false' by default) then customer,
+    network device, network node and customer node addresses should be checked as 'territ' [chilan]
+  - enhancement: JPK-V7M support added [chilan]
+  - enhancement: added email property to divisions [chilan]
+  - improvement: show territ address flag near node location info [chilan]
+  - improvement: force default location address or single location address or billing address of customer
+    as pre-selected customer assigned resources [chilan]
+  - improvement: new user permission - investment project management [chilan]
+  - improvement: replaced customer address selection icons by font awesome icons [chilan]
+  - enhancement: added uke income service type report [chilan]
+  - enhancement: added 'clone' action button on configuration variable list - single
+    variables and whole configuration sections can be cloned [chilan]
+  - enhancement: implemented multi configuration option delete [chilan]
+  - improvement: additional status filter 'no connections' introduced on network device list
+    (helpfull for UKE report preparations) [chilan]
+  - enhancement: 'sms.phone_number_validation_pattern' configuration variable specifies
+    mobile number pattern which is treated as correct [chilan]
+  - improvement: rt.ticket_service_required and rt.ticket_type_required introduced allow to
+    make ticket service and ticket type selection mandatory [interduo]
+  - enhancement: implemented helpdesk ticket cloning [chilan]
+  - improvement: switched helpdesk ticket category selection to modern ui control
+    based on lms-ui-advanced-select [chilan]
+  - improvement: rt.category_selection_checkbox_limit configuration variable controls
+    switching between old-style and new-style look of category selection ('0' by default
+    what mens new-style is always used) [chilan]
+  - improvement: smscenter.pl unicode message support added [chilan]
+  - enhancement: new backend script 'lms-proforma-transform.php' allows to periodically
+    transform pro forma invoices to regular invoices (if related conditions
+    are met) [chilan]
+  - improvement: lms-teryt.php uses the same method of explicit node address determination
+    as webui [chilan]
+  - improvement: customer can be filtered by active assignments with pro forma flag [chilan]
+  - improvement: redesigned related and parent ticket selection user interface [chilan]
+  - improvement: redesigned ticket event assignment selection [chilan]
+  - enhancement: filtering nodes by 'without radio sector' cryterion [chilan]
+  - improvement: 'phpui.copy_ticket_summary_to_assigned_event' ('false' by default) controls
+    if assigned ficket properties are copied to newly created event [chilan]
+  - improvement: show location type icon in location selection button [chilan]
+  - enhancement: 'phpui.markdown_documentation_file' configuration variable can point to
+    markdown configuration variable documentation file
+    ('<sys-dir>/doc/Zmienne-konfiguracyjne-LMS-Plus.md' by default) [chilan]
+  - enhancement: implemented configuration variable suggestions with documentation displayed
+    in tooltip [chilan]
+  - enhancement: lms-ui-autogrow css class allow to make input fields auto-adjusting to their
+    content [chilan]
+  - devel: bumped fontawesome to 5.13.0, mousetrap to 1.6.5 [chilan]
+  - enhancement: configuration variable documentation presentation in config add end edit
+    forms [chilan]
+  - enhancement: allow to load multiple cash source files at once [chilan]
+  - enhancement: optionally add sent document attachments to message for archive purpose
+    ('documents.message_attachments' introduced with 'false' as default value) [chilan]
+  - improvement: new menu subitem 'New setting' in configuration menu [chilan]
+  - improvement: investment project and type are multiple selections on network node
+    list [chilan]
+  - enhancement: added network device assignments tab in network device info
+    and edit views and node assignments tab in node info and edit view [chilan]
+  - improvement: added overdue events in another menu item and few fixes with
+    overdue [interduo]
+  - improvement: new filter on ticket list - allows to show only parent tickets [interduo]
+  - improvement: separate configuration variables used as api key for google maps and geocode
+    apis (respectively 'google.maps_api_key' and 'google.geocode_api_key') [chilan]
+  - enhancement: 'invoices.show_expired_balance' configuration variable controls if balance
+    without unexpired invoices is presented on invoice [chilan]
+  - enhancement: additional confirmation is required during customer address clear
+    or delete if it is assigned to some nodes, network devices and network nodes [chilan]
+  - enhancement: 'cashimport.use_file_date' set to 'true' ('false' by default) enables imported
+    file datetime usage to force source file uniqueness [chilan]
+  - enhancement: customer consents can be managed in lib/definitions.php file [chilan]
+  - improvement: newly created invoice new position netto and brutto values are cleanup
+    from special characters [chilan]
+  - improvement: don't send helpdesk notifications to disabled users [chilan]
+  - improvement: 'rt.subject_max_length' specifies maximum allowed helpdesk ticket subject
+    length ('50' by default) [chilan]
+  - improvement: numberplan template substitution symbols are described in tooltip [chilan]
+  - improvement/devel: userpanel document management feature separated to dedicated userpanel
+    module [chilan]
+  - enhancement: customer can send signed document scans through userpanel [chilan]
+  - enhancement: operator can approve contract with document scan attached and thus
+    activate services related with contract [chilan]
+  - improvement: customers can be filtered by 'no zip code' virtual status [chilan]
+  - enhancement: customer can approve selected documents from userpanel using sms one-time
+    code authentication [chilan]
+  - improvement: 'phpui.default_customer_consents' specified which customer consents are
+    checked by default during add customer form open ('data_processing' is default) [chilan]
+  - enhancement: new customer consents: userpanel document form approvals using SMS or scan [chilan]
+  - enhancement: customer billing and post addreses can be copied to location address [chilan]
+  - enhancement: new 'phpui.customer_invoice_notice_consent_check' configuration variable controls
+    if customer with invoice notice consent checked should have marked one of his email contacts
+    with 'invoices' flag [chilan]
+  - enhancement/devel: new easier warning system - warning global backend variable has
+    the similar role to so far existing error variable [chilan]
+  - improvement: redesigned choose territ location popup dialog - switched to jquery-ui
+    dialog [chilan]
+  - enhancement: implemented mass customer consent change support [chilan]
+  - improvement: new action on customer search result is possible - add looked up customers
+    to customer group with specified name [chilan]
+  - improvement: new variable 'phpui.timetable_hide_description' allows to hide
+    description in timetable [interduo]
+  - improvement: ticket message attached images can be scaled to 300 pixels width
+    on server-side if pecl-imagick is installed on server [chilan]
+  - enhancement: image gallery support for helpdesk tickets and ticket message items [chilan]
+  - enhancement: smarty block '{buttons}' support introduced - allows to create responsive
+    button panels on resource list [chilan]
+  - enhancement: image gallery support for network nodes, devices and models [chilan]
+  - improvement: zip code validation is made basing on selected location address country [chilan]
+  - improvement: 'invoices.hide_prodid' configuration variable controls product id column
+    visibility on invoices ('false' by default) [chilan]
+  - improvement: 'mail.debug_level' allows to control debug message detail level ('2' is
+    default) [chilan]
+  - improvement: 'phpui.quicksearch_keyboard_shortcut_modifier' defines quick search keyboard shortcut
+    modifier key ('ctrl' by default) [chilan]
+  - improvement: confirmation dialogs are responsive [chilan]
+
+version 24.0 (2019-05-16):
+
+  - enhancement: script automating the installation of LMS + PostgreSQL in the Centos 7
+    system has been added to the "sample" catalog [darton]
+  - enhancement: script automating the installation of LMS + MariaDB in the Centos 7
+    system has been added to the "sample" catalog [darton]
+  - enhancement: allow to filter network devices by territ not specified [chilan]
+  - enhancement: helpdesk/rt: introduced ticket netdevice assignment [interduo]
+  - enhancement: added %queue symbol support for helpdesk notification templates [chilan]
+  - enhancement: allow to select company/division for financial data export  [chilan]
+  - enhancement: added support for helpdesk notification for event add form [chilan]
+  - enhancement: invoices.hide_expositor - variable to hide expositor in pdf invoice
+    generated by tcpdf [interduo]
+  - enhancement: invoices.show_customerid - variable to show customerid in pdf invoice
+    generated by tcpdf [interduo]
+  - enhancement: added user notification about helpdesk ticket status change
+    - phpui.ticket_state_change_notify configuration variable controls if
+    it is triggered [chilan]
+  - enhancement: current division properties are copied to new receipts [chilan]
+  - improvement: resolved tickets in quick search displayed as blended [chilan]
+  - enhancement: additional operations on node search result - node group assign
+    and unassign [chilan]
+  - enhancement: added helper icons in quick search suggestions (customers, node,
+    tickets) [chilan]
+  - enhancement: added support for tariff burst properties [chilan]
+  - enhancement: allow to search nodes by network devices to which
+    they are connected to [chilan]
+  - enhancement: invoices.use_alert_color configuration variable ('false' by default)
+    specifies if deadline, quote to pay and bank accounts are printed as red on tcpdf
+    and ezpdf invoices [chilan]
+  - improvement: allow to manually disable user notification when new ticket
+    is created [chilan]
+  - improvement: allow to change ticket priority during new ticket message/note creation [chilan]
+  - enhancement: list assigned tickets in netdevinfo [interduo]
+  - enhancement: list assigned tickets in netnodeinfo [interduo]
+  - enhancement: added barcode in second title line of userpanel transfer form [chilan]
+  - improvement: warn about event user assignment overlaps - phpui.event_overlap_warning
+    configuration variable controls if it is enabled ('false' by default) [chilan]
+  - enhancement: allow to print transfer forms from customer balance box [chilan]
+  - improvement: allow to define ticket verifier [interduo]
+  - improvement: allow to define ticket deadline [interduo]
+  - enhancement: introduced quick search for netnode and netdev [interduo]
+  - improvement: phpui.helpdesk_hide_disabled_users configuration variable controls if
+    disabled users are shown in user lists used in helpdesk forms [chilan]
+  - improvement: allow to search customers with selected balance relation and value [chilan]
+  - improvement: lms-ui-multiselect supports all element selection shortening
+    to default value [chilan]
+  - improvement: added optional invoice comment [interduo]
+  - enhancement: allow to change customer PIN in userpanel [chilan]
+  - improvement: allow to select multiple customer groups in invoice list and multiple
+    network in customer search form [chilan]
+  - improvement: allow to select multiple customer groups and number plans
+    in invoice report [chilan]
+  - improvement: allow to change ticket state from RT_NEW to RT_OPEN when variable
+    phpui.helpdesk_allow_change_ticket_state_from_open_to_new is set [interduo]
+  - improvement: block ticket close with open events when
+    phpui.helpdesk_block_ticket_close_with_open_events is enabled [interduo]
+  - improvement: phpui.protect_passwords configuration variable controls if password
+    are displayed in plain text; protected passwords can be still copied to clipboard [chilan]
+  - improvement: updated textual representation of teryt street names (name parts reversed) [chilan]
+  - enhancement: changed invoice content count precision from 2 to 3 digits [chilan]
+  - improvement: overdue events are presented at top of timetable, variable:
+    phpui.timetable_overdue_events [interduo]
+  - improvement: phpui.disable_contacts_during_customer_delete controls if customers
+    contacts are disabled after customer delete [chilan]
+  - enhancement: added new filters in customer assignments box - expired and commited filters [chilan]
+  - improvement: added support for html mail format in lms-notify.php backend script" [chilan]
+  - enhancement: introduced ticket service types and ticket types, added variable %service, %type
+    for helpdesk notify messages [interduo]
+  - ehnancement: helpdesk ticket unread status introduced [chilan]
+  - improvement: mark current ticket message with brown color border [chilan]
+  - improvement: show user info column in customer message box [chilan]
+  - improvement: performance optimalisation for loading long record lists [chilan]
+  - improvement: helpdesk ticket priorities are mapped to X-Priority header from
+    user mail notifications [chilan]
+  - enhancement: added button in event list row which assigns currently logged user
+    to event [interduo]
+  - enhancement: introduced indicators in top menu [interduo/chilan]
+  - improvement: new priority idle,higher and remake of priority colors [interduo]
+  - enhancement: added network<->public network bindings [chilan]
+  - improvement: phpui.show_assigned_networks_only configuration variable controls if only
+    assigned public network are presented in network selection list in choose ip popup [chilan]
+  - improvement: phpui.autodetect_network_types configuration variable controls what
+    network types (public or private) are displayed in main/public ip address selection popup [chilan]
+  - improvement: tooltip short info can be preserved open after moving mouse to them
+    to it allows to copy text from them [chilan]
+  - enhancement: new quicksearch for SSID wireless networks [interduo]
+  - improvement: phpui.helpdesk_check_owner_verifier_conflict variable introduces
+    ('true' by default) [chilan]
+  - improvement: phpui.helpdesk_allow_all_users_modify_deadline variable controls if any
+    user can change ticket deadline ('false' by default) [chilan]
+  - enhancement: file attachment support introduced for network devices and network nodes [chilan]
+  - improvement: added lms-ui-combobox css class support which transforms select
+    element to combobox [chilan]
+  - improvement: visual unification of lms-ui-select-address, lms-ui-multiselect and
+    lms-ui-combobox [chilan]
+  - enhancement: allow to upload files using drag&drop technique [chilan]
+  - enhancement: replaced TinyMCE 3.x with 4.x handled by composer [chilan]
+  - enhancement: almost the same special symbols are supported for sendinvoices.mail_body as
+    for lms-notify.php mail_body setting [chilan]
+  - enhancement: allow to filter message recipients to customers connected to selected network
+    device or subtree of selected network device (phpui.root_netdevice_id configuration variable
+    should contain root network device id as it is used to calculate subtree) [chilan]
+  - improvement: allow to add ip addresses to network devices without mac [chilan]
+  - enhancement: allow to select properties which we use as key to quick search resorces [chilan]
+  - enhancement: global CTRL+n keyboard shortcuts for quick search inputs [chilan]
+  - improvement: phpui.multiselect_popup_on_bottom (false by default) controls position of popup
+    window for multiselects [chilan]
+  - improvement: phpui.multiselect_max_visible (unlimited by default) controls maximum items
+    displayed in multiselect [chilan]
+  - improvement: new quicksearch for networks [interduo]
+  - enhancement: allow to show/hide quick search fields on top [chilan]
+  - enhancement: allow to clear filter in helpdesk queue and event list view [chilan]
+  - enhancement: introduced persistent filter support [chilan]
+  - enhancement: lms-ui-advanced-select on 'chosen' backend and lms-ui-combobox on
+    'simple-combobox' backend [chilan]
+  - enhancement: allow to change invoice content order during invoice new and edit
+    using drag & drop [chilan]
+  - improvement: allow to edit invoice positions in convenient way [chilan]
+  - enhancement: allow to move event to another day using drag & drop [chilan]
+  - enhancement: allow to select multiple owners in rtqueueview [chilan]
+  - improvement: user logical operator for user selection in event list [chilan]
+  - enhancement: keyboard support for multi select ui controls [chilan]
+  - enhancement: document list type filter is multi-select field [chilan]
+  - enhancement: allow to filter document list by service type [chilan]
+  - enhancement: new filter engine applied to queuelist; allow to filter deleted queues
+    on queue list [chilan]
+  - enhancement: allow to search tickets by body fragment [chilan]
+  - improvement: ability to mark radiosector as access/infrastructure (uni/nni network interface type) [interduo]
+  - improvement: promotion schema assignments: added support for current period settlement
+    assignment [chilan]
+  - enhancement: phpui.event_time_step configuration variable controls minial time interval for events
+    (default: 30) [chilan]
+  - improvement: replaced old style date and time selector by datetimepickers and slider [chilan]
+  - enhancement: introduced whole day events support [chilan]
+  - improvement: allow to configure phone call icon placed near phone number (phpui.call_phone_url
+    empty by default what it means no icon at all) [chilan]
+  - enhancement: allow to set customer owner for network nodes [chilan]
+  - improvement: allow to clone existing event quickly [chilan]
+  - improvement: allow to store encryption key for network interface in netradiosectors [interduo]
+  - improvement: now we can assign tickets to invprojects [interduo]
+  - improvement: mail.hide_sensitive_headers configuration variable controls if sensitive
+    headers should be removed from posts via application [mikenowak]
+  - enhancement: added support for phpui.helpdesk_sender_email configuration variable which
+    stores explicit suggested order of attributes in sender mail determination [mikenowak/chilan]
+  - enhancement: indicator expired2 - my expired tickets for current logged user assigned as verifier [interduo]
+  - enhancement: revolutionary layout changes: main menu and toolbar are always visible [chilan]
+  - enhancement: added back to top button always visible on right bottom of contents [chilan]
+  - enhancement: allow to arrange welcome boxes using drag & drop to create own layout
+    - phpui.welcome_panels configuration variable controls how many welcome panels are created [chilan]
+  - enhancement: allow to generate group reply message to all marked helpdesk tickets [chilan]
+  - improvement: modernized mac address selection (separated smarty function called
+    'mac_address_selection') [chilan]
+  - improvement: started to use fontawesome icon library [chilan]
+  - improvement: incorrect customer identify card number generates warning instead of error [chilan]
+  - improvement/bugfix: convert received posts which are loaded into helpdesk from html
+    to text using Html2Text [chilan]
+  - improvement: tariffs are not unique per promotion schema - phpui.promotion_tariff_duplicates
+    configuration variable controls if tariff duplicates are allowed per promotion schema
+    or not ('false' by default) [chilan]
+  - enhancement: contracts.expiration_type configuration variable controls how expiring
+    contract calculation is made ('documents' by default) [chilan]
+  - improvement: allow to automatically determine explicit teryt node locations basing
+    on customer addresses [chilan]
+  - enhancement: allow to move found customers between many customer groups [chilan]
+  - improvement: click on table row with ctrl key pressed open link in new window [chilan]
+  - improvement: added phpui.skip_zip_validation configuration variable that allows to skip zip
+    code format validation [Mike Nowak]
+  - improvement: lms-sendinvoices.php: sendinvoices.limit can be percentage value [chilan]
+  - improvement: lms-sendinvoices.php: sendinvoices.interval or --interval parameter allow to specify
+    delay in milliseconds between subsequent posts [chilan]
+  - improvement: sale report: allow select document type from within invoices, credit notes,
+    debit notes [chilan]
+  - improvement: allow to search customers by different assignment states [chilan]
+  - improvement: allow to search customers which have tariff with end date fulfilling
+    some common criterions [chilan]
+  - improvement: bash/curl script for fetching emails from imap server to LMS RT [interduo]
+  - enhancement: related tickets introduced [interduo]
+  - improvement: search customer by his location name is possible [chilan]
+  - enhancement: separate management of message templates added [chilan]
+  - enhancement: phone quick search can look up numbers in customer contact numbers
+    or voip account numbers  [chilan]
+  - enhancement: payments.delete_old_assignments_after configuration variable controls time
+    after which old assignments are deleted - 30 days by default [chilan]
+  - improvement: phpui.node_name_regexp configuration variable defines regular expression
+    to which node name should match - default: ^[_a-z0-9-.]+$ [chilan]
+  - improvement: allow to check all users for given document right with single click [chilan]
+  - improvement: allow to aggregate documents on customer balance list [chilan]
+  - enhancement: added after promotion period support [chilan]
+  - improvement: lms-sendinvoices.php --no-attachments parameter support [chilan]
+  - improvement: phpui.helpdesk_additional_user_permission_checks ('false' by default)
+    configuration variable controls if additional ticket properties are checked to verify if user
+    has access to ticket even if ticket queue is not accessible for user [chilan]
+  - improvement: lms-teryt.php: allow to reverse TERYT identifiers to textual representation [chilan]
+  - improvement: show network device description and file containers in network device tooltip [chilan]
+  - enhancement: implemented separated smtp settings support for helpdesk/rt [chilan]
+  - enhancement: lms-notify.php: added customer 'income' notify type [chilan]
+  - enhancement: allow to search nodes by lastonline date [chilan]
+  - improvement: phpui.helpdesk_allow_empty_categories controls if helpdesk ticket category assignments
+    are required [chilan]
+  - improvement: phpui.helpdesk_empty_category_warning controls if helpdesk empty ticket category
+    assignment generates warning [chilan]
+  - enhancement: new user privilege 'invoice_sale_date' controls if user can manipulate
+    invoice/invoice-note sale date [chilan]
+  - enhancement: new user privilege 'invoice_consent_date' controls if user can manipulate
+    invoice/invoice-note/note consent date [chilan]
+  - enhancement: implemented credit note 'chains' (we can correct one credit note issuing another
+    credit note) [chilan]
+  - enhancement: helpdesk: file attachments are sent during user notifications [chilan]
+  - improvement: smarty {date_period_preset} function generates shortcut button panel for
+    instant changing date period [chilan]
+  - enhancement: phpui.helpdesk_notification_attachments controls if attachments are appended to sent
+    user notifications ('false' by default) [chilan]
+  - helpdesk user notification %attachments substitution support [chilan]
+  - improvement: allow to determine ticket id using regular expression match on mail
+    subject - rt.subject_ticket_regexp_match with 'RT#(?<ticketid>[0-9]{6,})' default value [chilan]
+  - improvement: invoices.protection_password (unset by default) set owner password
+    for pdf invoices; it also required to enable pdf protection [chilan]
+  - improvement: userpanel: helpdesk: user friendly file size upload limitation [chilan]
+  - enhancement: userpanel/info: allow to auto-hide customer document box if customer
+    hasn't got any documents [chilan]
+  - enhacement: allow to embed images in messages [chilan]
+  - improvement: userpanel/finances: tariffs speeds are aggregate to sane units [chilan]
+  - improvement: userpanel/finances: tariff speed units are configurable [chilan]
+  - improvement: aggregate tariff speeds to kMG units [chilan]
+  - enhancement: uke/siis: customer network device support added [chilan]
+  - improvement: confirmation dialog after event drag between days in timetable [chilan]
+  - improvement: phpui.pin_restriction_description configuration variable allow to define tooltip
+    contents describing customer pin restrictions (html code usage is possible) [chilan]
+  - enhancement: userpanel: allow to customize web browser shortcut icon [chilan]
+  - enhancement: allow to filter invoice list by number plans [chilan]
+  - enhancement: added support for mark non-financial documents as archive [chilan]
+  - enhancement: support of financial document archivization [chilan]
+  - improvement: new customer removal access privilege added [chilan]
+  - enhancement: customer income report broken down into link technology (helpfull for UKE income
+    reports) [chilan]
+  - enhacement: allow to automatically generate debit notes [chilan]
+  - enhancement: allow to preserve pro forma invoice after its conversion to invoice
+    - phpui.default_preserve_proforma_invoice check/uncheck corresponing checkbox [chilan]
+  - enhancement: selected users can modify prices for promotion schema tariffs [chilan]
+  - improvement: new trade document archiving and unarchiving user privileges added [chilan]
+  - enhancement: added support for helpdesk message/note templates [chilan]
+  - improvement: ticket message reply with citing forced by click on newly added button [chilan]
+  - enhancement: added representative customer contact type as it will be used to select
+    them on documents [chilan]
+  - improvement: try to restore scrolling state of rtqueueview or eventlist after
+    each operation has runned [chilan]
+  - enhancement: allow to select invoice duplicate date manually [chilan]
+  - devel/cleanup: calendar, calendar-time css classes renamed to lms-ui-date, lms-ui-datetime
+    respectively [chilan]
+  - enhancement: assignment last defficient period support [chilan]
+  - enchancement: allow lms-payments.php script to set aligned partial periods for invoice items
+    (added special symbol %aligned_partial_period) [ravvar]
+  - improvement: added delete and clear contact buttons [chilan]
+  - improvement: added jquery based confirmation dialog [chilan]
+
+version 1.11.23 (2018-03-21):
+
+  - improvement: create db dumps with multi records inserts statements which
+    dramatically reduces db restore time [chilan]
+  - enhancement: allow to backup all financial documents issued a given day
+    in selected output directory (--backup and --output-directory parameters
+    were introduced for lms-sendinvoices.php) [chilan]
+  - enhancement: added payments.check_invoices ('false' by default) configuration
+    variable support and its behavior is the same as deprecated daemon payments
+    module configuration variable [chilan]
+  - enhancement: added support for default queue categories used during new ticket
+    creation [chilan]
+  - improvement: pdf ticket and document attachments are displayed in popup window
+    instead of forcing writing them to disk [chilan]
+  - improvement: phpui.pin_min_size, phpui.pin_max_size and phpui.pin_allowed_characters
+    configurtion variables control customer pin constraints (by default: 4, 6 and
+    '0123456789' respectively) [chilan]
+  - improvement: suppport for teryt locations where city consists of many sections/districts
+    [chilan]
+  - improvement: phpui.category_adjustments_in_ticketedit (false by default) controls if selected
+    categories in ticket edit form are automatically adjusted with queue change [chilan]
+  - improvement: pdf and html unification of receipts.default_printpage ('original,copy' by
+    default) configuration variable support which controls how many receipts are printed [chilan]
+  - enhancement: log ticket category changes [chilan]
+  - enhancement: implemented helpdesk notification mail threading compatible with RFC5322 [chilan]
+  - enhancement: added ticket source information [interduo]
+  - enhancement: allow to define ticket with which sources are visible in userpanel helpdesk
+    module [chilan]
+  - enhancement: Fake delete operations in helpdesk to regular users. After deleting queue,
+    ticket or message regular user can't see deleted items, only superuser can see
+    deleted items [ravvar/chilan]
+  - enhancement: added support for array parameter to LMSDB class [kosa/chilan]
+  - improvement: allow to add new network device directly from customer box [chilan]
+  - enhancement: allow to quick search by external customer id fragment [chilan]
+  - improvement: all url in helpdesk notifications open ticket immediately
+    on comment added before the moment [chilan]
+  - enhancement: helpdesk ticket <-> customer locations (this allows to assign locations
+    to tickets) [chilan]
+  - enhancement: helpdesk ticket <-> customer nodes (only customer nodes which have the same
+    location as selected ticket customer location are displayed) [chilan]
+  - enhancement: added support for event <-> customer location assignment [chilan]
+  - enhancement: allow to filter tariffs by tags in customer assignment forms [chilan]
+  - improvement: added support for named state list in lms-teryt.php [chilan]
+  - improvement: added special user privilege which controls if helpdesk queues, tickets,
+    messages, notes are only archived (with permanent remove option) instead of removing
+    them [ravvar/chilan]
+  - enhancement: tax rate reverse charge flag support added (JPK generators use it) [chilan]
+  - improvement: show invoice pro forma items in customer balance box [chilan]
+  - enhancement: phpui.proforma_invoice_generates_commitment configuration variable
+    ('false' by default) controls if related cash records are created for proforma
+    invoices [chilan]
+  - enhancement: allow to view and search tickets from many queues and categories [chilan]
+  - enhancement: allow to view and search events selecting many types and owners [chilan]
+  - improvement: helpdesk_notification_mail_subject, helpdesk_notification_mail_body
+    helpdesk_notification_sms_body, helpdesk_customerinfo_email_body and
+    helpdesk_customerinfo_sms_body configurtion variables control additional information
+    in helpdesk ticket notice via templates [ravvar/chilan]
+  - improvement: userpanel/info: customer properties which have pending value changes
+    assigned to them are presented in different color [chilan]
+  - enhancement: userpanel/info: customer data change which requires operator confirmation
+    triggers mail notification [chilan]
+  - enhancement: userpanel/info: customer data change confirmations and rejections are sent
+    to customers [chilan]
+  - improvement: added customer status filter in message add form (opened documents) [chilan]
+  - improvement: added lmsd systemd unit file which automatically restart lmsd process
+    when it fails [chilan]
+  - improvement: minor tcpdf invoice look improvements [interduo]
+  - enhancement: rewrite of old lms-makedhcpconf perl script in php; dhcp.use_network_authtype
+    configuration variable controls which networks are processes by default [chilan]
+  - enhancement: new lms-maketcnew.php backend script which allows to generate
+    almost any traffic shaper configuration [chilan]
+  - improvement: message send - allow to filter recipients by expired customer balances [chilan]
+  - improvement: allow to download recorded voip calls [chilan]
+  - enhancement: sms.queue configuration variable allow to specify outgoing queue
+    for smstools service [chilan]
+  - enhancement: allow to force separate invoice issuing for liabilities [chilan]
+  - enhancement: optional support of Google reCAPTCHA mechanism for userpanel logins and
+    credential reminders [chilan]
+  - improvement: all userpanel styles/themes have the same features [chilan]
+  - improvement: quicksearch: if many customers with the same full name has been found,
+    we add their billing/main addresses as description [chilan]
+  - improvement: receipt with cash move allows to get total balance of source cash
+    registry [chilan]
+  - enhancement: allow to filter customer list by assignments to so many customergroups
+    as were selected [chilan]
+  - improvement: customerinfo: show assignmentid when more then one. show ticketid in eventspanel [interduo]
+  - enhancement: netnodes: added creationtime, administrative contact, lastinspectiontime [interduo]
+  - enhancement: customerraports: added sending book generator for sending letters/packages [interduo]
+  - improvement: show queue name in queuelist [interduo]
+  - improvement: show count of assigned events in rtqueueview [interduo]
+  - improvement: show categories in rtqueueview (rt.show_ticket_categories configuration
+    variable allows to control their visiblity) [interduo]
+  - improvement: lmsuser can define category color [interduo]
+  - improvement: rtmodule: more filtering options in "User"-->"no owner" [interduo]
+  - improvement: rtmodule: multiselect in filtering in status field [interduo]
+  - enhancement: rtmodule: if ticket status is waiting and has no opened events
+    show "+" image and link [interduo]
+  - improvement: eventsearch: added posibility to search by ticketid [interduo]
+  - improvement: event: id of ticket moved into more ui friendly place [interduo]
+  - enhancement: reference documents were introduced - it allows to create
+    document chains [chilan]
+  - enhancement: document templates support reference_types and references_templates properties
+    which define to which document given template can refer to [chilan]
+  - enhancement: allow to sort customer by external id [chilan]
+  - improvement: published_document_modification privilege controls if user can modify/delete
+    published documents [chilan]
+  - enhancement: allow to add new note for created helpdesk ticket [interduo]
+  - introduced: rt: requestor_phone, requestor_mail in rtticketadd [interduo]
+  - improvement: allow to fast-clone existing customer node to new one [chilan]
+  - enhancement: introduced payments_before_assignment_loop plugin hook in lms-payments.php backend script;
+    it has potential to be used for now at least by Adescom plugin [chilan]
+  - cleanup: all columns in database related to other tables are foreign keys [chilan]
+  - enhancement: when application is called with api GET parameter we avoid running some code which
+    is needed only for webui [chilan]
+  - improvement: allow to search customers by different address types [chilan]
+  - enhancement: instant receipt issuing is possible during customer balance add [chilan]
+  - enhancement: allow to create receipt with one click near customer balance info [chilan]
+  - improvement: added support for mail.reply_email configuration variable which controls
+    what email address is set in Reply-To header in messageadd [chilan]
+  - improvement: phpui.promotion_activation_at_next_day configuration variable controls
+    if activation assignment is setup to next day [chilan]
+  - improvement: receipts.instant_payment_print variable controls if instant payment
+    is marked for printing by default [interduo]
+  - improvement: show/hide customer credentials on debit notes - notes.customer_credentials
+    configuration variable [interduo]
+  - improvement: phpui.promotion_preserve_at_day configuration variable controls if assignments added
+    from promotion scheme have at day the same as given assignment day [chilan]
+  - improvement: downrates and uprates don't need upper limit [chilan]
+  - enhancement: assignments can be commited together with document closing/commiting [chilan]
+  - improvement: if there is only one division in database we use its properties
+    for receipt division header [chilan]
+  - enhancement: allow to visually filter customer assignments by tariff type [chilan]
+  - enhancement: promotion tariff selections are named selection lists [chilan]
+  - enhancement: promotion schema tariffs can be ordered using drag & drop technique [chilan]
+  - enhancement: customer post addresses are stored within financial documents in the state
+    of issue time [chilan]
+  - enhancement: all promotion schema tariffs can have labels applied [chilan]
+  - enhancement: added clear date button in datepicker dialogs [chilan]
+  - enhancement: added auth/session type property for tariffs [chilan]
+  - enhancement: only nodes matched with selected tariff auth/session types are show
+    for edited customer assignments [chilan]
+  - enhancement: nodes can be separately selected for all promotion schema tariffs [chilan]
+  - improvement: show location and device id on customer network device list [chilan]
+  - enhancement: assignments can be created basing on promotion schema during document
+    creation [chilan]
+  - enhancement: creating new assignment/document we can decide what should be applied
+    to already existing assignments [chilan]
+  - enhancement: added document selection to filter on customer assignment list [chilan]
+  - enhancement: option for new assignment to allow impact on existing assignments
+    with the same tariff type [chilan]
+  - improvement: store commit flags for later use if created document is not closed
+    and then use it during document close process [chilan]
+  - enhancement: multi document operations are possible from customer document box [chilan]
+  - enhancement: lms-notify.php: added documents type support which takes document end
+    dates into consideration [chilan]
+  - enhancement: allow to select permanent attachments which are included with generated
+    document [chilan]
+  - improvement: phpui.default_link{type,technology,speed} configuration variables allow to preselect
+    link properties for new and edited nodes [chilan]
+  - improvement: negative credit notes are taken immediately to account, by for positive ones
+    we wait for their pay time [chilan]
+  - enhancement: allow to send documents directly to mail [chilan]
+  - enhancement: phpui.document_password configuration variable controls if documents generated
+    by html2pdf conversion are protected [chilan]
+  - improvement: added support for CC and BCC headers in mail backends [chilan]
+  - enhancement: new userpanel authentication type - node name and password
+    (as pppoe login and password) [chilan]
+  - improvement: openlayers map: allow to copy gps coordinates of network devices from
+    coordinate selector popup [chilan]
+  - improvement: introduced 'mail' section configuration variables which allow to change
+    smtp ssl session behavior (mail.ssl_verify_peer, mail.ssl_verify_peer_name,
+    mail.ssl_allow_self_singed) [chilan]
+  - improvement: cashimport.folder configuration variable specifies which imap folder
+    to check for new cash import files [chilan]
+  - improvement: when customer has 'electronic invoice' not checked and we are trying to mark
+    mail contact as for invoice sending, we show alert popup [chilan]
+  - enhancement: allow to select issued document type for assignments [chilan]
+  - enhancement: helpdesk/rt: introduced ticket priorities [interduo]
+  - enhancement: allow to check all items with one click in lms-ui-multiselect [chilan]
+  - enhacement: userpanel: allow to limit reopening helpdesk tickets to newer than
+    configured seconds (userpanel.allow_reopen_tickets_newer_than configuration variable)
+    [chilan]
+  - cleanup: mysql and mysqli database types point to mysqli php extension [chilan]
+  - enhancement: allow to modify credit note and debit note numbers during their edits [chilan]
+  - enhancement: document cancellation support for debit notes [chilan]
+  - enhancement: allow to decide if customer data should be updated during
+    credit note creation, modification and invoice modification [chilan]
+  - enhancement: simple api support - netnodelist, netnodeadd, netnodedel, netnodeedit,
+    netdevlist, netdevadd, netdevdel, netdevedit, nodelist, nodeservicelist,
+    customerlist [chilan]
+  - enhancement: added telecom number support for divisions [chilan]
+  - enhancement: aadded qr2pay payment method on TcpdfInvoice [wdjag/chilan]
+  - enhancement: gusapi support added which allows to get company details from GUS REGON
+    database (phpui.gusapi_key configuration variable stores API key) [chilan]
+  - enhancement: zip code auto and manual completion using OpenStreetMap API [chilan]
+  - enhancement: zip code auto and manual completion using PNA database [chilan]
+  - enhancement: phpui.zipcode_backend controls which zip code auto completion backend
+    is used (by default: 'osm'; 'pna' is second supported backend) [chilan]
+  - enhancement: pna codes which are not assigned to existing teryt locations are
+    also stored in database and are searchable by streetname [chilan]
+  - bugfix: sql schema compatibility with PowerDNS 4.x [chilan]
+
+version 1.11.22 (2017-06-08):
+
+  - userpanel enhancement: show confirmed documents only checkbox decides if confirmed
+    documents are only shown for customer [chilan]
+  - documentview enhancement: allow to view many pdf documents as single pdf file [chilan]
+  - userpanel enhancement: module order can be changed from LMS userpanel configuration
+    using drag&drop (fixes LMS+ #102) [chilan]
+  - improvement - don't show boxes for contact types when no contact
+    type is assigned to customer [chilan]
+  - enhancement: phpui.disable_active_links_in_nodeinfo controls if some controls
+    are active ui elements [chilan]
+  - performance improvement: phpui.datatables_max_records limits datatables initialisation
+    to tables with specified number of records (default: 300) [chilan]
+  - improvement: click on tariff tag should add tag to filter and click on right side
+    should move to tariff tag info (should fix LMS+ #101) [chilan]
+  - added support for attribution network device for customer [kosa/chilan]
+  - enhancement: added support for pro forma invoices (should resolve LMS+ #120) [chilan]
+  - enhancement: support of convertion pro forma invoice to invoice [chilan]
+  - improvement: splited user name to separated first name and last name components [kyob]
+  - enhancement: support of customer number plans with special symbol %C [chilan]
+  - enhancement: allow to select first free ip address automatically in node forms
+    (phpui.first_reserved_addresses controls how many first addresses are omitted
+    for selected network) [chilan]
+  - added support for assignment tariffs to network device hosts [kosa/chilan]
+  - improvement: if ip address is not empty go to the page in ip address selection
+    window where this non-empty ip address is visible [chilan]
+  - added support for set type of voip pool numbers [kosa/chilan]
+  - improvement: allow to change number and number plan for edited invoices [chilan]
+  - improvement: phpui.helpdesk_author_notify configuration variable controls
+    if new helpdesk ticket/message/note notifications are sent to author [chilan]
+  - improvement: allow to search for customers which are not assigned to any
+    customer groups [chilan]
+  - bugfix: taxes were inproperly displayed on invoice for both zero tax and tax free
+    values were present at the same time [chilan]
+  - enhancement: added node session support for ip addresses assigned to network
+    devices [chilan]
+  - enhancement: allow to automatically get first free address for network device
+    ip addresses [chilan]
+  - enhancement: allow to specify indefinite cutoff stop dates [chilan]
+  - enhancement: JPK FA (invoices) support added [chilan]
+  - enhancement: allow to define teryt addresses and tax office codes for divisions [chilan]
+  - improvement: JPK FA (invoices) report uses recently added division teryt location
+    and division tax office assigned [chilan]
+  - improvement: allow to print web layout without left menu bar, top autosuggest fields
+    and toolbar [chilan]
+  - enhancement: show document creator on document lists [chilan]
+  - enhancement: added support for confirmation user storage in documents [chilan]
+  - enhancement: allow to select which helpdesk ticket details are printed [chilan]
+  - enhancement: added document number sort cryterion to invoice report [chilan]
+  - added script to load and bind buildings with teryt localizations [kosa/chilan]
+  - improvement: switched to new multi attachment code for new mail messages [chilan]
+  - improvement: when we try to send messages to more than 50 customers at once, confirmation
+    dialog is displayed [chilan]
+  - enhancement: cash source: added suport for main bank account definition [chilan]
+  - enhancement: lms-notify.php: all actions are logged into transaction log [chilan]
+  - improvement: voip.cdr_billing_record_format configuration variable describes
+    format of billing record [chilan]
+  - improvement: allow to print invoices manually issued [chilan]
+  - enhacement: added documents flag to email and phone customer contacts which allows
+    to decide if those contacts should be printed on documents [chilan]
+  - enhancement: added support for effective dates of tariffs and promotions - only effective
+    ones are displayed by default [chilan]
+  - enhancement: added rbe info fields to divisions and rbe name for customers [chilan]
+  - enhancement: allow filter document list by creator/authorising and all date types
+    for periods [chilan]
+  - moved addresses from nodes, netdevices, customers, netnodes, voipaccounts and divisions
+    to one table [kosa/chilan]
+  - removed possibility for setting up custom address for nodes and voipaccounts [kosa/chilan]
+  - added possibility for create many addresses for each customer [kosa/chilan]
+  - improvement: added new event types - vacation and duty [chilan]
+  - enhancement: number plan list is updated automatically after customer or document
+    type selection change [chilan]
+  - improvement: sendinvoices.mail_format=text|html ('text' by default) allows
+    to select mail format between html and text [chilan]
+  - improvement: for new receipt show only cash registries to which cashier have
+    read/write access privileges (we also take selected customer division into account) [chilan]
+  - improvement: switched to pear/mail maintained by composer [chilan]
+  - improvement: invoices: dynamic adjustment of number plan list according to
+    selected customer division [chilan]
+  - improvement: show db backup sizes also in human friendly units [chilan]
+  - improvement: switched to xajax 0.6 beta fork from https://github.com/feuzeu/xajax which
+    generates much less warnings in PHP 7 (if any at all) [chilan]
+  - enhancement: added support for JPK-VAT exports [chilan]
+  - rewrite lms-teryt to PHP [kosa/chilan]
+  - merged lms-teryt and lms-teryt-buildings scripts [kosa/chilan]
+  - added posibility to set recipient for invoices [kosa/chilan]
+  - enhancement: added backend script which creates new helpdesk tickets when new sms
+    messages has been received by smstools [chilan]
+  - enhancement: allow to notify customer via sms for helpdesk ticket messages which were
+    created from customer sms earlier [chilan]
+  - improvement: phpui.helpdesk_customer_notify determines if customer notify checkbox
+    should be checked by default (for messages created from customer smses) [chilan]
+  - improvement: hosts are automatically reloaded after one click if there is only
+    one host in database [chilan]
+  - enhancement: allow to assign events with helpdesk tickets [interduo]
+  - improvement: phpui.default_event_ticket_assignment controls if event ticket
+    assignment is checked by default [chilan]
+  - clarification: customer pin on html and tcpdf invoices are printed based on
+    the same common rules [chilan]
+  - improvement: lms-gps.php script allows to automatically determine netnodes gps
+    coordinates [chilan]
+  - improvement: lms-gps.php script can search for more exact locations if resource
+    address is teritied [chilan]
+  - enhancement: lms-gps.php allows to use two different sources of gps coordinates:
+    google and siis [chilan]
+  - enhancement: restore old-style quick search panel behavior [chilan]
+  - enhancement: added potential ranges for UKE report [kosa/chilan]
+  - improvement: show unique customer node locations in helpdesk notification footer [chilan]
+  - improvement: allow to select division for liability report [chilan]
+  - improvement: added select by customer type for sale registry [kosa]
+  - enhancement: auto gps coordinates detection in UI uses territory units if they are
+    defined [chilan]
+  - improvement: phpui.gps_coordinate_providers specifies which gps providers are used
+    (google,siis by default) [chilan]
+  - improvement: added support for polish mazovia encoding for cash import files [chilan]
+  - improvement: added support of References, In-Reply-To and Message-ID headers
+    for phpmailer mail backend [chilan]
+  - improvement: complete rewrite of lms-rtparser script to php [chilan]
+  - bugfix: money quotes printed in words use system locales instead ui locales [chilan]
+  - enhancement: added network usage module for print list of used IP addresses [kosa/chilan]
+  - enhancement: added cloud account type for hosting and refactored account code [chilan]
+  - improvement: allow to decide if customer notifications are sent after new ticket
+    / new message creation [chilan]
+  - improvement: if name of requestor was not specified for new ticket, we set it to
+    current logged user name [chilan]
+  - enhancement: added post office property for addresses [chilan]
+  - improvement: allow to select invoices between enabled, disabled and all as customer
+    agreement for an electronic invoice [chilan]
+  - improvement: phpui.capitalize_customer_names configuration variable settings decides
+    if customer last names are automatically capitalized ('true' by default) [chilan]
+  - improvement: if gps coordinates determined by google api are not precise we show
+    javascript popup which allows user to decide if they should stored beside of this [chilan]
+
+version 1.11.21 (2016-10-14):
+
+  - added support for DSN and MDN in lms-notify.php script [chilan]
+  - smarty installation is provided by composer from now [chilan]
+  - added support for sms notifications in timetable type [chilan]
+  - show event summary for all found events at bottom [chilan]
+  - unification of cash import code as preparation for cashimport backend
+    scripts' usage [chilan]
+  - added bin/lms-cashimport.php script as universal backend for
+    loading cash import file contents from specified files [chilan]
+  - added creation time for events [chilan]
+  - added selection between invoice report and debit note report and
+    generating related report according to this selection [chilan]
+  - current is marked by darker title bar in timetable [chilan]
+  - allow to select between all, public and private events in event list filter [chilan]
+  - lms-notify.php: added %totalB, %totalsaldo, %totalbalance special
+    symbol support for debtors notification type which store total customer balance [chilan]
+  - added script which fetches cash import files from mailbox (pop3, imap, etc.) [chilan]
+  - sending invoices code moved to LMS::SendInvoices() as preparation for
+    invoice sends from LMS UI [chilan]
+  - invoice sends are possible from LMS UI [chilan]
+  - print events accordingly to privacy filter selection [chilan]
+  - changed input types to email and tel where it is sane [kyob]
+  - set required attibute for some form fields [kyob]
+  - improved selection of node and network devices which should be connected
+    to given network device [kosa/chilan]
+  - log customer properties changes after commit userpanel changes from LMS UI [chilan]
+  - added new doc types (price-list, promotion, warranty, regulations) [kyob]
+  - visual improvements of event list [kyob/chilan]
+  - unified visual layout of event list and event search results [chilan]
+  - added preliminary support for voip price lists [kosa/chilan]
+  - phpui.customer_ten_existence_check and phpui.customer_ssn_existence_check settings
+    decide if customer ten and ssn duplication warnings/errors are enabled [chilan]
+  - workaround new mysql version restricted sql mode forbiding default value
+    for text/blob fields [chilan]
+  - improved voip scripts and updated voip tables in database [kosa/chilan]
+  - improved voip billing list search [kosa/chilan]
+  - added check for maximum helpdesk subject length [kosa/chilan]
+  - allow plugins to modify button list in network device info [chilan]
+  - automatically move transfer form to separate page if there is no
+    enough space on tcpdf invoice page [chilan]
+  - invoices.header_image config variable controls pdf invoice logo placement [chilan]
+  - added backend script for voip emergency numbers database creation [chilan]
+  - added backend script which generates sip account and extensions configuration
+    files in asterisk format [chilan]
+  - asterisk configuration file generation script checks call recodings flags [chilan]
+  - added possibility to hide customer balance by invoices.show_balance configuration
+    variable on tcpdf invoice [gbn.pl]
+  - automatically position of invoice footnote on tcpdf invoice [gbn.pl]
+  - listening of voip call recordings are possible from now [chilan]
+  - added tags for tariffs [kyob]
+  - switched to ezpdf supported by composer [chilan]
+  - adding support for dialing phone from smartfones [kosa/chilan]
+  - added variable phpui.settings_timeout determine inactivity time after which
+    user session settings are cleared (0 means settings are stored only to logout) [chilan]
+  - added support for %srcaccount%, %dstaccount% and %customername% replace symbols
+    in imported financial operation comments [chilan]
+  - unification customer contact management code [chilan]
+  - added new customer contact type support - url addresses [chilan]
+  - important fix: avoid to settle duplicated liabilities on invoices when almost their
+    all properties are identical [chilan]
+  - added support for voip tariff rules [kosa/chilan]
+  - simplicity syslog code and make it more oop [chilan]
+  - more oop improvements for SYSLOG and Auth classes [chilan]
+  - added support for %last_10_in_a_table symbol in lms-notify.php [chilan]
+  - allow to filter balance history list by cash import file [chilan]
+  - added cashimport_after_commit hook which is executed immediately after
+    cash import record commit [chilan]
+  - jquery and jquery-ui composer and header/layout template support [chilan]
+  - got rid of old calendar js - use jquery calendar from now [chilan]
+  - ported almost all dynamic popups to jquery [chilan]
+  - added module to user panel for view VoIP billings [kosa/chilan]
+  - added receipts.default_printpage config variable support [chilan]
+  - added support for create voip billing invoices [kosa/chilan]
+  - allow to add attachments for helpdesk notes [chilan]
+  - added support for audio prelisten and video preview clicked from helpdesk
+    message and note attachment links [chilan]
+  - support for customer document attachment preview in popup dialogs [chilan]
+  - added support for document multi-attachments [chilan]
+  - document attached file management is possible from document edit form [chilan]
+  - helpdesk and documents: remember selected file attachments between form posts - brand new
+    file uploader which hardly uses html5 [chilan]
+  - added support for multiple phone numbers [kosa/chilan]
+  - bumped openlayers version to current 2.x series HEAD and allow to use
+    google maps api key defined by phpui.googlemaps_api_key variable [chilan]
+  - show selected position on map for network device and node current coordinates
+    presentaion [chilan]
+  - allow to select company/division for mass invoice printing [chilan]
+  - defined html class multi-check which allows tbodies function with multi
+    select elements on lists [chilan]
+  - support of multi message deletions [chilan]
+  - multi customer group assignments can be added and deleted from customer form [chilan]
+  - selected liabilities can be deleted from customer form [chilan]
+  - added support for jquery datatables plugin and use it for cash import package list,
+    customer messages and customer balance box [chilan]
+  - multiselect control supports onchange event handler so we can use it quite
+    easy in resource filters [chilan]
+  - tariff list can be filtered by multi selection of tariff tags from upper filter [chilan]
+  - multi node group assignments can be added and deleted from node form [chilan]
+  - added global try/catch block as default resort error handler [chilan]
+  - ported node group list sort to jquery and ajax [chilan]
+  - support of auth type for networks [chilan]
+  - user is able to sort node and customer tabs on his own and order is persistent [chilan]
+  - added support for ssl_verify_peer, ssl_verify_peer_name, ssl_allow_self_signed boolean
+    configuration variables in LMS::SendMail (for now these variables are handled only
+    by phpmailer mail.backend) [chilan]
+  - allow to switch on column filter and toggle for lms-ui-datatable using
+    lms-ui-datatable-column-search and lms-ui-datatable-column-toggle classes respectively [chilan]
+  - introduced persistent settings: tabs order are stored persistently
+    in users.persistentsettings database table [chilan]
+  - allow to limit invoice send by mail count per hour [olimplan/chilan]
+  - lms-ui-wysiwyg-editor css class point text areas which should have
+    tinymce toggle feature [chilan]
+  - many items can be opened in menu at the same time - phpui.max_opened_menus
+    (default: 3; 0 means unlimited) configuration variable controls this [chilan]
+  - main menu items are sortable by draging menu icon and dropping it in another place [chilan]
+  - removed support for swekey [prezes_kk]
+  - datatables column search supports selection lists [chilan]
+  - allow to toggle main menu visibility [chilan]
+  - added published flag to documents which means if document has been published and
+    probably received by customer [chilan]
+  - financial documents can be previewed without publishing [chilan]
+  - added support for voip pool numbers [kosa/chilan]
+  - document form title is automatically set after document template selection
+    to form_title or title template property [chilan]
+  - dynamic presentation of quick search input depending - they are shown after
+    mouse over on quick search icons [chilan]
+  - added quick search customers by phone numbers on top [chilan]
+  - added phpui.node_assignment_warning configuration variable which
+    determines if alert is displayed when no node has selected for internet assignment [chilan]
+  - added node list filter: without gps coordinates [chilan]
+  - added customer list filter: liabilities without invoice flag [chilan]
+  - added support for voip phone priority [kosa/chilan]
+  - changed customer instant messengers handling code to more generic code which will allow
+    to easier support more im types in the future [chilan]
+  - added support for change voip account settings in userpanel by customer [kosa/chilan]
+  - when phpui.big_networks is set to true show customer name on right side of input control [chilan]
+  - added support for convenient dynamic plugin javascript code loading in document templates [chilan]
+
+version 1.11.20 (2016-04-19):
+
+  - bclean: added responsive menu [kyob]
+  - www, userpanel messages are always sent initially and userpanel messages are
+    marked as delivered after message read confirmation [chilan]
+  - added support for user groups [wawryk]
+  - customer address and postal address were separated to street, building and
+    apartment fields [chilan]
+  - added support for external system customer identifiers need to bind
+    lms customers with external system customers [chilan]
+  - invoice notes can be edited from now [chilan]
+  - allow to clone network devices from user interface [chilan]
+  - add hook for documents in plugins [wawryk]
+  - don't allow to issue invoice credit note for invoice which already has issued
+    credit note [chilan]
+  - bumped html2pdf library version to 4.5.0 [prezes_kk]
+  - allow lms-payments.php script to set aligned periods for invoice items
+    (added special symbol %aligned_period) [chilan]
+  - added type, private and opened filters in event list [chilan]
+  - localised bank account functions use common iban account functions [chilan]
+  - we can add many bank accounts to single customer (both source and destination
+    accounts) [chilan]
+  - invoices.show_all_accounts allows to display all customer bank accounts
+    on invoices [chilan]
+  - allow to select customer for all imported transactions [wawryk/chilan]
+  - replaced all customer selectiors by smarty customerlist function [chilan]
+  - removed deprecated chkconfig, check_conf and get_conf public functions [chilan]
+  - lib/config.php is needed only for config load module [chilan]
+  - added column with type in uiconfig, and configuration is validated by this type [pjona]
+  - function $LMS->CheckOption() takes a '$type' as the first parameter [pjona]
+  - lms-sendinvoices.php can send additional file as a separate attachment [pjona]
+  - added support for second mail library (PHPMailer), see mail.backend option [wawryk]
+  - lms-payments.php: added option which allows to define date format [pjona]
+  - node list: added support for investment project selection [chilan]
+  - node list: added support for 'without tariff' status [chilan]
+  - added phpui.quicksearch_limit config variable with 15 as default [chilan]
+  - fixed calculation of brutto value basing on netto value
+    (fixes https://github.com/lmsgit/lms/issues/559) [chilan]
+  - added payments.default_unit_name config variable with "pcs." as default [pjona]
+  - customer and user notifications about still opened events [chilan]
+  - fixed multidays event presentation in event list when end time is 00:00 [chilan]
+  - remember all form settings between user sessions [chilan]
+  - 'unblock' channel support added to lms-notify.php backend script [chilan]
+  - fixed radio sectors visualisation on network map - azimuth points angle related
+    to north direction [chilan]
+  - add filters (with nodes, without nodes, active nodes, e-invoice) in customerlist [wawryk]
+  - add filters (online, without terryt) in nodelist and show info on welcome [wawryk]
+  - bumped used smarty version to 3.1.29 (LMS Plus users should not use the newest
+    lms master version for the moment) [chilan]
+  - allow to view and search node sessions [chilan]
+  - allow to use web browser mechanism to open new invoice/receipt/note form in customer
+    balance box [chilan]
+  - invoices.disable_protection allows to disable modify and copy protection in
+    tcpdf invoice [chilan]
+  - added possibility to add note to events by technician without timetable_access [wawryk]
+  - added showOrHide function to boxes on welcome page [wawryk]
+  - added autolinker in rttickets [wawryk]
+  - copy ip address to clipboard after click on ip.gif image [wawryk]
+  - added clone option to promotions and promotion schemas [wawryk]
+  - added tcpdf support for debit note [pjona]
+  - added documents cacheing [wawryk]
+  - added support for sending debit notes by mail [chilan]
+  - allow to assign numberplans to tariffs [chilan]
+  - receiptadd: we show also not accounted debit notes [pjona]
+  - separation force_ssl for UI and Userpanel [pjona]
+  - added node location info in network devices connected nodes list [chilan]
+  - added support for network searching [kosa/chilan]
+  - added support for different placements of suggestion window
+    (phpui.default_autosuggest_placement) [kosa/chilan]
+  - suggestion window adjust its width to displayed data
+    (phpui.autosuggest_max_length) [kosa/chilan]
+  - improved performance of default type detection for config variables [chilan]
+  - redesigned multiselect window to be more useable [kosa/chilan]
+  - networks: added support for vlan ids [kosa/chilan]
+  - added support for userpanel_<module_name>_<function_name>_before_module_display
+    hooks [chilan]
+  - allow to add custom links in userpanel customer balance list [chilan]
+  - workaround postgresql array_agg multi function existence during db schema updates [chilan]
+  - added delivery status notification support for mail messages [chilan]
+  - invoice sends are optionally confirmed by new messages [chilan]
+  - added mail disposition notification support for mail messages [chilan]
+  - added support for DSN, MDN and Reply-To header in phpmailer backend
+    (DSN required separated patch for PHPMailer code) [chilan]
+
+version 1.11.19 (2015-12-21):
+
+  - updated lms swekey code to be conformed with PHP 7 [prezes_kk]
+  - added support for message delivery status [Jarosław Dziubek]
+  - rewrite of user access rights code completely - it can require
+    related adjustments in 3rd party plugins and patches [chilan]
+  - introduced new hook which allows to attach handlers for all LMS modules
+    before smarty template displaying (*_before_module_display) [chilan]
+  - don't use smarty prefilter for document directory [chilan]
+  - multiple files can be send by email when we create mail message [chilan]
+  - selection of phones and emails is possible when we send message to customer [chilan]
+  - fixed liability reports when assignments with many tax rates for customer was
+    assigned [chilan]
+  - sms.transliterate_message config variable introduced - allows to
+    getting rid of national characters in sms messages [chilan]
+  - added contract filter for customer list and report [chilan]
+  - invoices.customer_credentials and invoices.customer_balance_in_form configuration
+    settings were introduced [chilan]
+  - userpanel helpdesk module: ticket/message attachment support added [chilan]
+  - userpanel helpdesk module: allow customer to download message attachments [chilan]
+  - new pagination engine [maciejlew]
+  - added limit and offset support for customer list [maciejlew]
+  - added flag CONTACT_DISABLED, CONTACT_INVOICES and CONTACT_NOTIFICATIONS to customer contact data [wawryk]
+  - adjusted database schema for powerdns 3.4.x [chilan]
+  - resolved tcpdf invoice problem where position names were not wrapped [chilan]
+  - added holiday information in timetable [pjona]
+  - added event type in timetable [pjona]
+  - added session type for node sessions [chilan]
+  - added extra_css_styles Smarty block - plugins can use it to inject their own CSS styles [maciejlew]
+  - helpdesk: added history of the ticket when you add notes [pjona]
+  - helpdesk: added ability to change queue and owner when you add notes [pjona]
+  - helpdesk: added type to notes [pjona]
+  - added new access type/session types - WiFi AP Client, VoIP Gateway [chilan]
+  - added preliminary support for customer disconnected status and refactoring customer status
+    support code to make adding new customer statuses easier [chilan]
+  - permanent customer removal for customers which are already removed [chilan]
+  - allow to optionally send mail copy to message sender (checkbox is checked by default if
+    phpui.send_message_to_sender_checkbox is set to true) [chilan]
+  - added phpui.capitalize_node_names setting which is true by default and decides
+    if node names are automatically capitalized during node add or update [chilan]
+  - allow plugins to add their own buttons in customer balance box and invoice list [chilan]
+  - allow plugins to add their own content in left and right column of customer info and edit boxes [chilan]
+  - allow assign a whole network to the customer [pjona]
+  - invoices.attachment_name setting allows to define pdf invoice file name pattern (%number symbol
+    is only supported symbol for now) [chilan]
+  - complete rewrite of invoice generation code - common path code for pdf and html invoices [chilan]
+  - lms-sendinvoices.php stopped pretending www browser - it uses new pdf generation code path [chilan]
+  - complete rewrite of receipt generation code - common path code for pdf and html receipts [chilan]
+  - complete rewrite of note generation code [chilan]
+  - complete rewrite of two transfer form types - killed old pdf backend code [chilan]
+  - new bootstrap based userpanel style integrated - bclean [kyob]
+  - customer info box: show customer all and not resolved ticket stats (as bold when there
+    are some unresolved tickets) [chilan]
+  - added support for customer source and destination bank accounts in cash import parser [chilan]
+
+version 1.11.18 (2015-10-01):
+
+  - added support of new style plugins in userpanel - hooks executed before
+    module load have 'userpanel_*_on_load' name pattern [chilan]
+  - added support of new style plugins in userpanel module setup part [chilan]
+  - template inheritance chains are supported; we can use the same names
+    for all templates in chain - should be very usefull in plugins [chilan]
+  - move upgrade db schema code to LMSDB class - it can also be used by plugins [chilan]
+  - added simple plugin management form [chilan]
+  - added support for old style plugin management [chilan]
+  - added location to voip accounts as we're preparing for plicbd2 localisation service [chilan]
+  - we can add many mail accounts in customer properties (customers.mail field in db was removed,
+    but values set so far are stored in customercontacts table from now) [chilan]
+  - added smarty blocks for customer assignments template [maciejlew]
+  - added smarty blocks for customer list template [maciejlew]
+  - added smarty blocks for customer voip accounts list template [maciejlew]
+  - added smarty blocks for voip account add template [maciejlew]
+  - added smarty blocks for voip account edit template [maciejlew]
+  - added smarty blocks for voip account info template [maciejlew]
+  - added smarty blocks for voip account list template [maciejlew]
+  - added number_of_table_columns variables at voip account list template that can be used by plugins [maciejlew]
+  - added customerlist-list-columns smarty block at customer list template [maciejlew]
+  - added number_of_table_columns variables at customer list template [maciejlew]
+  - added colgroup at customer voip account list template [maciejlew]
+  - added customervoipaccountsbox-list-columns smarty block at customer voip account list template [maciejlew]
+  - added number_of_table_columns variables at customer voip account list template [maciejlew]
+  - added posibility to filter document list by document status [chilan]
+  - userpanel: new authentication type - by email and pin [chilan]
+  - userpanel: selection of authentication type is possible from lms user interface [chilan]
+  - userpanel urgent notices are working independently from userpanel style and are completely separated
+    from userpanel code core [chilan]
+  - added support for invoicenew_save_{before,after}_submit plugin hooks [chilan]
+  - daemon: fixed parser module compilation on centos 7 (and probably on other newer linux
+    distributions) [chilan]
+
+version 1.11.17 (2015-06-29):
+
+  - added support for radio sectors management in user interface [chilan]
+  - fixed serious performance regression introduced by autoloader [chilan]
+  - added radio sector management for network device links [chilan]
+  - added license number and frequency for radio sectors [chilan]
+  - added link technology and bandwidth support for radio sectors [chilan]
+  - userpanel: we can enable/disable modules from lms user interface [chilan]
+  - added connection type (PPPoE, DHCP, EAP) in nodes [nicraM Marcin Romanowski]
+  - added network device selection from map [chilan]
+  - added connection type (DHCP, EAP) in network device nodes [nicraM Marcin Romanowski]
+  - move 'replace device" to popup for better netdevinfo/edit performance [maniac]
+  - added visualisation of radio sectors on network device map [chilan]
+  - added filter in network device list which allows to select device status
+    and investment project to which device belong to [chilan]
+  - added in debt above 100% and 200% filters in add message form [chilan]
+  - adjustements to smarty versions above or equal 3.1.22 [chilan]
+  - uke siis generator adjusted to earlier added radio sector feature [chilan]
+  - daemon: ewx-pt module: fixed inproper mac content copying which caused segfaults
+    on systems with newer system libraries [chilan]
+  - daemon: ewx-pt module: don't remove hosts from ewx_pt_config sql table
+    when host doesn't belong to any network defined by networks setting
+    - in other words more sane multi ewx-pt instance support [chilan]
+  - helpdesk notifications: attach all phone contacts [chilan]
+
+version 1.11.16 (2015-03-31):
+
+  - allow for separated template files in userpanel style [chilan]
+  - print customer list from selected division is possible [chilan]
+  - save also message subjects in message templates [chilan]
+  - added debian package config - build can be done by dpkg-buildpackage [maniac]
+  - new message types added (userpanel, userpanel urgent [chilan]
+  - new database access layer [maciejlew]
+  - new configuration system [maciejlew]
+  - wysiwyg edition of config values is possible [chilan]
+  - we can delete all customer liabilities by one click [chilan]
+  - add fullnumber with dispatched document full number in documents table [chilan]
+  - documentlist: selection of numberplan is possible [chilan]
+  - added quick search by document full number [chilan]
+  - daemon: if snmp.h is not available then don't build ewx-* modules [maniac]
+  - daemon: fixed daemon start on some platforms. Closes: #239 [maniac]
+  - tariffs: 500M is new maximum allowed bandwidth [chilan]
+  - invoicereport: multi selection of numberplans is possible [chilan]
+  - helpdesk ticket add: make form layout more similar to ticket edit form [chilan]
+  - events: multi-day event support [chilan]
+  - events: multi user selection is possible in event search form [chilan]
+  - management urls can be also assigned to nodes [chilan]
+  - LMS class is able to send many posts via single smtp session [chilan]
+  - new plugins management system [maciejlew]
+  - many sms service providers can be set in sms.service
+    setting (separated by colon) [chilan]
+  - bumped ezpdf library version (viewing invoices in firefox should
+    work again) [chilan]
+  - pdf receipts ported to new ezpdf library version [chilan]
+  - new tags: %period_begin() and %period_end() to customize period date format
+    in lms-payments [kcem]
+  - support for more than one email per customer, comma is a delimiter [kcem]
+  - explicitly given language in http headers when lms-sendinvoice get invoices
+    to be sure that script get invoices in correct language [kcem]
+  - reduced ezpdf invoice file size by subset font usage [chilan]
+  - new privilege for compacting traffic statistics [maniac]
+  - correction of typos on domain record list [darton]
+  - correction of the table that displays a list of domain records [darton]
+  - update top level domains list to newest version [darton]
+  - tariff liabilities composed of two elements [darton]
+  - added transaction log core modules [chilan]
+  - allow to use old-style and new-style plugins at the same time [chilan]
+  - added terminate cause in node sessions [chilan]
+  - network node list can be filtered by nodes without investment project [chilan]
+  - added network node column in network device list [chilan]
+  - show info about state, district and borough in netnode, netdev and node info boxes [chilan]
+  - full location info in netnode, netdev and node lists [chilan]
+  - lms-teryt: added option which allows to choose if city matches should be unique [chilan]
+  - added network device producers and models management [chilan]
+  - siisv5: new version of siis report generator which allows to save much time;
+    the old generator still works and can be selected by user [chilan]
+  - siisv5: create fake network ranges with the same location as network node
+    to avoid strange siis bussiness logic rules [chilan]
+
+version 1.11.15 (2014-05-15):
+
+  - host owner selection for networks [pjona/chilan]
   - separation of privileges: finance management and cash registry administration [chilan]
   - show last 10 node sessions in nodeinfo and nodedit [chilan]
   - transaction logging engine introduced [chilan]
@@ -79,8 +1543,6 @@ version ?.??.?? (????-??-??):
   - daemon/dns: module now is looking additional files in LMS_CONF_DIR/daemon/dns [maniac]
   - move custom plugins to lib/SmartyPlugins - bumps min. smarty ver. to 3.1 [maniac]
   - daemon: resolve source dependency problem for gcc 4.4 - bumps api version [maniac]
-  - allow for separated template files in userpanel style [chilan]
-  - print customer list from selected division is possible [chilan]
 
 version 1.11.14 (2013-03-25):
 
@@ -128,7 +1590,7 @@ version 1.11.14 (2013-03-25):
   - javascript smarty literal cleanup [chilan]
   - network maps show nodes and node links & switched map creation from markers to features [chilan]
   - separated js and php files created for map support [chilan]
-  - livemap(tm) in LMS ;-) network state is updated asynchronously in real time 
+  - livemap(tm) in LMS ;-) network state is updated asynchronously in real time
     in phpui->lastonline_limit time periods [chilan]
   - we can ping nodes and devices watching results in popups [chilan]
   - 5 default base layers for maps [chilan]
@@ -159,7 +1621,7 @@ version 1.11.14 (2013-03-25):
   - we can use percentage and amount discounts [chilan]
   - BTS#0000894: lmsd/parser: Fixed SQL query for NODES variable [alec]
   - fixed listing of customers who in debt above 100% and 200% [Jarosław Dziubek/chilan]
-  - complete rewrite of graph statistics engine. Graphs look like in Cacti [chilan] 
+  - complete rewrite of graph statistics engine. Graphs look like in Cacti [chilan]
   - we can choose graph statistics from node information form [chilan]
   - rewritten graph navigation panel [chilan]
   - invoicenote: we use tax rates which were current in the day
@@ -191,10 +1653,10 @@ version 1.11.14 (2013-03-25):
   - assignmentlocks -> nodelocks [chilan]
   - we can choose format of reports beetween html and pdf - phpui->report_type [prezes_kk]
   - script for automatic filling of gps coordinates based on Sebastian Wielgosz work [prezes_kk]
-  - changed pin field type from int to varchar(6) [red]
+  - changed pin field type from int to varchar(6) [pjona]
   - liability reports are consistent with invoice/cash issues [chilan]
-  - small fix for new PHP version [red]
-  - fix validation data in domains for DKIM [red]
+  - small fix for new PHP version [pjona]
+  - fix validation data in domains for DKIM [pjona]
   - added management urls for netdevices [chilan]
   - customersearch: we can search customers by tariff [ceho]
   - cashimportparser.php: fixed problem with long customername and description [ceho]
@@ -232,7 +1694,7 @@ version 1.11.14 (2013-03-25):
   - don't update time counter for session when we get access to xajax funcions [chilan]
   - netdevmap: openlayers map works again in google chrome [chilan]
   - uke siis reports adjusted to version 3 [chilan]
-  - added possibility to disable the tariffs [red]
+  - added possibility to disable the tariffs [pjona]
   - mysql schema fixes [LoLe/chilan]
   - it's possible to add new config sections from ui [chilan]
 
@@ -359,7 +1821,7 @@ version 1.11.10 Kri (2010-04-19)
 
   - contrib/daemon/gentoo-init: small fixes (Mariusz Szulerecki)
   - lmsd/oident: use lower case'd node names (alec)
-  - added PowerDNS support, LMS now can directly manage PowerDNS server 
+  - added PowerDNS support, LMS now can directly manage PowerDNS server
     with mysql/pqsql backend support (Dariusz Kowalczyk/Jan Gancarczyk)
   - Userpanel: added possibility to print many invoices with one click (alec)
   - unified pdf invoices in Userpanel and LMS-UI (alec)
@@ -416,7 +1878,7 @@ version 1.11.10 Kri (2010-04-19)
   - more PHP-5.3 compat. fixes (alec)
 
 version 1.11.9 Moloc (2009-10-28):
- 
+
   - BTS#0000794: fixed postfix configuration for MySQL (alec)
   - improved performance of bank account fetching (alec)
   - added contrib/bin cash-import scripts for BPH, BZ WBK and PEKAO
@@ -541,11 +2003,11 @@ version 1.11.5 Ishkur (2009-01-24):
 
   - changed Smarty's homepage address to http://www.smarty.net (alec)
   - added Configuration -> States and possibility to search customers
-    by country state in Customers/Search and filter them in 
+    by country state in Customers/Search and filter them in
     Customers/Reports/Customers List (alec)
-  - in short customer nodes list added possibility to change node's 
+  - in short customer nodes list added possibility to change node's
     warning flag and status (alec)
-  - in short customer nodes list added online status icon 
+  - in short customer nodes list added online status icon
     with status title (alec)
   - helpdesk: in tickets list added short nodes list popup (alec)
   - helpdesk: in ticket view added requestor's nodes list (alec)
@@ -568,7 +2030,7 @@ version 1.11.5 Ishkur (2009-01-24):
   - Companies/Divisions (alec)
   - per-division configuration - removed [invoices] options: header, footer,
     cplace, default_author and [finances] option: account (alec)
-  - removed finances/iban option, now mass-payments account is generated 
+  - removed finances/iban option, now mass-payments account is generated
     automatic if account is short (8-20 chars) (alec)
   - performance: optimized LMS::GetCustomer calls using its 2nd argument (alec)
   - reload: we can see live output from reload script (Grzegorz Cichowski)
@@ -597,20 +2059,20 @@ version 1.11.4 Telchak (2008-08-07):
 
   - hosting: removed description column from domains list (alec)
   - hosting: added BCC (blind carbon copy) address in accounts (alec)
-  - DB drivers: in postgresql driver added @-operator and changed 
-    _driver_geterror() and _driver_disconnect() according to other 
+  - DB drivers: in postgresql driver added @-operator and changed
+    _driver_geterror() and _driver_disconnect() according to other
     drivers (alec)
   - DB drivers: removed server version checking in mysql drivers (alec)
-  - DB drivers: don't die when extension isn't loaded, trigger warning 
+  - DB drivers: don't die when extension isn't loaded, trigger warning
     instead (alec)
   - stop working when database connection errors occured (alec)
   - lmsd/hostfile: fixed skip_dev_ips (alec)
   - BTS#0000734: fixed problem with \r\n on pdf invoices (alec)
   - hosting: auto-select domain when clicking on New account on accounts list
     after domain filter was used (alec)
-  - added Actions tab in Customer Info with cutoff suspending and warning 
+  - added Actions tab in Customer Info with cutoff suspending and warning
     messages management as separate actions (alec)
-  - Balance Sheet: fixed big memory usage problem and increased speed of 
+  - Balance Sheet: fixed big memory usage problem and increased speed of
     groups filtering (alec)
   - Invoices List: fixed big memory usage problem, increased speed of filtering
     by group and by value (alec)
@@ -621,15 +2083,15 @@ version 1.11.4 Telchak (2008-08-07):
   - added "trivial" vlan support in lms-makedhcpconf (chilan)
   - lmsd/dhcp: added "trivial" vlan support (alec)
   - tariffs: added possibility to clone tariffs data (alec)
-  - don't overwrite invoice's creation time on edit if date wasn't 
+  - don't overwrite invoice's creation time on edit if date wasn't
     changed (alec)
-  - invoiceedit: we can copy item content to edit fields clicking mouse 
+  - invoiceedit: we can copy item content to edit fields clicking mouse
     button (chilan)
   - lms-reminder: use Mail::Sender with smtp auth (alec)
   - removed english manual in one html file (alec)
   - added polish manual in plain text format (alec)
   - lms-mgc: added 'customergroups' and 'excluded_customergroups' options (alec)
-  - rtticketview: we can open attachments directly from message list 
+  - rtticketview: we can open attachments directly from message list
     in rtticketview (chilan)
   - lmsd/hostfile: added variables %maskpub, %addrpub, %domainpub, %netpub,
     %ifpub, %gwpub, %dns2pub, %dnspub, %winspub (alec)
@@ -678,23 +2140,23 @@ version 1.11.3 Quetesh (2008-03-26):
     phpui.helpdesk_customerinfo (alec)
   - in quicksearch searching ID columns by '=' not LIKE operator (alec)
   - added int2txt() SQL function designed for postgresql 8.3 compatybility, it
-    needs int-to-text type casting when using LIKE operator with numeric 
+    needs int-to-text type casting when using LIKE operator with numeric
     columns (alec)
   - receiptadd: we always show last 10 REALLY not accounted invoices (chilan)
   - invoicenew: we choose last invoice number according to selected month (chilan)
   - we can set incorrect SSN and TEN for customers if we wish it (chilan)
   - hosting: menu Accounts renamed to Hosting (alec)
   - hosting: domain for account is required now (alec)
-  - hosting: added possibility to create multi-destination aliases (alec) 
+  - hosting: added possibility to create multi-destination aliases (alec)
   - hosting: on Domains List added assigned accounts number (alec)
   - hosting: improved interface, added info, delete links (alec)
   - hosting: added domain/account/alias info pages (alec)
   - hosting: mail forwarding to external accounts (alec)
   - hosting: added accounts descriptions (alec)
   - hosting: account's password change moved to separate module (alec)
-  - hosting: define no quota limit as NULL in database (alec) 
+  - hosting: define no quota limit as NULL in database (alec)
   - tariffs: added hosting limits definitions (alec)
-  - tariffs: increased max rate limit to 100000 (alec) 
+  - tariffs: increased max rate limit to 100000 (alec)
   - hosting: added aliases list in account info (alec)
   - hosting: allow only lowercase in logins/domains (alec)
   - fixed download and upload units - we use SI units from now (chilan)
@@ -707,12 +2169,12 @@ version 1.11.3 Quetesh (2008-03-26):
   - helpdesk: fixed jump from quicksearch to requests searching module (alec)
   - hosting: added accounts searching module and quicksearch input (alec)
   - lmsd/ewx-stm: added 'excluded_networks' option (alec)
-  - helpdesk: added delete and print links on tickets searching results 
+  - helpdesk: added delete and print links on tickets searching results
     list (alec)
   - hosting: added aliases and domains searching modules (alec)
   - optimized not closed invoices list by documents.closed index addition (alec)
-  - lmsd/ewx-stm: added new options 'excluded_dummy_ip_networks' and 
-    'excluded_dummy_mac_networks', options 'dummy_mac_networks', 
+  - lmsd/ewx-stm: added new options 'excluded_dummy_ip_networks' and
+    'excluded_dummy_mac_networks', options 'dummy_mac_networks',
     'dummy_ip_networks' can contains asterisk for all networks selection (alec)
   - removed contrib/bin/lms-sendinvoices.diff as we're using Mail::Sender with
     smtp auth in lms-sendinvoices (alec)
@@ -728,14 +2190,14 @@ version 1.11.2 Neera (2008-01-23):
   - lmsd: when used with -q option crontab instances are skipped (alec)
   - lmsd/hostfile: better customergroups option handling (alec)
   - lmsd/hostfile: added options 'warn', 'warn_pub', 'warn_replace' for
-    warning flag support, 'public_replace' for better public IPs 
+    warning flag support, 'public_replace' for better public IPs
     handling and 'host_begin', 'host_end' for usability (alec)
   - cash receipts: added 'show_nodes_warning' and 'nodes_warning' in
     receipts section (alec)
   - rtmessageadd: fixed php_ui/debug_email empty value checking (chilan)
   - invoices: added option invoices/print_balance_history_save (alec)
   - receipts: positions adding with double click protection (alec)
-  - lmsd configuration: instances cloning (alec) 
+  - lmsd configuration: instances cloning (alec)
   - perl backend: excluded_networks parameter added (chilan)
   - added phpui/custom_menu option with possibility to add user-defined items
     and/or subitems to LMS menu (alec)
@@ -747,16 +2209,16 @@ version 1.11.2 Neera (2008-01-23):
   - added searching customers and printing customers list by nodes group (alec)
   - lmsd/hostfile: added 'nodegroups' option (alec)
   - lmsd/cutoff: added 'setnodegroup_only' option (alec)
-  - nodegroups: added prio field - we are be able to set nodegroups 
+  - nodegroups: added prio field - we are be able to set nodegroups
     order (chilan)
-  - mac sort moved from GetMACs() to choosemac dialog (sorting local mac 
+  - mac sort moved from GetMACs() to choosemac dialog (sorting local mac
     adresses with mac adresses received from arpd servers) (Mad Mark)
   - improved status/warning setting and group assigning in customer's nodes
     list - checkbox selection (alec)
   - added nodes groups list popups in customer's nodes list (alec)
   - added possibility to move members of one group to other group (alec)
   - lmsd/cutoff: fixed query for customers without tariffs (alec)
-  - lmsd/cutoff: balance limit can be set as percentage value of sum of monthly 
+  - lmsd/cutoff: balance limit can be set as percentage value of sum of monthly
     assignments (alec)
   - nodegrouplist: improved nodegroups UI movement ergonomy (chilan)
   - lms-sendinvoice: added smtp authorization, sending mail with Mail::Sender,
@@ -768,17 +2230,17 @@ version 1.11.2 Neera (2008-01-23):
   - added options 'show_nodegroups_warning' and 'nodegroups_warning' in
     [receipts] section (alec)
   - lmsd/cutoff: added 'disable_suspended' option (alec)
-  - lmsd/dhcp: added broadcast address (%b) variable in 'subnet_start' 
+  - lmsd/dhcp: added broadcast address (%b) variable in 'subnet_start'
     option (alec)
   - added improved traffic control module lmsd/tc-new (alec)
   - network devices: few functions optimized (alec)
   - network devices: added port numbers for links (alec)
-  - network devices: redesigned device's info/edit pages with 
+  - network devices: redesigned device's info/edit pages with
     show'n'hide boxes (alec)
   - network devices: show both (private and public) addresses in connected
     nodes box (alec)
   - lms-rtparser: BTS#0000719: fixed problem with string escaping (alec)
-  - lms-rtparser: use Mail::Sender (with authentication) instead of 
+  - lms-rtparser: use Mail::Sender (with authentication) instead of
     Net::SMTP, added options 'smtp_host', 'smtp_auth', 'smtp_user',
     'smtp_pass' (alec)
   - lmsd/tc-ng moved to contrib as deprecated (alec)
@@ -788,8 +2250,8 @@ version 1.11.2 Neera (2008-01-23):
   - lms-mgc: added %PORT variable in nodes rules (alec)
   - added SQL functions mask2prefix() and broadcast() (alec)
   - added IMMUTABLE flag for inet_ntoa/inet_aton functions on postgres (alec)
-  - networks: few functions optimized (alec)  
-  - documents: hide exluded customers groups on documents list (alec) 
+  - networks: few functions optimized (alec)
+  - documents: hide exluded customers groups on documents list (alec)
 
 version 1.11.1 Talus (2007-12-03):
 
@@ -802,26 +2264,26 @@ version 1.11.1 Talus (2007-12-03):
     configuration is readed from database and can be set in UI (alec)
   - excluded groups: don't show excluded groups on filters (alec)
   - excluded groups: works in modules from menu Finances (alec)
-  - in Finances -> Raports -> Transfer forms balance value can be entered 
+  - in Finances -> Raports -> Transfer forms balance value can be entered
     with . or , sign (alec)
   - invoices list: fixed sorting by items count (alec)
   - fixed SQL query in Mailing (alec)
   - pdf invoices: added page numbers, invoices can have many positions -
     added page breaking, using ezpdf tables (alec)
-  - lmsd/payments: added options 'networks', 'customergroups', 
+  - lmsd/payments: added options 'networks', 'customergroups',
     'numberplan' (alec)
   - added numbering plan filter to Sale Registry report (alec)
   - added customer groups filter to Cash Report (alec)
   - added customer groups filter to Finances/Reports/Transfer Forms (alec)
-  - added customer groups and numberng plan filter to 
+  - added customer groups and numberng plan filter to
     Finances/Reports/Invoices  (alec)
-  - helpdesk: fixed attachments removing when deleting tickets and 
-    messages (alec) 
+  - helpdesk: fixed attachments removing when deleting tickets and
+    messages (alec)
   - new invoice settlement date checking takes numbering plan into
     consideration (alec)
   - fix: customers assignments addition and edition moved from
     "customers management" privilege to "finances management" (alec)
-  - in config_defaults.ini added all options described in 
+  - in config_defaults.ini added all options described in
     configlist.php (alec)
   - BTS#0000690: documents viewing allowed in 'customers management'
     access right (alec)
@@ -838,7 +2300,7 @@ version 1.11.1 Talus (2007-12-03):
   - added user's position field (alec)
   - optimized Invoices List sql query (25% faster) (alec)
   - Cash Import: added support for many import patterns, added 'use_line_hash',
-    'pid_regexp', pinvoice_month' and 'comment_replace' pattern parameters, 
+    'pid_regexp', pinvoice_month' and 'comment_replace' pattern parameters,
     added not matching lines printing (alec)
   - lms-traffic-htbiptlimits: fixed tc class identifiers (alec)
   - lmsd/payments: fixed 'customergroups' and 'networks' option, added options
@@ -851,7 +2313,7 @@ version 1.11.1 Talus (2007-12-03):
   - invoices: added link Save in invoice(note) edit/add forms (alec)
   - invoices: added possibility to select original/copy/duplicate when
     creating/editing an invoice(note) with Save & Print (alec)
-  - invoices: after invoice addition/edition redirecting to invoices list 
+  - invoices: after invoice addition/edition redirecting to invoices list
     or to empty new invoice form (alec)
   - helpdesk: added info about ticket creator in ticket info (alec)
   - BTS#0000705: lmsd/dhcp: fixed default value of 'subnet_domain' option (alec)
@@ -862,7 +2324,7 @@ version 1.11.1 Talus (2007-12-03):
   - BTS#0000706: fixed query in Finances/Reports/Network Balance Sheet (alec)
   - added option invoices/default_printpage (alec)
   - improved GetNumberPlans() function (alec)
-  - removed unused GetNumberPlans() function calls in cash receipts 
+  - removed unused GetNumberPlans() function calls in cash receipts
     interface (alec)
   - increased speed of customer searching with choosecustomer.php (alec)
   - added tariffs list sorting (alec)
@@ -875,7 +2337,7 @@ version 1.11.1 Talus (2007-12-03):
   - optimized node edition (alec)
   - deleting node-to-tariff assignment when owner is changing (alec)
   - custom_accesstable file can be anywhere - requires absolute path (alec)
-  
+
 version 1.11.0 Thoth (2007-08-17):
 
   - common pdf functions and initialization moved to lib/pdf.php (alec)
@@ -889,7 +2351,7 @@ version 1.11.0 Thoth (2007-08-17):
   - cash import: when customer is known don't show selection field,
     added $modvalue configuration variable, code cleanup, transactions
     support (alec)
-  - when customer wasn't found in quick customer search do redirect to 
+  - when customer wasn't found in quick customer search do redirect to
     customer search module with filled zip and city fields  (alec)
   - fixed few problems with apostrophe sign in tariffs names (alec)
   - optimized query speed of cash registries list (alec)
@@ -897,22 +2359,22 @@ version 1.11.0 Thoth (2007-08-17):
   - lmsd/payments: added %month and %year variables for comment (alec)
   - cash receipts: BTS#0000673 - cash receipts of type 'other' and
     'advance' included in balance sheet (alec)
-  - customers list: fixed sorting by balance when balance is NULL 
+  - customers list: fixed sorting by balance when balance is NULL
     (customers without cash operations) (alec)
-  - added transactions for deleting (customer, node, etc.) 
+  - added transactions for deleting (customer, node, etc.)
     operations (alec)
-  - tariffs: fixed data limit feature (alec)    
+  - tariffs: fixed data limit feature (alec)
 
 version 1.9.8 Idos (2007-07-12):
 
   - changed DB driver version format (alec)
   - lmsd: added %i16 variable for IP's last octet heximal representation
-    in tc/tc-ng and %i16 and %i16pub in hostfile module (alec) 
+    in tc/tc-ng and %i16 and %i16pub in hostfile module (alec)
   - mysql driver: server version checking only when connected (alec)
   - fixed problem when invoicing without tax rates defined (alec)
   - renamed tariffdelete.php to tariffdel.php according to modules naming
     convention (alec)
-  - helpdesk: added 'include contact info' checkbox for requests list 
+  - helpdesk: added 'include contact info' checkbox for requests list
     printing (alec)
   - lms-traffic-logiptables: iptables 1.3.7 support (alec)
   - mac fields should accept now every mac format, including windows, cisco,
@@ -937,7 +2399,7 @@ version 1.9.8 Idos (2007-07-12):
   - removed unused SetTS() calls and table 'timestamps' (alec)
   - fixed problem with 'events' table's sequence on postgres (alec)
   - added month and year selection fields on Timetable (alec)
-  - stats: database compacting with cron eg.: links -dump 
+  - stats: database compacting with cron eg.: links -dump
     "http://lms/?m=trafficdbcompact&level=low&removeold=1&removedeleted=1
     &loginform[login]=login&loginform[pwd]=pass&override=1" (alec)
   - PIN code field cannot be empty now (alec)
@@ -950,19 +2412,19 @@ version 1.9.8 Idos (2007-07-12):
     without tariff assignments (alec)
   - added 'mysqli' database driver (alec)
   - Customer Info: added descriptions for contact phones, not limited number of
-    phones for each customer, now numbers are stored in 'customercontacts' 
+    phones for each customer, now numbers are stored in 'customercontacts'
     table (alec)
-  - lmsd/parser: removed phone1, phone2, phone3 subvariables of 
+  - lmsd/parser: removed phone1, phone2, phone3 subvariables of
     CUSTOMERS constant (alec)
   - lms-notify: removed %phone variable (alec)
   - lms-notify-sms: removed %phone variable (alec)
- 
+
 version 1.9.7 Thalan (2007-05-09):
 
   - cash receipts: added target 'advance' (alec)
   - cash receipts: changed registry privilages system (alec)
   - cash receipts: added 'Save' link - saving receipts without printing (alec)
-  - choosecustomer: removed not needed WHERE conditions in customer 
+  - choosecustomer: removed not needed WHERE conditions in customer
     select window, rewrited query for MySQL 5.0, now is 20-100 times faster (alec)
   - we can move customers from one tariff to another filtering it by network (chilek)
   - optimized Customers List generation time when using filters (alec)
@@ -976,7 +2438,7 @@ version 1.9.7 Thalan (2007-05-09):
   - helpdesk: added customer info in ticket view (alec)
   - helpdesk: added option 'helpdesk_customerinfo' (alec)
   - helpdesk: sending notifications when ticket's queue has changed and option
-    'newticket_notify' is set (alec) 
+    'newticket_notify' is set (alec)
   - lms-payments, lmsd/payments: fixed problem with discounts invoicing (alec)
   - traffic filter: we can filtering stats by customer (chilek)
   - added index customerid on table documents (alec)
@@ -1003,7 +2465,7 @@ version 1.9.7 Thalan (2007-05-09):
   - lms-makeiptables: added DNAT rules for public IPs (alec)
   - fixed some remote file inclusion vulnerabilities when register_globals
     is enabled (alec)
-  - cash registry: added cash history for information about periodic 
+  - cash registry: added cash history for information about periodic
     cash summary state e.g. daily cash state (alec)
   - added .htaccess files in /lib and /modules dirs (alec)
   - Romanian language support (zet/alec)
@@ -1012,7 +2474,7 @@ version 1.9.7 Thalan (2007-05-09):
   - many Internet Messengers (GG, Skype, Yahoo) in customer's data (zet/alec)
   - fixed customers searching by address in quick search module (alec)
   - fixed %UID4 in cash documents export (alec)
-  - cash receipts: BTS#0000651: better credit notes treating in list of 
+  - cash receipts: BTS#0000651: better credit notes treating in list of
     not accounted invoices (alec)
   - node link type can be set while node addition and edition (alec)
   - helpdesk: added queue filter on Requests List (chilek/alec)
@@ -1024,13 +2486,13 @@ version 1.9.6 Belos (2007-02-16):
   - project's homepage changed to www.lms.org.pl (lukasz)
   - now is possible to define password for device's IP (alec)
   - added nodes list (and report) filtering by customer's group (alec)
-  - cash receipts: added document's positions clearing when customer 
-    is changing (alec) 
+  - cash receipts: added document's positions clearing when customer
+    is changing (alec)
   - lms-traffic-logiptables: added 'networks' option (alec)
   - BTS#0000625: one-address DHCP ranges allowed (alec)
   - lmsd: don't save config.status when using configure script
     with option --help (alec)
-  - BTS#0000603: lmsd: instance names with spaces works with -i option (alec)  
+  - BTS#0000603: lmsd: instance names with spaces works with -i option (alec)
   - BTS#0000594: clickable gateway record when selecting IP for network
     device's IP (alec)
   - cash receipts: 'other' target name is required now (alec)
@@ -1065,8 +2527,8 @@ version 1.9.5 Tagar (2007-02-05):
   - fixed customers list filtering (alec)
   - common.js: fixed syntax error in openWindow function (chilek/grzes)
   - traffic.php: missed translatable 'unknown' string for node (chilek)
-  - added workaround for ILIKE's unicode bug (postgresql < 8.2) in invoices list 
-    searching by customer's name and address (alec) 
+  - added workaround for ILIKE's unicode bug (postgresql < 8.2) in invoices list
+    searching by customer's name and address (alec)
   - nowadays max. bandwidth 4096kbit/s for customer is not so excellent, so
     bandwidth limit has been increased to 10000kbit/s aka 10Mbit/s (chilek)
   - added 'big_networks' support in Reports forms (alec)
@@ -1082,7 +2544,7 @@ version 1.9.4 Mot (2006-12-30):
 
   - fixed upgrade scripts for PostgreSQL versions that do not support
     "ALTER TABLE ... ADD ... NOT NULL DEFAULT ...": 2006061200, 2006082300,
-    2006081000 (alec) 
+    2006081000 (alec)
   - added document type "customer sheet" and "contract termination" (alec)
   - BTS#0000599: patched xajax library for using it with other ajaxized stuff (alec)
   - in documents creation numbering plans are binded with document types (alec)
@@ -1090,12 +2552,12 @@ version 1.9.4 Mot (2006-12-30):
   - BTS#0000602: don't hide disposable liabilities for current day (alec)
   - printing customer's groups in new/edit cash receipt form (alec)
   - now we can display to cashier warnings about unconfirmed documents and
-    customer's notes with [receipts] options 'show_notes' and 
-    'show_documents_warning' (alec)  
+    customer's notes with [receipts] options 'show_notes' and
+    'show_documents_warning' (alec)
   - fixed helpdesk tickets searching (alec)
   - added 'MAC checking' checkbox in nodes and device's IPs data (alec)
   - in new receipt interface on covenants list printing also credit notes (alec)
-  - added option 'big_networks' for hidding some big ISP's specific stuff like 
+  - added option 'big_networks' for hidding some big ISP's specific stuff like
     e.g. long selection dropdowns (alec)
   - big_networks support in forms: helpdesk ticket new/edit, document add,
     invoice new/edit, cash receipts add/edit (alec)
@@ -1104,15 +2566,15 @@ version 1.9.4 Mot (2006-12-30):
   - fixed nodes searching with 'OR' operator (alec)
   - printing page generation time (alec)
   - EtherWerX support: added option phpui/ewx_support, node's ID should be less
-    than 99999 (alec) 
+    than 99999 (alec)
   - lms-cutoff: added %b and %B variables in message (alec)
   - added helpdesk request's cause field (alec)
   - added option 'short_pagescroller' for lists with many pages (alec)
   - added indexes: rttickets.createtime and rttickets.customerid (alec)
-  - added helpdesk requests causes stats - helpdesk_stats option (alec) 
+  - added helpdesk requests causes stats - helpdesk_stats option (alec)
   - menus Printing renamed to Reports (alec)
   - added Helpdesk -> Reports -> List of Requests and Requests Stats (alec)
-  - recovered Delete button in customer's balance list: option 
+  - recovered Delete button in customer's balance list: option
     phpui/delete_link_in_customerbalancebox (alec)
   - added daemon's tc-ng module supporting node-to-tariff assignments (alec)
   - added possibility to create invoices for past invoiceless liabilities (alec)
@@ -1129,7 +2591,7 @@ version 1.9.3 Zarin (2006-09-19):
   - lmsd/parser: fixed T-Script's problem with big numbers (alec)
   - lmsd/parser: support for multiple +, -, *, / operators in expression (alec)
   - added shortcut icon definition in page header (alec)
-  - added Business Registration Number (polish REGON), Identity Card Number 
+  - added Business Registration Number (polish REGON), Identity Card Number
     (polish dow.os.) and Register of Business Entities Number (polish EDG/KRS)
     fields in customer data (alec)
   - accounts must have unique logins in domain context only (alec)
@@ -1142,12 +2604,12 @@ version 1.9.3 Zarin (2006-09-19):
   - BTS#0000586: fixed summary on Customers List when using some filters (alec)
   - BTS#0000589: fixed customers searching by create/delete dates (alec)
   - nodes with tariffs assignments - UI only (alec)
-  - increased performance: using LAST_INSERT_ID/CURRVAL functions instead of 
+  - increased performance: using LAST_INSERT_ID/CURRVAL functions instead of
     e.g. SELECT MAX(id) after insert (alec)
-  - BTS#0000467 lms-arping: setting lastonline time after scanning, not at 
+  - BTS#0000467 lms-arping: setting lastonline time after scanning, not at
     the end of script execution (alec)
   - added %cid variable in lms-notify and lms-notify-sms (alec)
-  - BTS#0000591: fixed problems with octet-format mask in IP checking 
+  - BTS#0000591: fixed problems with octet-format mask in IP checking
     procedures for 'allow_from' option and users authorization (alec)
   - improved getnetaddr(), and getbraddr() functions (alec)
   - added Sale Registry in "extended" format (alec)
@@ -1156,8 +2618,8 @@ version 1.9.3 Zarin (2006-09-19):
   - all nodes and devices can share '00:00:00:00:00:00' MAC address even
     with disabled 'allow_mac_sharing' option (alec)
   - awaiting customers can have nodes (alec)
-  - Smarty integration: LMS's smarty addons rewrited to plugins in 
-    lib/Smarty/plugins, removed option 'smarty_dir', now Smarty will be included 
+  - Smarty integration: LMS's smarty addons rewrited to plugins in
+    lib/Smarty/plugins, removed option 'smarty_dir', now Smarty will be included
     in LMS packages (alec)
     ************ WARNING: remove contents of templates_c directory! ************
   - added 'post-action' in document templates (alec)
@@ -1168,8 +2630,8 @@ version 1.9.3 Zarin (2006-09-19):
   - design changes in customers and nodes information windows (alec)
 
 version 1.9.2 Thanos (2006-07-15):
-  
-  - added possibility to read customer's own iban bank account number from 
+
+  - added possibility to read customer's own iban bank account number from
     ui (lexx)
   - added 'set names utf8;' for connection to mysql >= 5.0 (lexx)
   - added input field for cust. ID on New Cash Document (alec)
@@ -1200,7 +2662,7 @@ version 1.9.2 Thanos (2006-07-15):
     special characters (\\, \", \r, \n, \t) in string literals
     escaping brackets in plain text using backslashes (\{, \})
     ignoring tabs at the beginning of text lines - allowing indents
-    len command in string extension 
+    len command in string extension
   - modularity: added example modules 'traffic', 'users' and 'auth' with use of plaugins
     and new access rights management method, core consist only core actions, added 'init', 'end'
     and 'install' core actions, and many other changes (alec)
@@ -1223,7 +2685,7 @@ version 1.9.1 Jumar (2006-02-13):
 
   - BTS#0000488: fixed title on nodes list printout (alec)
   - BTS#0000487: fixed printing from Invoices List (alec)
-  - BTS#0000486: added duplicate and fixed invoices printing in 
+  - BTS#0000486: added duplicate and fixed invoices printing in
     Finance -> Print -> Invoices (alec)
   - added submit button in genfake interface (alec)
   - fixed solid payments accounting (alec)
@@ -1244,7 +2706,7 @@ version 1.9.1 Jumar (2006-02-13):
   - added customers searching by creation or deletion dates (alec)
   - fixed credit notes printing from customer balance box (alec)
   - lms-rtparser: added support for multipart/alternative messages, fixed
-    problem with attachements with spaces and unknown/forbidden characters 
+    problem with attachements with spaces and unknown/forbidden characters
     in filename (alec)
   - cash documents extended numbering (alec)
   - changed look of balance lists: columns Liability, Income, Expense (alec)
@@ -1260,10 +2722,10 @@ version 1.9.1 Jumar (2006-02-13):
   - added reduction/enhancement summary on credit notes (alec)
   - in customernodesbox added link to node's network (alec)
   - using 4th argument of Smarty's truncate function (alec)
-  - changed/improved financial documents settlement for multiuser 
+  - changed/improved financial documents settlement for multiuser
     environment (alec)
   - automatic columns width setting on pdf invoices (alec)
-  - new customers searching popup form in cash receipts and 
+  - new customers searching popup form in cash receipts and
     invoices interface (alec)
   - new method of selected customer representation in invoices
     and cash receipts interface (alec)
@@ -1284,16 +2746,16 @@ version 1.9.0 Tilgath (2005-12-07):
   - added link to customer stats in customer info page (alec)
   - BTS#0000471: fixed 'Tickets' link in customerinfo box (alec)
   - fixed summary on customer search results list (alec)
-  - lmsd/parser: multiple logical expressions ("a && b && c" etc.) 
+  - lmsd/parser: multiple logical expressions ("a && b && c" etc.)
     supported, multiple instructions in one block supported - using
     semicolon (alec)
   - few fixes for very long customer names on pdf invoices and UI (alec)
   - fixed NetworkRemap() function when destination network is empty (alec)
   - changed link on nodes list in network info to node info instead of
     customerinfo (alec)
-  - don't compress network when changing network address, user must 
+  - don't compress network when changing network address, user must
     do commpression by himself (alec)
-  - standardised sorting of transfer forms and invoices printouts (alec) 
+  - standardised sorting of transfer forms and invoices printouts (alec)
   - BTS#0000481: fixed translation on transfer forms (alec)
   - invoices list display speed optimized (alec)
   - example invoices/cash records generation in genfake module (alec)
@@ -1304,7 +2766,7 @@ version 1.9.0 Tilgath (2005-12-07):
   - added invoice duplicates printing (alec)
   - fixed customer balance list sorting on invoice (alec)
   - added default value of 'print_balance_history_limit' option (alec)
-  - lmsd/parser: updated tscript library: fixed types conversion, 
+  - lmsd/parser: updated tscript library: fixed types conversion,
     added "exit" and "foreach" instructions (alec)
   - fix: do customers accounting (with "Account" link) at "Has" side (alec)
   - lmsd/parser: added "syslog" extension (alec)
@@ -1313,7 +2775,7 @@ version 1.7.6 Grannus (2005-11-10):
 
   - disposable liabilities (alec)
   - introduction to UI modularity (lukasz)
-  - use HTTP_X_FORWARDED_FOR, HTTP_CLIENT_IP, REMOTE_ADDR to retrive 
+  - use HTTP_X_FORWARDED_FOR, HTTP_CLIENT_IP, REMOTE_ADDR to retrive
     user IP address (Jerzy Kolosowski)
   - added Finance -> Printing -> Transfer forms (alec)
   - fixed problem with access rights to transferforms modules (alec)
@@ -1324,7 +2786,7 @@ version 1.7.6 Grannus (2005-11-10):
 version 1.7.5 Shaq-ran <broken version> (2005-11-05):
 
   - BTS#0000466: lms-antyvir: fixed parse error (alec)
-  - BTS#0000373: lms-notify: added exception handler for mail server 
+  - BTS#0000373: lms-notify: added exception handler for mail server
     connection problems (alec)
   - changed stats units to kbps (alec)
   - added traffic stats in node information window (alec)
@@ -1333,14 +2795,14 @@ version 1.7.5 Shaq-ran <broken version> (2005-11-05):
 version 1.7.4 Wraith (2005-10-31):
 
   - BTS#0000451: lms-rtparser uses also CC: header to get queue ID (alec)
-  - BTS#0000455: documentation fixed options names 
+  - BTS#0000455: documentation fixed options names
     usergroups -> customergroups (alec)
   - lmsd/dhcp: fixed problem with hosts with public IP (alec)
   - lmsd/parser: updated tscript library - added "break" and "continue"
     instructions in "for" and "while" loops (alec)
-  - added "type" in cash table to handle some operation types 
+  - added "type" in cash table to handle some operation types
     (cash, non-cash) - it fixes network balance calculations for
-    backward compatybility and lost in 2005092900 database upgrade 
+    backward compatybility and lost in 2005092900 database upgrade
     additional functionality (alec)
   - contrib/sqlpanel: design fixes (alec)
   - forms can be submitted by Enter (lukas)
@@ -1352,10 +2814,10 @@ version 1.7.4 Wraith (2005-10-31):
   - added last 10 not accounted invoices list in cash receipt addition
     form (alec)
   - lmsd: added option --reload-all (alec)
-  - BTS#0000391: lmsd: fixed problem with long executed (sleeping) 
+  - BTS#0000391: lmsd: fixed problem with long executed (sleeping)
     instances (alec)
   - added tip with IP address on nodes list in network info page (alec)
-    
+
 version 1.7.3 Inubis (2005-10-05):
 
   - contrib/customer: removed directories checking (alec)
@@ -1366,12 +2828,12 @@ version 1.7.3 Inubis (2005-10-05):
     finances revolution: removed prepayments, unpaid covenants,
     any cash references and related features,
     invoices can't be paid, but only can be checked as accounted
-    added filter 'hide accounted' on Invoices List (alec) 
+    added filter 'hide accounted' on Invoices List (alec)
     **********************************************************************
   - fixed round-off method on Invoices Report (alec)
   - daemon configuration moved to menu Configuration (alec)
   - changed table name 'daemonhosts' to 'hosts' (alec)
-  - lmsd/parser: changed tscript's API, added extensions: deletefile, 
+  - lmsd/parser: changed tscript's API, added extensions: deletefile,
     readfile, getfile, listdir, fileexists, date, replace, systype (alec)
   - Credit Notes - WARNING! Invoice templates has been changed (alec)
   - Cygwin support for lmsd (lexx)
@@ -1396,7 +2858,7 @@ version 1.7.3 Inubis (2005-10-05):
   - lmsd: added while() and operators <<, >> and leftside --, ++ (alec)
   - ***********************************************************************
     finances revolution: droped 'type' column from 'cash' table, now we're
-    using signed values, redesigned balance lists: using signed values instead 
+    using signed values, redesigned balance lists: using signed values instead
     of type (alec)
     ***********************************************************************
   - on New Operation added last operation info with [Delete] link (alec)
@@ -1406,13 +2868,13 @@ version 1.7.3 Inubis (2005-10-05):
   - added customer's traffic raport - Stats -> Printing (alec)
   - BTS#0000453: lms-payments fixed problem with discount (alec)
   - BTS#0000453: lmsd/payments: fixed problem with discount and itemid (alec)
-    
+
 version 1.7.2 Doci (2005-08-13):
 
   - in Mailing added replacement variables (alec)
   - in Nodes List added network and status filtering (alec)
   - in Nodes -> Print added network filter (alec)
-  - in Balance Sheet and Customer Balance added dynamic popups with invoice 
+  - in Balance Sheet and Customer Balance added dynamic popups with invoice
     and receipt numbers (alec)
   - lms-payments: fixed unwanted params binding in DBI's execute method (alec)
   - fixed tax calculations on Sale Registry (alec)
@@ -1469,7 +2931,7 @@ version 1.7.1 Swarog <A.L.E.C's Nightmare> (2005-06-27):
   - added warning about lack of PEAR::Mail in SendMail() function (alec)
   - fixed nodes searching results list - nodes with ID=0 (alec)
   - lmsd/system: added option 'sql' (alec)
-  - in nodes and customers searching added workaround for postgresql's ILIKE 
+  - in nodes and customers searching added workaround for postgresql's ILIKE
     problem with national characters (alec)
   - lmsd/dns: networks can share the same domain name (alec)
   - lms-notify: added option 'mailcharset' with default setting 'UTF-8' (alec)
@@ -1498,7 +2960,7 @@ version 1.7.1 Swarog <A.L.E.C's Nightmare> (2005-06-27):
   - BTS#0000360: tickets adding in customer context (alec)
   - bugfix: going to backup view by clicking on record on backup list (alec)
   - SQLite support: fixed upgradedb scripts, added iconv support, added
-    sample/sqlite_createdb.php script for database creation without any 
+    sample/sqlite_createdb.php script for database creation without any
     of sqlite client applications (alec)
   - lms-payments: again tariff value can be less than zero (alec)
   - fixed customer name capitalization on contract (alec)
@@ -1516,8 +2978,8 @@ version 1.7.1 Swarog <A.L.E.C's Nightmare> (2005-06-27):
     *  Changed 'pkwiu' to 'prodid' in 'tariffs' and 'invoicecontents'  *
     *               Tax rates moved to table 'taxes'                   *
     ********************************************************************
-  - Finances -> Tax Rates - user-defined tax rates (alec)    
-  - automatic generation of bank account number (iban format) to use with 
+  - Finances -> Tax Rates - user-defined tax rates (alec)
+  - automatic generation of bank account number (iban format) to use with
     automatic identification of massive payments (lexx)
   - added 'assign' argument for _smarty_function_sum() (alec)
   - added dberrors displaying on login form (alec)
@@ -1532,7 +2994,7 @@ version 1.7.1 Swarog <A.L.E.C's Nightmare> (2005-06-27):
   - lmsd: added -fPIC flag for x86-64 arch. compat. (alec)
   - changed defaults of customerlist_pagelimit and nodelist_pagelimit
     to '100' (alec)
-    
+
 version 1.7.0 Klorel (2005-05-13):
 
   - lmsd/ethers: fixed output file format (alec)
@@ -1542,12 +3004,12 @@ version 1.7.0 Klorel (2005-05-13):
   - lmsd: added option --inifile to ./configure script for configuration files
     support (alec)
   - lmsd: added command line option '-f' to run in foreground (without fork),
-    fixed reload of instances with empty crontab on every minute, write last 
+    fixed reload of instances with empty crontab on every minute, write last
     reload time to database if reload was ordered, fixed problem with
     zombies (alec/G.Stanislawski)
   - BTS#0000338: can specify network device while node addition (alec)
   - lmsd: fixed -h option segfault (alec)
-  - on customers list added nodes online status and icon for nodes connection 
+  - on customers list added nodes online status and icon for nodes connection
     status change (alec)
   - additional filters for Customer Search, searching in service address (alec)
   - most of icons resized to 16x16 (alec)
@@ -1559,9 +3021,9 @@ version 1.7.0 Klorel (2005-05-13):
   - lms-squid: changed/fixed lms.ini section name to [redirector] (alec)
   - removed old contrib/squid_warnings (alec)
   - added option custom_accesstable for user-defined access rights (alec)
-  - fixed devices desc on map when device has no IP, now device lastonline 
+  - fixed devices desc on map when device has no IP, now device lastonline
     status is getting from all connected nodes lastonline value (alec)
-  - BTS#0000340: option [Account] on customer list accounts all customer's 
+  - BTS#0000340: option [Account] on customer list accounts all customer's
     covenants including invoices (alec)
   - added contrib/bin/lms-antyvir (alec/wojtek_sw)
   - added contrib/bin/lms-debtors (alec)
@@ -1573,7 +3035,7 @@ version 1.7.0 Klorel (2005-05-13):
     escaping for parameters of db_pexec() and db_pquery() functions (alec)
   - lmsd: configure create config.status script (alec)
   - lmsd: `make install` moves modules to PREFIX/lms/lib and program to
-    PREFIX/lms/bin, in configuration modules can be set without path or 
+    PREFIX/lms/bin, in configuration modules can be set without path or
     extension (alec)
   - force logout after timeout /http-equiv=refresh/ (alec)
   - fixed access denied window in dynamic popups (alec)
@@ -1620,11 +3082,11 @@ version 1.5.6 Baal (2005-04-24):
   - BTS#000327: in lms-reminder added negative values of daylight saving time
     for time functions acc. to PHP functions (alec)
   - added balance and tariff summary on customers list printout (alec)
-  - lms-sendinvoices: fixed message and attachement charset/encoding, added 
+  - lms-sendinvoices: fixed message and attachement charset/encoding, added
     reading of invoice type configuration option from database (alec)
   - while adding or searching tickets in helpdesk customer ID can be
     specified instead of selecting customer from the list (alec)
-  - nodes and customers search results (if they are lists) can be displayed 
+  - nodes and customers search results (if they are lists) can be displayed
     in printer-friendly format (alec)
   - little (?) layout revolution (inspired by lexx and kondi) (lukasz)
   - fixed total tax summary on Sale Report (alec)
@@ -1650,19 +3112,19 @@ version 1.5.6 Baal (2005-04-24):
   - fixed liabilities report (bugy Smarty's math) and added customer ID (alec)
   - lmsd/traffic: fixed sequence of data while reading log file (alec)
   - sample/traffic_ipt.sh replaced by sample/traffic_ipt.pl (alec)
-    
+
 version 1.5.5 Anubis (2005-03-25):
 
-  - fixed empty page printing on invoices when trying to print only 
+  - fixed empty page printing on invoices when trying to print only
     originals or only copies (alec)
   - fixed encoding conversion of some strings on pdf invoices (peter/alec)
-  - index.php: localization before uiconfig reading, to have proper encoding 
+  - index.php: localization before uiconfig reading, to have proper encoding
     in configuration options if we use server_encoding != unicode (alec)
   - contrib/customer_otherip: changed login.html to customerlogin.html because
     of conflict with templates/login.html in Smarty cache (alec)
-  - size reduction of LMS main class, some one-time functions moved to 
+  - size reduction of LMS main class, some one-time functions moved to
     modules i.e. Mailing(), Traffic() (alec)
-  - added basic (without group checking) body of check_ssn() function for 
+  - added basic (without group checking) body of check_ssn() function for
     'en' locale (alec)
   - contrib/formularz_przelewu_wplaty(_2): fixed encoding and bug with empty
     page (alec)
@@ -1679,7 +3141,7 @@ version 1.5.5 Anubis (2005-03-25):
   - added index on tariffid column in assignments table (alec)
   - BTS#0000284: user login is unique and can't be reused - changed content
     of warning message (alec)
-  - added 'in debt', 'deleted' and 'disconnected' filters for mailing (alec) 
+  - added 'in debt', 'deleted' and 'disconnected' filters for mailing (alec)
   - contrib/customer_otherip: invoices printing (alec)
   - fixed floats formatting in AddBalance() for non-english locale (.PaKuD)
   - fixed month and year in invoice number in 'setcustomer' action of file
@@ -1699,21 +3161,21 @@ version 1.5.5 Anubis (2005-03-25):
   - we can pay invoices in userbalancebox (chilek)
   - new session management using database backend, also authorization has been
     put into separate class (lukasz)
-  - BTS#0000308: added lost customer's groups table while adding new node for 
+  - BTS#0000308: added lost customer's groups table while adding new node for
     a customer (alec)
   - added support for dynamic tooltips (lexx)
   - netdevmap in flash (requires ming) (lexx)
-  - added Finances -> Print -> Covenants Realization Report (alec)  
+  - added Finances -> Print -> Covenants Realization Report (alec)
   - new layout for menu (lukasz)
   - ip address selection divided to pages (chilek)
   - if we find only one customer we will redirect to his info (chilek)
   - almsd/dhcp,oident,ethers: changed defaults of 'file' and 'command'
     options (alec)
   - translated to english almost entire documentation (kondi/alec)
-  - database backups can be restored only on system version according 
+  - database backups can be restored only on system version according
     with database version where backup was created (alec)
-  - added contrib/squid_redirector which extends capabilities of squid_warnings 
-    (enable/disable nodes access to squid), and marking squid_warnings as 
+  - added contrib/squid_redirector which extends capabilities of squid_warnings
+    (enable/disable nodes access to squid), and marking squid_warnings as
     obsolete (lexx)
   - BTS#0000315: remove assignments in customer delete function (alec/WiktorRB)
   - page headers have been removed (chilek)
@@ -1723,7 +3185,7 @@ version 1.5.5 Anubis (2005-03-25):
   - notifications about new tickets in UI and lms-rtparser (chilek/alec)
   - proper char encoding in mail notifications (chilek)
   - added confirm. dialog for generation of new PIN and node's password (alec)
-  - added "Notices" privilage for helpdesk queues (alec) 
+  - added "Notices" privilage for helpdesk queues (alec)
 
 version 1.5.4 Ramius (2005-02-16):
 
@@ -1731,12 +3193,12 @@ version 1.5.4 Ramius (2005-02-16):
     tłumaczenie na język polski, zmieniono nazewnictwo: użytkownicy -> klienci,
     administratorzy -> użytkownicy, język jest odczytywany z ustawień
     przeglądarki, a może być także ustawiony poprzez opcję 'lang', zmieniono
-    kodowanie danych i interfejsu na UTF-8, trwają prace nad tłumaczeniem 
+    kodowanie danych i interfejsu na UTF-8, trwają prace nad tłumaczeniem
     dokumentacji (alec/lexx/maniac/chilek i inni)
-  - zmiana opcji 'userlist_pagelimit' na 'customerlist_pagelimit' (alec) 
+  - zmiana opcji 'userlist_pagelimit' na 'customerlist_pagelimit' (alec)
   - poprawiony błąd przy usuwaniu opłaty stałej powodujący usunięcie opłaty
     bez potwierdzenia (alec)
-  - dodana opcja konfiguracyjna (phpui -> lang_debug) która pozwala na 
+  - dodana opcja konfiguracyjna (phpui -> lang_debug) która pozwala na
     wyświetlanie w popupie brakujących ciągów w tłumaczeniach (lexx)
   - poprawiony błąd na liście użytkowników wyszukanych powodujący ignorowanie
     braku potwierdzenia przy rozliczaniu użytkownika (alec)
@@ -1759,7 +3221,7 @@ version 1.5.4 Ramius (2005-02-16):
   - BTS#0000282: lms-rtparser: w polu 'Do:' potwierdzenia wstawiamy tylko
     adres email bez nazwy konta zgłaszającego (rejmer/alec)
   - BTS#0000274: Nie można przypisać komputerowi adresu gatewaya (alec)
-  - usunięty błąd powodujący złe rozpoznawanie adresu sieci i broadcastu na 
+  - usunięty błąd powodujący złe rozpoznawanie adresu sieci i broadcastu na
     liście hostów w danej sieci, jeśli lista ta była na więcej niż jednej
     stronie (alec)
   - poprawiony błąd w skrypcie lms-notify oraz modułach almsd notify i ggnotify
@@ -1785,9 +3247,9 @@ version 1.5.4 Ramius (2005-02-16):
     wraz z opisem, np. "plik.html:Umowa Test, plik2.html:Umowa Standard" (alec)
   - lms-sendinvoices: dodana opcja --fakedate (alec)
   - dodano możliwość wydruku listy użytkowników z bilansem na dany dzień (alec)
-  - na bilansie użytkownika oraz bilansie sieci dodano możliwość wydruku 
+  - na bilansie użytkownika oraz bilansie sieci dodano możliwość wydruku
     oryginałów/kopii wybranych faktur (alec)
-  - lms-payments (almsd/payments): jednej pozycji na fakturze odpowiada 
+  - lms-payments (almsd/payments): jednej pozycji na fakturze odpowiada
     dokładnie jedno obciążenie, także wtedy gdy pozycja składa się z wielu
     podpozycji/taryf (alec)
   - edycja i usuwanie faktur (lexx)
@@ -1804,12 +3266,12 @@ version 1.5.4 Ramius (2005-02-16):
 
 version 1.5.3 Nirrti (2004-12-16):
 
-  - w polu email przy dodawaniu/edycji użytkownika można wpisać tylko jeden 
+  - w polu email przy dodawaniu/edycji użytkownika można wpisać tylko jeden
     adres, dodane sprawdzenie poprawności tego adresu (alec)
   - poprawiona walidacja PINu przy dodawaniu użytkownika (alec)
   - poprawione sprawdzanie poprawności loginu i domeny konta (alec)
   - możliwość zmiany opcji konfiguracyjnych z sekcji [phpui] i [invoices]
-    w interfejsie użytkownika (menu Administracja -> Konfiguracja), więcej 
+    w interfejsie użytkownika (menu Administracja -> Konfiguracja), więcej
     w dokumentacji: Rozdział 3.2.5. (alec)
   - contrib/formularz_przelewu_wplaty: dwa druki na stronie i inne drobne
     poprawki (J.Krzymin/alec)
@@ -1824,19 +3286,19 @@ version 1.5.3 Nirrti (2004-12-16):
   - edycja zobowiązań użytkownika (alec)
   - dodana opcja 'to_words_short_version' w sekcji [phpui] określająca format
     reprezentacji słownej kwot (alec/kubatyszko)
-  - w formularzu przelewu/wpłaty można zdefiniować format reprezentacji słownej 
+  - w formularzu przelewu/wpłaty można zdefiniować format reprezentacji słownej
     kwoty (alec/kubatyszko)
   - BTS#0000252: usunięte spacje wiodące w repr. słownej kwot (alec)
   - filtrowanie listy zgłoszeń Helpdesk wg statusu (alec)
   - w dokumentacji dodany opis podłączenia lms-rtparser do Exima (P.Górski)
-  - Konta/Aliasy/Domeny 
+  - Konta/Aliasy/Domeny
 	!!! UWAGA: Domeny nie są już trzymane w passwd !!! (alec)
   - dodany filtr 'on-line' do listy użytkowników (alec)
   - usunięty błąd w module payments demona, występujący na mysql'u, który
     powodował niezapisywanie zawartości faktur (alec)
   - almsd: zmiana w funkcji db_query() dla mysql'a powodująca, że przy pustym
     resultsecie nie zwracamy teraz NULL'a, tzn. tak jak dla innych baz,
-    czyli po wywołaniu tej funkcji należy pamiętać o sprawdzeniu pola 
+    czyli po wywołaniu tej funkcji należy pamiętać o sprawdzeniu pola
     'nrows' wyniku (alec)
   - usunięta redefinicja funkcji chkconfig() z customer (chilek)
   - w userinfo dodany link do listy kont użytkownika (alec)
@@ -1863,7 +3325,7 @@ version 1.5.2 Isis (2004-11-25):
   - dokumentacja: dodany opis lms-makedhcpconf (alec)
   - dodane brakujące defaulty do niektórych kolumn w tabeli rtmessages
     w lms.mysql (alec)
-  - w funkcji odczytującej nazwę hosta (którą następnie widać w nagłówkach 
+  - w funkcji odczytującej nazwę hosta (którą następnie widać w nagłówkach
     stron) dodano sprawdzenie stałych $_ENV['HOSTNAME'] i $_SERVER[SERVER_NAME']
     jeśli nie powiedzie się próba odczytania nazwy poprzez `hostname` (alec)
   - do danych komputera dodano pole 'info' (alec)
@@ -1917,9 +3379,9 @@ version 1.5.1 Eamon (2004-10-25):
   - Helpdesk: dodane wpisy do sample/lms.ini, poprawiony błąd przy zmianie
     właściciela zgłoszenia, w dokumentacji dodana informacja o wymaganych
     przez rtparser modułach Perla (alec)
-  - w lms-rtparser potwierdzenia wysyła Net::SMTP zamiast sendmaila, 
+  - w lms-rtparser potwierdzenia wysyła Net::SMTP zamiast sendmaila,
     dodane opcje smtp_server, mail_from_name (alec)
-  - usunięty błąd przy odtwarzaniu backupu na postgresie spowodowany 
+  - usunięty błąd przy odtwarzaniu backupu na postgresie spowodowany
     aktualizacją nieistniejących sekwencji (alec)
   - status online adresów urządzeń w netdevinfo (alec)
   - poprawiony błąd w zapytaniu sql w lms-notify (alec)
@@ -1928,7 +3390,7 @@ version 1.5.1 Eamon (2004-10-25):
   - dodana opcja networkhosts_pagelimit, domyślnie pokazujemy 256 hostów
     w netinfo (alec)
   - przebudowany i poprawiony lms-notify-sms (alec)
-  - lms-notify: uzupełniona dokumentacja (%phone1, %date_month_name), poprawione 
+  - lms-notify: uzupełniona dokumentacja (%phone1, %date_month_name), poprawione
     sortowanie %last_10_in_a_table i znak przy kwotach (alec)
   - możliwość szybkiego wyszukania zgłoszeń o określonych stanach z welcome.html (chilek)
   - pominięcie usuniętych użytkowników w szybkim wyszukiwaniu (moduł quicksearch) (averne)
@@ -1951,10 +3413,10 @@ version 1.5.1 Eamon (2004-10-25):
   - usunięte przekierowanie do listy faktur po dodaniu faktury (alec)
   - połączenia wireless na mapie sieci (alec)
   - poprawiony błąd w polu 'adres IP' podczas edycji komputera (lukas/alec)
-  - BTS#0000214: rozwiązany problem z brakiem pamięci podczas tworzenia 
+  - BTS#0000214: rozwiązany problem z brakiem pamięci podczas tworzenia
     backupu (alec)
   - dodany contrib/import, czyli import płatności z pliku txt (alec)
-  
+
 version 1.5.0 Marduk (2004-09-18):
 
   - w lms-makedhcpconf hosty są sortowane (alec)
@@ -1980,16 +3442,16 @@ version 1.5.0 Marduk (2004-09-18):
     odpowiadające im radio-buttony (chilek)
   - w formularzu nowej operacji zapamiętywany jest na czas sesji typ operacji (chilek)
   - w UI dodana obsługa PIN dla użytkowników - UWAGA! automatyczny upgrade bazy
-    generuje nowe numery PIN dla wszystkich użytkowników! JEŚLI POSIADASZ 
+    generuje nowe numery PIN dla wszystkich użytkowników! JEŚLI POSIADASZ
     JUŻ NUMERY PIN W BAZIE TO ZOSTANĄ ONE WYGENEROWANE NA NOWO! (lexx)
   - BTS#0000185: poprawione rozliczanie użytkowników (alec)
   - możliwość wydrukowania umowy z poziomu UI (lexx)
-  - w demonie można zdefiniować polecenie powłoki, które będzie wykonywane 
+  - w demonie można zdefiniować polecenie powłoki, które będzie wykonywane
     przed każdym połączeniem z bazą (alec)
   - w skryptach dodano wyświetlanie błędów w pliku konfiguracyjnym (alec)
   - w formularzu nowej operacji pokazuje się ilość zaznaczonych użytkowników (chilek)
-  - przyspieszone wyświetlanie listy faktur na MySQL'u (alec) 	 
-  - polecenie 'make daemon' do kompilacji samego demona, bez modułów (alec) 	 
+  - przyspieszone wyświetlanie listy faktur na MySQL'u (alec)
+  - polecenie 'make daemon' do kompilacji samego demona, bez modułów (alec)
   - przy starcie almsd w 'background mode' nie następuje przeładowanie (alec)
   - dodane klawisze szybkiego dostępu w formularzu wyszukiwania użytkownika (S)
     oraz nowej operacji (W) (chilek)
@@ -2016,21 +3478,21 @@ version 1.3.6 Osiris (2004-09-01);
     (lexx)
   - poprawiony błąd w zapytaniu przy wyszukiwaniu zgłoszeń po temacie (alec)
   - uprawnienie 'manipulacja finansami' obejmuje także rozliczanie faktur (alec)
-  - BTS#0000180: zliczanie wolnych adresów w sieci nie bierze pod uwagę 
+  - BTS#0000180: zliczanie wolnych adresów w sieci nie bierze pod uwagę
     zarezerwowanych dla DHCP (lexx)
-  - BTS#0000181: okienko wyboru adresu IP nie pozwala wybrać adresu 
+  - BTS#0000181: okienko wyboru adresu IP nie pozwala wybrać adresu
     zarezerwowanego dla DHCP (lexx)
   - BTS#0000153: kliknięcie na urządzenie/komputer na mapie urządzeń powoduje
     przejście do wybranego urządzenia/komputera (lexx)
   - poprawiona czytelność napisów na mapie urządzeń (lexx)
-  - zawieszanie płatności wybranych zobowiązań użytkownika lub wszystkich 
+  - zawieszanie płatności wybranych zobowiązań użytkownika lub wszystkich
     na dany okres (alec)
   - dodany panel 'Użytkownicy'->'Ostrzeżenia' (alec)
   - dodany skrypt lms-fping (alec)
-  - BTS#0000052: odłączenie użytkownika poprzez cutoff powoduje automatyczne 
-    owinetkowanie komputerów użytkownika oraz ustawienie wiadomości 
+  - BTS#0000052: odłączenie użytkownika poprzez cutoff powoduje automatyczne
+    owinetkowanie komputerów użytkownika oraz ustawienie wiadomości
     administracyjnej (lexx)
-  - poprawiony BTS#0000157: gubienie urządzeń i błędne połączenia 
+  - poprawiony BTS#0000157: gubienie urządzeń i błędne połączenia
     na mapie (alec)
   - w welcome.html podajemy także ilość komputerów on-line (alec)
   - BTS#0000187: uzup. brakująca definicja $utsfmt w lms-notify (alec)
@@ -2040,7 +3502,7 @@ version 1.3.6 Osiris (2004-09-01);
   - usunięte błędy przy allow_call_time_pass_reference=Off w php.ini (alec)
   - dodane contrib/squid_warnings (lexx)
   - w dokum. dodany rozdział 'Dodatki' opisujący zawartość /contrib (alec)
-  
+
 version 1.3.5 Ju (2004-07-30):
 
   - usunięty błąd w skryptach perlowych, powodujący błędne działanie
@@ -2055,15 +3517,15 @@ version 1.3.5 Ju (2004-07-30):
     zmienne %UPCEIL, %DOWNCEIL, %CLIMIT, %PLIMIT (alec)
   - zmiana typu kolumn statystyk na BIGINT zapobiegająca błędom przy
     kompaktowaniu jeśli użytkownicy ściągają ponad 2 GB danych dziennie (alec)
-  - BTS#0000168: poprawione działanie zmiennej 'use_current_payday', przy 
+  - BTS#0000168: poprawione działanie zmiennej 'use_current_payday', przy
     okazji wreszcie działają error-triggery dla zobowiązań (alec)
-  - BTS#0000171: poprawiona obsługa błędu przy braku wolnych portów 
+  - BTS#0000171: poprawiona obsługa błędu przy braku wolnych portów
     w urządzeniu przy pierwszym podłączeniu komputera (alec)
-  - BTS#0000173: uzupełnione sprawdzanie długości nazwy komputera, urządzeń 
+  - BTS#0000173: uzupełnione sprawdzanie długości nazwy komputera, urządzeń
     sieciowych i ich adresów oraz dodany atrybut maxlength w szablonach (alec)
   - dodano możliwość nadpisania pojedyńczej reguły w lms-mgc poprzez wpis:
     node(192.168.1.1) = reguła (lukasz)
-  - dodano pole 'adres do doręczeń' dla danych użytkownika, który (jeśli 
+  - dodano pole 'adres do doręczeń' dla danych użytkownika, który (jeśli
     zdefiniowano) zastąpi adres użytkownika na fakturze (alec)
   - w module hostfile demona dodana zmienna '%gw' zamieniana na adres
     bramy (alec)
@@ -2085,14 +3547,14 @@ version 1.3.4 Terok (2004-07-06):
   - poprawiony BTS#0000137: dodany komunikat o braku wolnych portów w urządzeniu
     podczas podłączania z nodeinfobox.html (alec)
   - na listach użytkowników filtr 'wszyscy' wybiera z bazy wszystkich oprócz
-    usuniętych (nie bierze pod uwagę pola status), a nie tylko podłączonych 
+    usuniętych (nie bierze pod uwagę pola status), a nie tylko podłączonych
     jak dotychczas (alec)
-  - przy obliczaniu średniego zysku miesięcznego taryfy nie uwzględniamy 
+  - przy obliczaniu średniego zysku miesięcznego taryfy nie uwzględniamy
     użytkowników zainteresowanych i oczekujących - BTS#0000151 (alec)
   - poprawione opisy instalacji i upgrade'u bazy mysql, z uwagi na brakujące
     uprawnienia do polecenia ALTER, wszyscy planujący upgrade powinni z konta
     roota wykonać w mysqlu następujące polecenia: (alec)
-	GRANT select,insert,update,delete,create ON lms.* TO lms@localhost 
+	GRANT select,insert,update,delete,create ON lms.* TO lms@localhost
 		IDENTIFIED BY 'hasło';
 	FLUSH PRIVILEGES;
   - na mapie sieci oprócz nazw hostów pokazujemy ich adresy IP oraz
@@ -2113,7 +3575,7 @@ version 1.3.4 Terok (2004-07-06):
     %last_10_in_a_table (alec)
   - poprawka linku do listy zadłużonych w welcome.html (alec)
   - dodany contrib/customer_otherip (hunter)
-  - rozbudowane faktury o dane do htb: upload ceil, download ceil, 
+  - rozbudowane faktury o dane do htb: upload ceil, download ceil,
     connection limit, packet limit (alec)
   - przepisany moduł 'tc' demona uwzględnia zmiany w taryfach (alec)
   - poprawka w funkcji mailing, teraz pole from: powinno być dobre (lexx)
@@ -2123,8 +3585,8 @@ version 1.3.4 Terok (2004-07-06):
   - wznowiono prace na systemem RT (Helpdesk) (alec)
 
 version 1.3.3 Sokar (2004-05-05):
-  
-  - naprawione usuwanie pozycji na fakturze (alec) 
+
+  - naprawione usuwanie pozycji na fakturze (alec)
   - w demonie dodana obsługa bazy SQLite (alec)
   - poprawione zapytanie w lms-traffic-htbiptlimits uwzględniające prawidłowo
     okresowe assignmenty (alec)
@@ -2157,7 +3619,7 @@ version 1.3.3 Sokar (2004-05-05):
     komputerze i edycji komputera (chilek)
   - obsługa grup użytkowników w lms-makedhcpconf, lms-makeoidentconf,
     lms-makemacs, lms-makehosts (chilek)
-  - naprawione filtrowanie listy userów wg grupy i sieci (alec) 
+  - naprawione filtrowanie listy userów wg grupy i sieci (alec)
   - poprawka w bazie przywracająca możliwość dublowania MAC'ów (alec)
   - w Mailingu można wybrać grupę użytkowników (alec)
   - dodane skrypty lms-makewarnings, lms-makemessages (chilek)
@@ -2176,12 +3638,12 @@ version 1.3.3 Sokar (2004-05-05):
   - przebudowany rozdział 'Interfejs Użytkownika' w dokumentacji (alec)
 
 version 1.3.2 Kinsey (2004-04-03):
-  
+
   - przeniesienie warning&messages z contrib do głównej gałęzi
     dodanie lms-updatewarnings (maniac/alec/chilek)
-  - poprawione błędy w module 'hostfile' demona, dodane zmienne 
+  - poprawione błędy w module 'hostfile' demona, dodane zmienne
     %domain - zamieniana na nazwę domeny i %net - na nazwę sieci (alec)
-  - w zmiennej 'networks' dla modułów hostfile i oident nie podajemy adresów, 
+  - w zmiennej 'networks' dla modułów hostfile i oident nie podajemy adresów,
     ale listę nazw sieci (alec)
   - multilanguage? jednak nie (lexx)
   - rozpoczęto prace nad systemem RT (lukasz)
@@ -2209,7 +3671,7 @@ version 1.3.2 Kinsey (2004-04-03):
     operacji - BTS#0000122 (alec)
   - poprawione błędy w modułach hostfile i oident demona powodujące
     niewykonywanie instancji wyst. po tych modułach (alec)
-  - na liście użytkowników w kolumnie Abonament jest średnie obciążenie 
+  - na liście użytkowników w kolumnie Abonament jest średnie obciążenie
     miesięczne użytkownika (alec)
   - listę użytkowników oraz wydruki można filtrować wg sieci (alec)
   - w mailingu dodana możliwość wybrania sieci  (alec)
@@ -2221,24 +3683,24 @@ version 1.3.2 Kinsey (2004-04-03):
   - SQLite Support (alec)
   - poprawki w lms-notify zapobiegające błędom na postgresie (alec)
   - lms-sendinvoices: wysyłanie faktur (lukasz)
-  - w automatycznych fakturach można zdefiniować rodzaj płatności 
+  - w automatycznych fakturach można zdefiniować rodzaj płatności
     i termin zapłaty: lms-payments i almsd (alec)
-  
+
 version 1.3.1 Maybourne (2004-03-04):
 
   - poprawiony błąd w GetInvoiceContents() powodujący błędne wyświetlanie
     liczby groszy słownie na fakturze - BTS#0000112 (alec)
   - poprawione obliczanie kwot na fakturach dla kilku jednostek, błąd
-    powodował także zapisywanie niepoprawnych danych do tabeli 'cash' 
+    powodował także zapisywanie niepoprawnych danych do tabeli 'cash'
     podczas dodawania nowej faktury - BTS#0000114 (alec)
   - multilanguage? może tak (RFD) (lexx)
   - w almsd, do modułu hostfile dodano nowe opcje konfiguracyjne 'networks'
     oraz 'skip_dev_ips' (alec)
   - poprawione błędy w wyrażeniu regularnym w adminadd i adminedit (alec)
   - poprawka do upgrade'u: taryfy mają okres miesięczny, a nie tygodniowy,
-    poprawki składni sql w UPGRADE.pgsql oraz komentarze w UPGRADE.mysql (alec) 
+    poprawki składni sql w UPGRADE.pgsql oraz komentarze w UPGRADE.mysql (alec)
   - dodane local_ips i local_dests do lms-traffic-htbiptlimits (lukasz)
-  - koniec z wyszukiwaniem koniecznych upgradów bazy danych w ChangeLogu - 
+  - koniec z wyszukiwaniem koniecznych upgradów bazy danych w ChangeLogu -
     od teraz LMS sam będzie poprawiał bazę danych. Powiedzmy prawie koniec -
     oto ostatnie konieczne do wykonania zmiany w bazie:
     MySQL:
@@ -2248,14 +3710,14 @@ version 1.3.1 Maybourne (2004-03-04):
 	    PRIMARY KEY  (keytype),
 	    UNIQUE KEY keytype (keytype),KEY keytype_2 (keytype)
 	) TYPE=MyISAM;
-	INSERT INTO dbinfo (keytype, keyvalue) VALUES ('dbversion','2004030400');		  
+	INSERT INTO dbinfo (keytype, keyvalue) VALUES ('dbversion','2004030400');
     PostgreSQL:
 	CREATE TABLE dbinfo (
 	    keytype VARCHAR(255) DEFAULT '' NOT NULL,
 	    keyvalue VARCHAR(255) DEFAULT '' NOT NULL,
 	    PRIMARY KEY (keytype)
 	);
-	INSERT INTO dbinfo (keytype, keyvalue) VALUES ('dbversion','2004030400');		  
+	INSERT INTO dbinfo (keytype, keyvalue) VALUES ('dbversion','2004030400');
   - dodany 'Raport sprzedaży' czyli wydruk listy faktur za dany okres (alec)
 
 version 1.3.0 Apophis (2004-02-18):
@@ -2270,8 +3732,8 @@ version 1.3.0 Apophis (2004-02-18):
 	ALTER TABLE users UPDATE gguin SET DEFAULT 0;
 	ALTER TABLE users UPDATE gguin SET NOT NULL;
   - in genfake.php added example payments generation (alec)
-  - tariff and payments quarterly accounting, small systematization in 
-    period column (accounting: 0-weekly, 1-monthly, 2-quarterly, 
+  - tariff and payments quarterly accounting, small systematization in
+    period column (accounting: 0-weekly, 1-monthly, 2-quarterly,
     3-yearly) (alec)
 	UPDATE assignments SET period = 4 WHERE period = 1;
 	UPDATE assignments SET period = 1 WHERE period = 0;
@@ -2285,10 +3747,10 @@ version 1.3.0 Apophis (2004-02-18):
   - list of devices for connection is sorted by name (alec)
   - fixed navigation on invoicelist - BTS#0000104 (alec)
   - changes in daemon reload method: from 'timestamps' table readed is
-    time and compared with time from previous reload, '_force' record 
+    time and compared with time from previous reload, '_force' record
     isn't deleted, so there are no problems with many daemons (lexx/alec)
   - ethercodes.txt up-to-date (alec)
-  - BTS#0000109: fixes of bugs on BSD systems in loadavg() and hostname() 
+  - BTS#0000109: fixes of bugs on BSD systems in loadavg() and hostname()
     from Sysinfo.class.php (sfor/alec)
   - now some MGC section can have 'instances' that he calls other subsections
     - for example - if we have 5 sections related to the dns (dns1... dns5) -
@@ -2307,7 +3769,7 @@ version 1.3.0 Apophis (2004-02-18):
 
 version 1.1.8 Cronos (2004-02-01):
 
-  - netdevmap uses PNG images (some systems don't support GIF format) (Lexx) 
+  - netdevmap uses PNG images (some systems don't support GIF format) (Lexx)
   - fixed records accounting on empty lists, BTS#90 (alec)
   - added userlist sorting by sum of tariffs (alec)
   - fixed nodelist sorting by owner (alec)
@@ -2322,7 +3784,7 @@ version 1.1.8 Cronos (2004-02-01):
   - added IP and MAC address attribute for net devices (lexx/alec)
   - in genfake.php fixed cleanup of database and added net devices and netlinks
     data generation (alec)
-  - BTS#0000092 fix in GetMACs() (alec)    
+  - BTS#0000092 fix in GetMACs() (alec)
   - added deadline and payment type in invoices
     (lukasz):
     MySQL:
@@ -2330,7 +3792,7 @@ version 1.1.8 Cronos (2004-02-01):
     PostgreSQL:
 	ALTER TABLE invoices ADD paytype VARCHAR(255);
 	UPDATE invoices SET paytype='';
-	ALTER TABLE invoices ALTER COLUMN paytype ADD NOT NULL; 
+	ALTER TABLE invoices ALTER COLUMN paytype ADD NOT NULL;
 	ALTER TABLE invoices ALTER COLUMN paytype SET DEFAULT '';
   - 'permanent payments' (alec)
     MySQL:
@@ -2369,19 +3831,19 @@ version 1.1.8 Cronos (2004-02-01):
   - new 'mailing' interface, added e-mail checking and not taking deleted
     users into account (alec)
   - in window 'LMS Information' added DBMS version (alec)
-  - database cosmetics consistent with BTS#000103, or else bug fixes 
+  - database cosmetics consistent with BTS#000103, or else bug fixes
     while backup restoring on later versions of postgres (alec)
     MySQL:
 	ALTER TABLE `admins` CHANGE `lastlogindate` `lastlogindate` INT(11) DEFAULT '0';
 	ALTER TABLE `admins` CHANGE `failedlogindate` `failedlogindate` INT(11) DEFAULT '0';
     PostgreSQL:
 	UPDATE admins SET lastlogindate=0 WHERE lastlogindate IS NULL;
-	UPDATE admins SET failedlogindate=0 WHERE failedlogindate IS NULL;	 
+	UPDATE admins SET failedlogindate=0 WHERE failedlogindate IS NULL;
 	ALTER TABLE admins UPDATE lastlogindate SET DEFAULT 0;
 	ALTER TABLE admins UPDATE lastlogindate SET NOT NULL;
 	ALTER TABLE admins UPDATE failedlogindate SET DEFAULT 0;
 	ALTER TABLE admins UPDATE failedlogindate SET NOT NULL;
-	
+
 version 1.1.7 Hathor (2003-12-14):
 
   - networks address now are type of bigint, for conversions are used
@@ -2392,7 +3854,7 @@ version 1.1.7 Hathor (2003-12-14):
         ALTER TABLE networks CHANGE address address INT(16) UNSIGNED NOT NULL;
     PostgreSQL:
         CREATE OR REPLACE FUNCTION inet_ntoa(bigint) RETURNS text AS '
-        SELECT 
+        SELECT
     	    ($1/(256*256*256))::text
     	    ||''.''||
 	    ($1/(256*256) - $1/(256*256*256)*256)::text
@@ -2409,7 +3871,7 @@ version 1.1.7 Hathor (2003-12-14):
     	    split_part($1,''.'',4)::int8;
 	' LANGUAGE SQL;
 	ALTER TABLE networks ADD ipaddr bigint;
-        UPDATE networks SET ipaddr = inet_aton(address); 
+        UPDATE networks SET ipaddr = inet_aton(address);
         ALTER TABLE networks DROP COLUMN address;
         ALTER TABLE networks RENAME COLUMN ipaddr to address;
         ALTER TABLE networks ALTER COLUMN address set NOT NULL;
@@ -2429,13 +3891,13 @@ version 1.1.7 Hathor (2003-12-14):
 	ALTER TABLE invoicecontents MODIFY taxvalue DECIMAL(9,2);
 	ALTER TABLE invoicecontents MODIFY count DECIMAL(9,2);
 	ALTER TABLE tariffs MODIFY taxvalue DECIMAL(9,2);
-    PostgreSQL:    
+    PostgreSQL:
 	ALTER TABLE cash ADD val numeric(9,2);
 	UPDATE cash SET val=value;
 	ALTER TABLE cash ALTER val SET NOT NULL;
 	ALTER TABLE cash ALTER val SET DEFAULT 0;
 	ALTER TABLE cash DROP COLUMN value;
-	ALTER TABLE cash RENAME val TO value;	
+	ALTER TABLE cash RENAME val TO value;
 	ALTER TABLE tariffs ADD val numeric(9,2);
 	ALTER TABLE tariffs ADD taxv numeric(9,2);
 	UPDATE tariffs SET val=value;
@@ -2443,7 +3905,7 @@ version 1.1.7 Hathor (2003-12-14):
 	ALTER TABLE tariffs ALTER val SET NOT NULL;
 	ALTER TABLE tariffs ALTER val SET DEFAULT 0;
 	ALTER TABLE tariffs DROP COLUMN value;
-	ALTER TABLE tariffs RENAME val TO value;	
+	ALTER TABLE tariffs RENAME val TO value;
 	ALTER TABLE tariffs ALTER taxv SET NOT NULL;
 	ALTER TABLE tariffs ALTER taxv SET DEFAULT 0;
 	ALTER TABLE tariffs DROP COLUMN taxvalue;
@@ -2465,9 +3927,9 @@ version 1.1.7 Hathor (2003-12-14):
 	ALTER TABLE invoicecontents DROP COLUMN taxvalue;
 	ALTER TABLE invoicecontents RENAME taxv TO taxvalue;
 	ALTER TABLE invoicecontents DROP COLUMN count;
-	ALTER TABLE invoicecontents RENAME cnt TO count;	
+	ALTER TABLE invoicecontents RENAME cnt TO count;
   - added possibility to invoicing in PHP-UI (lukasz)
-  - standardized reload for almsd and ui, now almsd reloads with standard 
+  - standardized reload for almsd and ui, now almsd reloads with standard
     ui settings (reload table isn't needed) (Lexx)
 
 version 1.1.6 Seth (2003-12-08):
@@ -2483,7 +3945,7 @@ version 1.1.6 Seth (2003-12-08):
     MySQL:
     	ALTER TABLE tariffs CHANGE description description text;
     PostgreSQL:
-    	ALTER TABLE tariffs ALTER COLUMN description DROP NOT NULL;  
+    	ALTER TABLE tariffs ALTER COLUMN description DROP NOT NULL;
 
 version 1.1.5 Amaonet (2003-12-04):
 
@@ -2496,14 +3958,14 @@ version 1.1.5 Amaonet (2003-12-04):
     programm is missing (alec)
   - node search by address fixed, text searching by part of address added (alec)
   - added deleted nodes stats on stat bars and added option for deleting
-    this in database compacting process (alec) 
+    this in database compacting process (alec)
   - added possibility of netdevices exchange (lexx)
   - fixed bugs on private address recognition in scripts and misprint in
     lms-iptables (lukasz/wojboj)
   - lms-notify adjusted for new finances (lukasz)
   - in /daemon directory has become alfa version of programm for config
     generation and services reloading (alec)
-  - in index.php new config file parsing function, fully compatible 
+  - in index.php new config file parsing function, fully compatible
     with daemon and partly with lms-mgc (alec)
   - in lms.pgsql added SQL functions inet_ntoa() i inet_aton() for
     future applications (alec)
@@ -2586,7 +4048,7 @@ version 1.1.5 Amaonet (2003-12-04):
 	    count integer NOT NULL,
 	    description varchar(255) NOT NULL,
 	    tariffid integer NOT NULL
-	);	 
+	);
   - removed %TID and %TVAL from lms-mgc (lukasz)
   - added PESEL column in user record, database upgrade (lukasz):
     MySQL:
@@ -2606,13 +4068,13 @@ version 1.1.5 Amaonet (2003-12-04):
 	ALTER TABLE `invoicecontents` CHANGE `sww` `pkwiu` VARCHAR( 255 );
     PostgreSQL:
 	ALTER TABLE tariffs RENAME sww TO pkwiu;
-	ALTER TABLE invoicecontents RENAME sww TO pkwiu;  
+	ALTER TABLE invoicecontents RENAME sww TO pkwiu;
 
 version 1.1.4 Tanith (2003-10-03):
-  
+
   - tariff list not accounts deleted users (lukasz)
   - added new field on network list: interface - very usefull with making
-    iptables/ipchains/htb scripts when we have networks on different 
+    iptables/ipchains/htb scripts when we have networks on different
     interfaces, in lms-mgc named %IFACE, %DIFACE and %NIFACE,
     like allways database format upgrade needed (lukasz):
     MySQL:
@@ -2625,7 +4087,7 @@ version 1.1.4 Tanith (2003-10-03):
   - newly added node have access by default (lukasz)
   - amount of networks on summary was incremented by 2 (lukasz)
   - source code cosmetics (s/this->ADB->/this->DB->/g and others) (lukasz)
-  - added traffic-stats module (taken from contrib) and bin/lms-traffic, 
+  - added traffic-stats module (taken from contrib) and bin/lms-traffic,
     required table 'stats' creation for them: (alec)
     MySQL:
 	DROP TABLE IF EXISTS stats;
@@ -2644,14 +4106,14 @@ version 1.1.4 Tanith (2003-10-03):
 	    upload integer DEFAULT 0,
 	    download integer DEFAULT 0,
 	    PRIMARY KEY (nodeid, dt)
-	);    
+	);
   - new documentation (sgml/html/txt) (alec)
-  - bugfix allowing mac address with '-' char writing while node edition - now, 
+  - bugfix allowing mac address with '-' char writing while node edition - now,
     like while adding - changing all '-' for ':' (lukasz)
   - small change of philosophy in tariffs table - 'NULL' is not set limit, '0'
     is a limit lack - why? you learn at eny day ;-) (lukasz):
     MySQL:
-	ALTER TABLE tariffs CHANGE uprate uprate INT(11), CHANGE downrate downrate INT(11); 
+	ALTER TABLE tariffs CHANGE uprate uprate INT(11), CHANGE downrate downrate INT(11);
     PostgreSQL:
 	ALTER TABLE tariffs ALTER uprate DROP NOT NULL;
 	ALTER TABLE tariffs ALTER uprate DROP DEFAULT;
@@ -2659,9 +4121,9 @@ version 1.1.4 Tanith (2003-10-03):
 	ALTER TABLE tariffs ALTER downrate DROP DEFAULT;
   - 'small' rewolution in finances, and 'big' database upgrade, but i think
     you cope with this (lukasz):
-    
+
     0) COMPLETELY do database backup.
-    
+
     1) Create table 'assignments':
     MySQL:
     DROP TABLE IF EXISTS assignments;
@@ -2675,7 +4137,7 @@ version 1.1.4 Tanith (2003-10-03):
 	UNIQUE KEY id (id),
 	KEY id_2 (id)
     ) TYPE=MyISAM;
-    
+
     PostgreSQL:
     DROP SEQUENCE "assignments_id_seq";
     CREATE SEQUENCE "assignments_id_seq";
@@ -2689,7 +4151,7 @@ version 1.1.4 Tanith (2003-10-03):
 	PRIMARY KEY (id)
     );
     2) Run 'upgrade01' module - that means, after login write in url
-    at the end '?m=upgrade01', i.e. 'http://serwer.pl/lms/?m=upgrade01'. 
+    at the end '?m=upgrade01', i.e. 'http://serwer.pl/lms/?m=upgrade01'.
     CAUTION! Run that module ONLY one time. If you run them couple of times,
     you destroy your database.
 
@@ -2697,7 +4159,7 @@ version 1.1.4 Tanith (2003-10-03):
     MySQL:
 	ALTER TABLE users DROP tariff, DROP payday;
     PostgreSQL:
-	ALTER TABLE users DROP tariff; ALTER TABLE users DROP payday;	
+	ALTER TABLE users DROP tariff; ALTER TABLE users DROP payday;
 
     4) Write in cron lms-payments for runing everyday at 0:00.
 
@@ -2768,7 +4230,7 @@ version 1.1.4 Tanith (2003-10-03):
 	ALTER TABLE nodes ADD netdev integer;
 	ALTER TABLE nodes ALTER COLUMN netdev SET default 0;
 	UPDATE nodes SET netdev = 0;
-	ALTER TABLE nodes ALTER COLUMN netdev SET NOT NULL;  	
+	ALTER TABLE nodes ALTER COLUMN netdev SET NOT NULL;
   - update 'nodesearch' module (alec)
   - bugfixes in GetTariff() on postgres (alec)
   - errors are now popups (lukasz)
@@ -2781,7 +4243,7 @@ version 1.1.4 Tanith (2003-10-03):
     - new README and README.html - user manual
     - cleanup
   - fixed (I hope so) error handling - now we have tooltips (lukasz)
-	
+
 version 1.1.3 (2003-08-29):
 
   - changed users philosophy - now user deletion not delete them really,
@@ -2813,7 +4275,7 @@ version 1.1.3 (2003-08-29):
 				split_part(ipaddr,'.',3)::int4*256+
 				split_part(ipaddr,'.',4)::int4);
 	ALTER TABLE nodes ADD ipaddr2 BIGINT;
-	UPDATE nodes SET ipaddr2 = ipaddr::text::int8; 
+	UPDATE nodes SET ipaddr2 = ipaddr::text::int8;
 	ALTER TABLE nodes DROP COLUMN ipaddr;
 	ALTER TABLE nodes RENAME COLUMN ipaddr2 to ipaddr;
 	ALTER TABLE nodes ALTER COLUMN ipaddr set NOT NULL;
@@ -2826,8 +4288,8 @@ version 1.1.3 (2003-08-29):
 	ALTER TABLE nodes CHANGE access access BOOL NOT NULL DEFAULT '1';
     and in PostgreSQL columns are type of int2:
 	UPDATE nodes SET access= CASE access WHEN 'Y' THEN '1' ELSE '0' END;
-	ALTER TABLE nodes ADD access2 int2; 
-	UPDATE nodes SET access2 = access::text::int2; 
+	ALTER TABLE nodes ADD access2 int2;
+	UPDATE nodes SET access2 = access::text::int2;
 	ALTER TABLE nodes DROP COLUMN access;
 	ALTER TABLE nodes RENAME COLUMN access2 TO access;
 	ALTER TABLE nodes ALTER COLUMN access SET NOT NULL;
@@ -2837,12 +4299,12 @@ version 1.1.3 (2003-08-29):
 	ALTER TABLE nodes CHANGE ownerid ownerid INT(11) DEFAULT '0' NOT NULL;
 	ALTER TABLE nodes CHANGE mac mac VARCHAR(20) NOT NULL;
     PostgreSQL:
-	ALTER TABLE nodes ALTER COLUMN ownerid SET DEFAULT '0'; 
+	ALTER TABLE nodes ALTER COLUMN ownerid SET DEFAULT '0';
 	ALTER TABLE nodes ALTER COLUMN mac SET NOT NULL;
-	
+
   - source optimized for big networks printing (lukasz)
   - transactions while database backup restoring again enabled (lukasz)
-  
+
 version 1.1.2 (2003-08-24):
 
   - new substitution (%date_month_name) in mail templates, resolves into
@@ -2851,13 +4313,13 @@ version 1.1.2 (2003-08-24):
   - additional option %date_month_name in mailingu templates, solved for
     actual month name (acc. LC_NUMERIC? hunter)
   - some changes in docs concerning postgres, lms.pgsql upgrade (alec)
-  - humanization of empty admins table detection - now, when that table is 
+  - humanization of empty admins table detection - now, when that table is
     empty LMS allows adminadd module access (lukasz)
   - in lms-mgc network address and broadcast are ignored while rules
     generation (lukasz)
-  - while MAC's selection entries '00:00:00:00:00:00' and 'FF:FF:FF:FF:FF:FF' 
+  - while MAC's selection entries '00:00:00:00:00:00' and 'FF:FF:FF:FF:FF:FF'
     are ignored (lukasz)
-  - new toy in /contrib - bandlogger+htblimiter - supporting HTB and 
+  - new toy in /contrib - bandlogger+htblimiter - supporting HTB and
     iptables (lukasz)
   - is done - ADOdb is not required - LMS have own libs for mysql and
     postgres databases (lukasz)
@@ -2868,27 +4330,27 @@ version 1.1.1 (2003-08-09):
 
   - new possibility of indebted users printing (MichalZ)
   - added %TID (tariff id) and %TVAL (tariff value) in lms-mgc (lukasz)
-  - removed problems with sorting change on indebted or disconnected 
+  - removed problems with sorting change on indebted or disconnected
     users (lukasz)
   - Opera browser bugfix (change exit(0) to die) (lukasz)
   - added possibility of payments day setting, needed SQL change:
-    MySQL: 
+    MySQL:
 	ALTER TABLE `users` ADD `payday` INT DEFAULT '5' NOT NULL;
-    PostgreSQL: 
+    PostgreSQL:
 	ALTER TABLE users ADD payday integer;
 	ALTER TABLE users ALTER COLUMN payday SET DEFAULT 0;
 	ALTER TABLE users ALTER COLUMN payday SET NOT NULL;
     where in place of '5', can be write default payments day (lukasz)
-  - related to upper, not exist lms-eachmonth, now is lms-payments, 
+  - related to upper, not exist lms-eachmonth, now is lms-payments,
     which must be run everyday with cron! (lukasz)
   - source cleanup (lukasz)
-  
+
 version 1.1.0 (2003-06-23):
 
   - secondary nameserver support (%DNS2 in lms-mgc); database modification needed:
-    MySQL:	
+    MySQL:
 	ALTER TABLE `networks` ADD `dns2` VARCHAR( 16 ) AFTER `dns`;
-    PostgreSQL: 
+    PostgreSQL:
 	ALTER TABLE networks ADD dns2 VARCHAR(16);
   - if the lms.ini file exists in the same directory as index.php, LMS will use it instead of /etc/lms/lms.ini;
   - default values for address, city and postal code can now be set for adding users;
@@ -2923,7 +4385,7 @@ version 1.0.0rc1 (2003-05-17):
   - mail template changed (byko/lukasz)
   - email schema checking fixed (repcio/lukasz)
   - a lot of cleaning :-)
-  
+
 version 1.0pre10 (2003-04-15):
 
   - poprawki zgodności ze Smarty-2.5.0 (niestety, automatycznie 2.5.0 jest
@@ -2936,7 +4398,7 @@ version 1.0pre10 (2003-04-15):
   - logosy by Pierzak
 
 version 1.0pre9 'CVS-Has-Been-Crashed-Edition' (2003-04-13):
-  
+
   - wymaga Smarty-2.4.2
   - tooltips
   - force ssl
@@ -2952,7 +4414,7 @@ version 1.0pre8 (2003-03-30):
   - poprawiony bug z edycją użytkownika i traceniem zawartości pola z
     komentarzem
   - przeniesiony formularz dodawania sieci do oddzielnej strony
-  - poprawione kilka innych bugów	
+  - poprawione kilka innych bugów
 
 version 1.0pre7 (2003-03-24):
 
@@ -2988,11 +4450,11 @@ version 1.0pre6 (2003-03-17):
   - pole "Imię" może być puste
 
 version 1.0pre5 (2003-01-26):
- 
+
   - PLIKI KONFIGURACYJNE PRZENIESIONE DO KATALOGU /etc/lms/ !!!
   - podział listy użytkowników na strony
   - poprawiony bug przy dodawaniu nowego usera
-  - Pamiętanie ostatniej wybranej podsieci i ostatniego wpisanego 
+  - Pamiętanie ostatniej wybranej podsieci i ostatniego wpisanego
     komentarza do wpłat
   - przykładowe configi przeniesione do sample
   - utworzony katalog ze skryptami perlowymi - bin - znadjdują się
@@ -3018,19 +4480,19 @@ version 1.0pre5 (2003-01-26):
     nazwy miesiąca (set LANG=pl ?) i opisu pakietu z tariffs.
     %last_10_in_a_table zmienia się w maksymalnie 10 ostatnich operacji na
     koncie.
-	  
+
 version 1.0pre4 (2003-01-21):
 
   - pełne przeportowanie obsługi SQL'a na ADODB
   - support do MySQL i PostgreSQL
   - pola uprate i downrate w taryfach. upgrade:
-  
+
     ALTER TABLE tariffs ADD uprate INT DEFAULT '0' NOT NULL AFTER
     value , ADD downrate INT DEFAULT '0' NOT NULL AFTER uprate;
 
   - poprawka kolumny table na tablename w timestamps. upgrade:
 
-    ALTER TABLE `timestamps` CHANGE `table` `tablename` VARCHAR( 255 ) 
+    ALTER TABLE `timestamps` CHANGE `table` `tablename` VARCHAR( 255 )
     NOT NULL
 
   - lista użytkowników: dodana kwota abonamentu miesięcznego poniżej
@@ -3043,7 +4505,7 @@ version 1.0pre4 (2003-01-21):
   - możliwość zdefiniowania sposobu reloadu (albo via sql, albo exec
     jakiejś komendy);
   - poprawki w dodawaniu taryf;
-  
+
 version 1.0pre3 (2002-12-27):
 
   - poprawione pobieranie hostname i uptime (Marcoos)
@@ -3056,9 +4518,9 @@ version 1.0pre3 (2002-12-27):
 version 1.0pre2 (2002-12-25):
 
   - parsowanie configa nie zapisuje odrazu zmiennych odczytanych
-    z ini jako globalnych, a do tablicy $_CONFIG (nie można napisać 
+    z ini jako globalnych, a do tablicy $_CONFIG (nie można napisać
     niczego poprzez plik ini)
-  - dodane sprawdzanie czy istnieją katalogi backups i templates_c 
+  - dodane sprawdzanie czy istnieją katalogi backups i templates_c
     oraz czy można do nich zapisywać
   - naprawiony moduł od dodawania taryf
   - posprzątane w niektórych plikach
@@ -3086,7 +4548,7 @@ version 0.4:
     ręcznie ustawiać haseł w pliku .htpasswd
 
 version 0.3:
-   
+
   - obsługa finansów i rozliczeń użytkowników
 
 version 0.2:

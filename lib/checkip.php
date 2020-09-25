@@ -26,57 +26,25 @@
 
 // Checking if connection is from allowed IP
 
-if(!empty($CONFIG['phpui']['allow_from']))
-{
-	// delete ipv6 prefix if it's present: 
-	
-	$ipaddr = str_replace('::ffff:','',$_SERVER['REMOTE_ADDR']);
+$allow_from = ConfigHelper::getConfig('phpui.allow_from', null);
 
-	$allowedlist = explode(',',$CONFIG['phpui']['allow_from']);
+if ($allow_from) {
+    // delete ipv6 prefix if it's present:
 
-	$isin = FALSE;
+    $ipaddr = str_replace('::ffff:', '', $_SERVER['REMOTE_ADDR']);
 
-	foreach($allowedlist as $value)
-	{
-		$net = '';
-		$mask = '';
-		
-		if(strpos($value, '/')===FALSE)
-			$net = $value;
-		else
-			list($net, $mask) = explode('/', $value);
-		
-		$net = trim($net);
-		$mask = trim($mask);
-
-		if($mask == '')
-			$mask = '255.255.255.255';
-		elseif(is_numeric($mask))
-			$mask = prefix2mask($mask);
-
-		if(isipinstrict($ipaddr, $net, $mask))
-		{
-			$isin = TRUE;
-			break;
-		}
-	}
-
-	if(!$isin)
-	{
-		header('HTTP/1.1 403 Forbidden');
-		echo '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+    if (!Utils::isAllowedIP($ipaddr, $allow_from)) {
+        header('HTTP/1.1 403 Forbidden');
+        echo '<!DOCTYPE html>
 		<HTML><HEAD>
 		<TITLE>403 Forbidden</TITLE>
 		</HEAD><BODY>
 		<H1>Forbidden</H1>
-		You don\'t have permission to access '.$_SERVER['REQUEST_URI'].'
+		You don\'t have permission to access ' . $_SERVER['REQUEST_URI'] . '
 		on this server.<P>
 		<HR>
-		'.$_SERVER['SERVER_SIGNATURE'].'
-		</BODY></HTML>
-		';
-		exit(0);
-	}
+		' . $_SERVER['SERVER_SIGNATURE'] . '
+		</BODY></HTML>';
+        exit(0);
+    }
 }
-
-?>

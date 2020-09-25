@@ -1,0 +1,88 @@
+{extends file="layout.html"}
+{block name=title}LMS: {$layout.pagetitle|striphtml}{/block}
+{block name=module_content}
+<!--// $Id$ //-->
+<H1>{$layout.pagetitle}</H1>
+<TABLE class="lmsbox">
+    <THEAD>
+	<TR>
+		<TD width="1%" NOWRAP><IMG src="img/division.gif" alt=""> <B>{trans("Name:")}</B></TD>
+		<TD width="1%" align="right" NOWRAP>{trans("ID:")}</TD>
+		<TD width="96%" align="left" NOWRAP>{trans("Long name:")}</TD>
+		<TD width="1%" align="right" NOWRAP>{trans("Customers:")}</TD>
+		<TD width="1%" align="right" NOWRAP>
+			{button type="link-button" icon="add" label="Add division" href="?m=divisionadd"}
+		</TD>
+	</TR>
+	{if $pagination->getTotal() != 0}
+		<TR>
+			<TD class="lms-ui-pagination" COLSPAN="5">
+				{include file="pagination.html"}
+			</TD>
+		</TR>
+	{/if}
+    </THEAD>
+    <TBODY>
+	{cycle values="light,lucid" print=false}
+	{section name=list loop=$divisionlist}
+	<TR class="highlight {cycle}{if $divisionlist[list].status} blend{/if}" data-name="{$divisionlist[list].shortname}">
+		<TD NOWRAP onclick="return self.location.href='?m=divisionedit&amp;id={$divisionlist[list].id}';">
+			<IMG src="img/division.gif" alt=""> <B>{$divisionlist[list].shortname}</B>
+		</TD>
+		<TD align="right" NOWRAP onclick="return self.location.href='?m=divisionedit&amp;id={$divisionlist[list].id}';">
+			({$divisionlist[list].id|string_format:"%04d"})
+		</TD>
+		<TD align="left" onclick="return self.location.href='?m=divisionedit&amp;id={$divisionlist[list].id}';">
+			{$divisionlist[list].name}
+		</TD>
+		<TD align="right" onclick="return self.location.href='?m=divisionedit&amp;id={$divisionlist[list].id}';">
+			{$divisionlist[list].cnt|default:0}
+		</TD>
+		<TD align="right" class="lms-ui-buttons text-right nobr">
+			{button type="link" icon="lock" tip="{if $divisionlist[list].status}{trans("Unlock")}{else}{trans("Lock")}{/if}" href="?m=divisionedit&amp;id={$divisionlist[list].id}&amp;changestatus=1"}
+			{button type="link" icon="delete" tip="Delete" class="delete-division" href="?m=divisiondel&id={$divisionlist[list].id}"}
+			{button type="link" icon="clone" tip="Clone" class="clone-division" href="?m=divisionclone&id={$divisionlist[list].id}"}
+			{button type="link" icon="edit" tip="Edit" href="?m=divisionedit&id={$divisionlist[list].id}"}
+		</TD>
+	</TR>
+	{sectionelse}
+	<TR>
+		<TD colspan="5" class="empty-table">
+			<p>{trans("No such divisions in database.")}</p>
+		</TD>
+	</TR>
+	{/section}
+    </TBODY>
+    <TFOOT>
+	{if $pagination->getTotal() != 0}
+		<TR>
+			<TD class="lms-ui-pagination division-context" COLSPAN="5">
+				{include file="pagination.html"}
+			</TD>
+		</TR>
+	{/if}
+    </TFOOT>
+</TABLE>
+	<script>
+		$(function() {
+			$('.division-context').on( 'lms:division_selection', function() {
+				location.reload();
+			});
+		});
+
+		$('.delete-division').click(function() {
+			var name = $(this).closest('tr').attr('data-name');
+			confirmDialog($t("Are you sure, you want to delete division '$a'?", name), this).done(function() {
+				location.href = $(this).attr('href');
+			});
+			return false;
+		});
+		$('.clone-division').click(function() {
+			var name = $(this).closest('tr').attr('data-name');
+			confirmDialog($t("Are you sure, you want to clone division '$a'?", name), this).done(function() {
+				location.href = $(this).attr('href');
+			});
+			return false;
+		});
+	</script>
+{/block}

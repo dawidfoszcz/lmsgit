@@ -91,24 +91,26 @@ AS_IF([test "x$with_pgsql" = "xyes" -o "x$have_pgsql" = "xyes" ], [SETUP_POSTGRE
 AS_IF([test "x$with_mysql" = "xyes" -o "x$have_mysql" = "xyes"],  [SETUP_MYSQL])
 # Error when there is no database
 AS_IF([test ! "x$have_mysql" = "xyes" -a ! "x$have_pgsql" = "xyes"], AC_MSG_ERROR([No database client libraries detected. Try to use --with-mysql and/or --with-pgsql options.]))
+# setup libsnmp
+AS_IF([test "x$have_snmp" = "xyes"], [SETUP_SNMP])
+AM_CONDITIONAL([LIBSNMP], [test x$have_snmp = xyes])
 
-SETUP_SNMP
 SETUP_LIBGADU
 
 case "$host_os" in
         linux*)
                 OS="linux"
-                LIBS+=" -ldl"
-                CFLAGS+=" -fPIC -DGNU"
+                LIBS="$LIBS -ldl"
+                CFLAGS="$CFLAGS -fPIC -DGNU"
                 ;;
         CYGWIN* | Cygwin* | cygwin* )
                 OS="cygwin"
-                LIBS+=" -ldl -lz"
+                LIBS="$LIBS -ldl -lz"
 #                LMSDBIN="lmsd.exe"
                 ;;
         FreeBSD )
                 OS="freebsd"
-                CFLAGS+=" -fPIC"
+                CFLAGS="$CFLAGS -fPIC"
                 ;;
         *)
                 ;;
@@ -118,9 +120,12 @@ AM_CONDITIONAL([BUILD_PINGER], [test x$OS = xlinux])
 
 
 AC_ARG_ENABLE([debug0],
-    AS_HELP_STRING([--enable-debug0], [SQL query logging (disabled)]))
+    AS_HELP_STRING([--enable-debug0], [SQL query logging (disabled)]),
+    AC_DEFINE(DEBUG0, 1, SQL Query debugging))
+
 AC_ARG_ENABLE([debug1],
-    AS_HELP_STRING([--enable-debug1], [events logging (disabled)]))
+    AS_HELP_STRING([--enable-debug1], [events logging (disabled)]),
+    AC_DEFINE(DEBUG1, 1, events logging))
 
 GET_REVISION
 AC_DEFINE_UNQUOTED(LMSD_REVISION, ["$LMSD_REVISION"], Directore where lmsd should look for configuration - including lms.ini)

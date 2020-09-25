@@ -24,8 +24,8 @@
  *  $Id$
  */
 
-$DB->BeginTrans();
-$DB->Execute("
+$this->BeginTrans();
+$this->Execute("
     
     ALTER TABLE passwd ADD type SMALLINT;
     UPDATE passwd SET type = 32767;
@@ -46,6 +46,4 @@ $DB->Execute("
     
     UPDATE dbinfo SET keyvalue = '2004112100' WHERE keytype = 'dbversion';
 ");
-$DB->CommitTrans();
-
-?>
+$this->CommitTrans();

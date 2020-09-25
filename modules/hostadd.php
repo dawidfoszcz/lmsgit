@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2016 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -26,47 +26,45 @@
 
 function GetHostIdByName($name)
 {
-	global $DB;
-	return $DB->GetOne('SELECT id FROM hosts WHERE name = ?', array($name));
+    global $DB;
+    return $DB->GetOne('SELECT id FROM hosts WHERE name = ?', array($name));
 }
 
-$hostadd = isset($_POST['hostadd']) ? $_POST['hostadd'] : NULL;
+$hostadd = isset($_POST['hostadd']) ? $_POST['hostadd'] : null;
 
-if($hostadd) 
-{
-	$hostadd['name'] = trim($hostadd['name']);
-	$hostadd['description'] = trim($hostadd['description']);
-	
-	if($hostadd['name']=='' && $hostadd['description']=='')
-	{
-		$SESSION->redirect('?m=hostlist');
-	}
-	
-	if($hostadd['name'] == '')
-		$error['name'] = trans('Host name is required!');
-	elseif(GetHostIdByName($hostadd['name']))
-		$error['name'] = trans('Host with specified name exists!');
+if ($hostadd) {
+    $hostadd['name'] = trim($hostadd['name']);
+    $hostadd['description'] = trim($hostadd['description']);
+    
+    if ($hostadd['name']=='' && $hostadd['description']=='') {
+        $SESSION->redirect('?m=hostlist');
+    }
+    
+    if ($hostadd['name'] == '') {
+        $error['name'] = trans('Host name is required!');
+    } elseif (GetHostIdByName($hostadd['name'])) {
+        $error['name'] = trans('Host with specified name exists!');
+    }
 
-	if (!$error) {
-		$args = array(
-			'name' => $hostadd['name'],
-			'description' => $hostadd['description']
-		);
-		$DB->Execute('INSERT INTO hosts (name, description) VALUES (?,?)', array_values($args));
+    if (!$error) {
+        $args = array(
+            'name' => $hostadd['name'],
+            'description' => $hostadd['description']
+        );
+        $DB->Execute('INSERT INTO hosts (name, description) VALUES (?,?)', array_values($args));
 
-		if ($SYSLOG) {
-			$args[$SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST]] = $DB->GetLastInsertID('hosts');
-			$SYSLOG->AddMessage(SYSLOG_RES_HOST, SYSLOG_OPER_ADD, $args,
-				array($SYSLOG_RESOURCE_KEYS[SYSLOG_RES_HOST]));
-		}
+        if ($SYSLOG) {
+            $args[SYSLOG::RES_HOST] = $DB->GetLastInsertID('hosts');
+            $SYSLOG->AddMessage(SYSLOG::RES_HOST, SYSLOG::OPER_ADD, $args);
+        }
 
-		if (!isset($hostadd['reuse']))
-			$SESSION->redirect('?m=hostlist');
+        if (!isset($hostadd['reuse'])) {
+            $SESSION->redirect('?m=hostlist');
+        }
 
-		unset($hostadd['name']);
-		unset($hostadd['description']);
-	}
-
+        unset($hostadd['name']);
+        unset($hostadd['description']);
+    }
 }
 
 $layout['pagetitle'] = trans('New Host');
@@ -75,6 +73,4 @@ $SESSION->save('backto', $_SERVER['QUERY_STRING']);
 
 $SMARTY->assign('error', $error);
 $SMARTY->assign('hostadd', $hostadd);
-$SMARTY->display('hostadd.html');
-
-?>
+$SMARTY->display('host/hostadd.html');

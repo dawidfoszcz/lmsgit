@@ -24,7 +24,7 @@
  *  $Id$
  */
 
-$DB->Execute("
+$this->Execute("
     BEGIN;
     ALTER TABLE users ADD serviceaddr text;
     ALTER TABLE users ALTER serviceaddr SET DEFAULT '';
@@ -34,5 +34,3 @@ $DB->Execute("
     UPDATE dbinfo SET keyvalue = '2004072100' WHERE keytype = 'dbversion';
     COMMIT;
 ");
-
-?>

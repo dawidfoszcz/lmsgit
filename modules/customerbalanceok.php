@@ -3,7 +3,7 @@
 /*
  * LMS version 1.11-git
  *
- *  (C) Copyright 2001-2013 LMS Developers
+ *  (C) Copyright 2001-2017 LMS Developers
  *
  *  Please, see the doc/AUTHORS for more information about authors!
  *
@@ -26,29 +26,29 @@
 
 $customerid = $_GET['id'];
 
-if($LMS->CustomerExists($customerid))
-{
-	$balance = $LMS->GetCustomerBalance($customerid);
+if ($LMS->CustomerExists($customerid)) {
+    $balance = $LMS->GetCustomerBalance($customerid);
 
-	if($balance<0)
-	{
-		$DB->BeginTrans();
+    if ($balance<0) {
+        $DB->BeginTrans();
 
-		$DB->Execute('INSERT INTO cash (time, type, userid, value, customerid, comment)
-			VALUES (?NOW?, 1, ?, ?, ?, ?)', 
-			array($AUTH->id, 
-				str_replace(',','.', $balance*-1),
-				$customerid,
-				trans('Accounted')));
-	
-		$DB->Execute('UPDATE documents SET closed = 1 
+        $DB->Execute(
+            'INSERT INTO cash (time, type, userid, value, customerid, comment)
+			VALUES (?NOW?, 1, ?, ?, ?, ?)',
+            array(Auth::GetCurrentUser(),
+                str_replace(',', '.', $balance*-1),
+                $customerid,
+                trans('Accounted'))
+        );
+    
+        $DB->Execute(
+            'UPDATE documents SET closed = 1 
 			WHERE customerid = ? AND type IN (?, ?) AND closed = 0',
-			array($customerid, DOC_INVOICE, DOC_CNOTE));
+            array($customerid, DOC_INVOICE, DOC_CNOTE)
+        );
 
-		$DB->CommitTrans();
-	}
+        $DB->CommitTrans();
+    }
 }
 
 header('Location: ?'.$SESSION->get('backto'));
-
-?>
